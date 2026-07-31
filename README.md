@@ -1,17 +1,42 @@
-# ChiefJuiceV1.17 -- Injectable Fat-to-Stem-Cell Conversion & Immortality Engine
+# ChiefJuiceV1.17 -- Injectable Fat-to-Stem-Cell Conversion & Longevity Engine
 
-> **"Your fat is your cure. Your body is your pharmacy. Forever."**
+> **"Your fat is your cure. Your body is your pharmacy."**
 
-A standalone computational biology model (~12,700 lines) simulating an injectable formulation that reprograms the body's own adipose (fat) tissue into stem cells in vivo, then deploys them to reverse the hallmarks of aging and hold the patient at a chosen biological age. Features a 21-mode interactive pygame visualization with hover tooltips, a 247-condition disease-coverage survey with per-condition healing notes, a **prescription generator** (`--prescribe`), and **29 personalized treatment modules** with step-by-step formulation instructions.
+A computational biology model (~15,700 lines) of an injectable formulation that
+reprograms adipose tissue into stem cells in vivo, then deploys them to reverse
+the hallmarks of aging, hold the patient at a chosen biological age, regrow
+missing structures, and treat a 304-condition disease survey. Includes a 22-mode
+interactive visualization, a prescription generator, safety and uncertainty
+modelling, and a 51-check verification suite.
 
-> ### Scope and honesty statement
+> ### Read this before quoting any number
 >
-> This is a **speculative model**, not evidence. Please read before quoting any number below:
+> **Nothing here has been experimentally validated.** Not in a cell, an animal, or
+> a person. Every parameter is an estimate. A simulation cannot show that a
+> treatment heals anything — only that a set of assumptions is internally
+> consistent. This model's own uncertainty analysis says its safety figure could
+> be off by an order of magnitude.
 >
-> - **No claim here is experimentally validated.** Nothing in this repository has been tested in a cell, an animal, or a person. A simulation cannot demonstrate that a treatment heals anything; it can only show that a set of assumptions is internally consistent.
-> - **Coverage tiers are derived, not asserted.** Each condition's tier is computed at import time from its own note text by `_derive_tier()`. The current result is **188/247 HEALED (76%)**, with 15 MANAGED, 33 PARTIAL, and 11 GAP. Earlier versions of this README claimed 243/243 HEALED (100%); that figure came from bulk-overwriting the `tier` field and was contradicted by the project's own per-condition notes. It has been retracted.
-> - **The simulation does not model individual conditions.** It models generic aging biology plus fifteen extension modules. Two patients with different diagnoses produce nearly identical trajectories. A coverage tier is a reasoned literature claim about mechanism coverage — it is *not* a simulation output.
-> - **Only the 29 personalized treatment modules carry `healing_proof` citations.** The 247 survey entries have a `note`, not a proof. An earlier claim that all 243 conditions had detailed healing proofs was false.
+> **Three different numbers, and they answer different questions:**
+>
+> | | Result | Means |
+> |---|---|---|
+> | Mechanism coverage | **304/304 — 100%** | Every condition has a mechanism aimed at its root cause. **Not a claim any of them work.** |
+> | Engineering tractability | **61/61 — 100%**, 0 fundamental | Every unproven blocker has a *named experimental route*. Not a claim the experiments will succeed. |
+> | **Evidence (HEALED)** | **243/304 — 80%** | How many routes are actually proven. **This is the number that matters for a real person.** |
+>
+> And the evidence figure mixes two populations that should not be averaged:
+> **common/acute illness 54/57 (95%)** vs **severe/chronic 189/247 (77%)**. The
+> first is mostly diseases medicine already cures.
+>
+> **The model does not endorse this for healthy people.** Its own benefit/risk
+> assessment returns CAUTION for a healthy 30-year-old, because residual risk
+> exceeds what a person with nothing wrong should accept.
+>
+> Earlier versions of this README claimed **243/243 HEALED (100%)**. That figure
+> came from bulk-overwriting a `tier` field and was contradicted by the project's
+> own per-condition notes. It has been retracted, and `test_chiefjuice.py` now
+> fails if anything like it returns.
 
 ## Concept
 
@@ -25,7 +50,7 @@ The human body stores vast reserves of adipose tissue. Each adipocyte retains it
 - **DNA repair enhancers** (PARP1/2, NAD+ precursors)
 - **Exosomes** (BBB crossing, intercellular signaling repair)
 - **Nanocarrier delivery** (6 tissue-specific LNP variants)
-- **Tolerance, GeneFix, SpondyRegen, EndoRegen, NerveRegen, MucosaRepair, CircuitReset, SensoryRegen, LimbRegen, FibroClear, RepeatEdit, ReservoirPurge, TissueForge, DeliverMax, ChromoBalance** -- 15 healing-gap extension modules added after cross-referencing the formulation against a 247-condition disease survey (autoimmune tolerance reset, in-situ monogenic gene correction, axial/enthesis regeneration, endocrine organoid regrowth, peripheral nerve regeneration, mucosal barrier repair, psychiatric neurocircuit plasticity, sensory epithelium regeneration, structural/appendage regrowth, established-fibrosis reversal, repeat-expansion contraction, latent-reservoir clearance, de novo internal tissue regrowth, delivery-platform coverage, and chromosomal dosage correction)
+- **Tolerance, GeneFix, SpondyRegen, EndoRegen, NerveRegen, MucosaRepair, CircuitReset, SensoryRegen, LimbRegen, FibroClear, RepeatEdit, ReservoirPurge, TissueForge, DeliverMax, ChromoBalance** -- 15 healing-gap extension modules added after cross-referencing the formulation against a 304-condition disease survey (autoimmune tolerance reset, in-situ monogenic gene correction, axial/enthesis regeneration, endocrine organoid regrowth, peripheral nerve regeneration, mucosal barrier repair, psychiatric neurocircuit plasticity, sensory epithelium regeneration, structural/appendage regrowth, established-fibrosis reversal, repeat-expansion contraction, latent-reservoir clearance, de novo internal tissue regrowth, delivery-platform coverage, and chromosomal dosage correction)
 - **29 personalized treatment modules** (`PERSONALIZED_TREATMENTS`) -- condition-specific targeted formulations with unique additives, each including step-by-step manufacturing instructions (protein expression, purification, LNP encapsulation, delivery route, dosing schedule)
 
 The body's fat **is** the raw material -- and as of the LimbRegen module, that is a
@@ -35,36 +60,32 @@ when a patient does not have it. "Infinitely renewable" is not what the model sh
 
 ## Key Results
 
-Default run (`--compare`, start age 60, 50 years, holding age 18):
+Default comparative run (start age 60, 50 years, holding age 18):
 
-| Metric | Control (No ChiefJuice) | ChiefJuice Treated |
+| Metric | Control | Treated |
 |---|---|---|
-| Final Age | 64.3 years (death) | 110 years (alive) |
-| Biological Age | 52.5 | 18.0 (held exactly) |
-| Telomere Length | 1,919 bp (critical) | 7,253 bp |
-| Senescent Burden | 9.6% | 13.1% |
-| Organ Function | 66.5% | 73.4% avg |
-| Cancer Risk | 32.4% | 0.1% |
-| Status | **DECEASED** | **ALIVE** |
-| Stem Cells Generated | -- | 3.02 x 10^11 |
-| Fat Converted | -- | 20.0 kg (mass-balanced) |
+| Final age | 64.3 (deceased) | 110 (alive) |
+| Biological age | 52.5 | 18.0 (held exactly) |
+| Telomere length | 1,919 bp (critical) | 7,253 bp |
+| Organ function | 66.5% | 73.4% |
+| Cancer risk | 32.4% | 0.1% |
+| Fat converted | -- | 20.0 kg (mass-balanced to 0.0000 kg) |
 
-These differ from the figures published in earlier versions, which were produced
-by defects since fixed:
+**Recommended operating point** (`--optimize`), selected on 5th-percentile
+utility rather than median, verified over 1,000 runs under full uncertainty:
 
-| Was | Now | Why it changed |
-|---|---|---|
-| Bio age 18.0 for everyone | Holds at whatever `--target-age` you ask for | Age was driven into a hardcoded 18.0 clamp with no setpoint; any other holding age was unreachable |
-| 54 kg fat converted | 20.0 kg | Body fat was floored at 5% *after* subtraction, so fat was created from nothing every month — 54 kg was drawn from a body that only ever held 17.5 kg |
-| 8.12 x 10^12 stem cells | 3.02 x 10^11 | `adipocytes_per_gram` was 10x the human value, and 100% of expanded cells were credited to the pool with no engraftment loss |
-| Organ 97.5% | 73.4% | Biomarkers were driven to youthful maxima regardless of the target age; they now settle at values consistent with the holding age |
+**22% body fat · 2-on/1-off dosing · supplemented · non-accelerated**
 
-- 602 total doses over 50 years
-- 20.0 kg fat converted to 3.02 x 10^11 stem cells, with mass balance closing to 0.0000 kg
-- Conversion halts at the 5% essential-body-fat floor; sustained dosing past ~6 years needs dietary fat replenishment
-- Biological age reversal is rate-limited to 0.5 yr/month (6 biological years per calendar year). Previously a 70-year-old reached biological age 18 in **two months**, which was not coherent even within the model
-- 37 synergistic mechanisms with multiplicative stacking
-- 247 real-world conditions surveyed: **188 HEALED, 15 MANAGED, 33 PARTIAL, 11 GAP** -- tiers derived from each condition's note, visible in the CONDITIONS tab
+| | p5 | median | p95 |
+|---|---|---|---|
+| Quality | 71.4 | 84.5 | 89.4 |
+| Severe-event risk | 0.24% | 0.65% | 1.83% |
+
+- 37 mechanisms (22 core + 15 extension modules)
+- 304 conditions surveyed; tiers **derived** from each condition's note, never asserted
+- Biological age reversal rate-limited to 0.5 yr/month, and varies per patient
+- Fat is finite, mass-balanced, and conversion halts at the 5% essential floor
+- 14% of simulated patients are non-responders
 
 ## Quick Start
 
@@ -81,7 +102,7 @@ pip install numpy pygame
 ### Running
 
 ```bash
-# Default: launches interactive pygame visualization (21 modes)
+# Default: launches interactive pygame visualization (22 modes)
 python ChiefJuiceV1.17.py
 
 # Text-only simulation (no GUI)
@@ -119,7 +140,26 @@ python ChiefJuiceV1.17.py --sim --age 70 --years 40 --target-age 30 --sex female
 
 # Regrow a missing appendage (supply-limited by fat-derived stem cells)
 python ChiefJuiceV1.17.py --sim --age 35 --years 12 --regrow "hand"
+
+# Confidence intervals instead of point estimates, + benefit/risk verdict
+python ChiefJuiceV1.17.py --uncertainty --runs 200
+
+# Recommended operating point, re-derived by robust protocol search
+python ChiefJuiceV1.17.py --optimize --risk-weight 12
+
+# Route to 100% proven: which experiment unlocks which conditions
+python ChiefJuiceV1.17.py --roadmap
 ```
+
+### Verification suite
+
+```bash
+python test_chiefjuice.py           # 51 checks across ten subsystems
+python test_chiefjuice.py --quick   # skip the slow Monte Carlo suite
+```
+
+Run it after any change to `ChiefJuiceV1.17.py`. It exists because this project's
+headline metric was inflated three separate times before anything checked it.
 
 ### Choosing a holding age
 
@@ -227,6 +267,159 @@ read the honest notes and assigned PARTIAL and GAP.
 Read LimbRegen output as an illustration of what the model's assumptions imply,
 not as a prediction. See `CHIEF_JUICE["limbregen"]["evidence"]`.
 
+## Modelling the Things That Go Wrong
+
+Five subsystems were added after testing showed the model was describing safety
+and variability in prose while simulating neither.
+
+### Safety (`safety_model`)
+
+Eight hazard classes, each the known failure mode of its technology -- residual
+pluripotency after OSKM causes teratoma, ex vivo expanded cells accumulate
+transforming mutations, "shock and kill" latency reversal causes cytokine release
+syndrome, systemic collagenase weakens vessel walls. Mitigations are the
+safeguards the formulation already claimed (iCasp9 suicide switch, p53 activation,
+forced differentiation, clonal release testing, fibrosis-activated protease).
+A **safety interlock** halts dosing at 5% cumulative risk, as a DSMB stopping rule
+would.
+
+| | 8-year course |
+|---|---|
+| Unmitigated | halts after 6 doses |
+| Full safeguards | **0.78%, zero halts, all 98 doses** |
+
+`--no-safeguards` shows what the raw mechanisms do. Residual risk is never
+reported as zero -- a model claiming 0.0000% would be reporting that it stopped
+modelling hazards.
+
+### Discontinuation & rebound
+
+Stopping at month 60 sends biological age 18 → 41 in 4.5 years, ending roughly
+where the untreated control does. Gains decay **differentially**: a regrown hand
+persists at 70%, immune tolerance falls to 50%, the epigenetic clock drifts back.
+Rebound overshoots the untreated baseline, which is a documented failure mode of
+anti-cytokine and senolytic withdrawal.
+
+### Individual variation
+
+14% non-responders, 8% hyper-responders, plus pharmacogenomic clearance and
+immune-reactivity axes. A fixed `patient_seed` reproduces the same individual.
+Cohort time-to-target spans **50–151 months**; before this every patient was the
+mean patient, which systematically overstates reliability.
+
+### Internal drug interactions
+
+Three are contradictions in the formulation itself, not external drugs. The
+sharpest: it uses **immunosuppression to permit redosing while relying on immune
+surveillance to catch transformed clones** — opposite instructions to the same
+system. Surveillance now runs at 67% of nominal as a result.
+
+### Benefit/risk in context
+
+Risk only means something next to what the patient faces untreated:
+
+| Patient | Risk | Tolerance | Verdict |
+|---|---|---|---|
+| Healthy 30-year-old | 0.52% | 0.36% | CAUTION — marginal |
+| 3 chronic conditions, 55 | 0.78% | 1.72% | TREAT |
+| Healthy 30, safeguards off | 3.62% | 0.36% | **DO NOT TREAT** |
+
+**The model does not endorse this for healthy people** — the population the
+"immortality engine" framing implies.
+
+## Uncertainty: How Much of This to Believe (`--uncertainty`)
+
+Every figure here is computed from parameters that were *estimated, not measured*.
+Sampling 16 of them across ~11,500 runs:
+
+| Metric | 5th | median | 95th | Spread | Verdict |
+|---|---|---|---|---|---|
+| biological age | 18.02 | 18.08 | 18.97 | 1.1× | **ROBUST** |
+| organ average | 80.95 | 86.60 | 87.15 | 1.1× | **ROBUST** |
+| fat used | 14.83 | 14.83 | 14.83 | 1.0× | **ROBUST** |
+| regeneration | 59.1 | 81.2 | 95.5 | 1.6× | moderate |
+| months to target | 28 | 44 | 90 | 3.2× | FRAGILE |
+| **severe risk %** | **0.21** | **0.82** | **2.75** | **12.9×** | **FRAGILE** |
+
+**The safety number is the least trustworthy figure in the model.** Quote it as a
+range, never as a point estimate.
+
+**Value of information:** one parameter — `hazard_immune_reaction_per_month_pct`
+— dominates risk uncertainty (Spearman +0.39). Measuring it collapses most of the
+spread. Nine of the sixteen sampled parameters move nothing and can stay estimates.
+
+### Recommended operating point (`--optimize`)
+
+**22% body fat, 2-on/1-off dosing, supplemented, non-accelerated** — selected by
+best **5th-percentile** utility, not best median. Verified over 1,000 runs:
+quality p5 71.4 / median 84.5; risk p5 0.24% / median 0.65% / p95 1.83%.
+
+Two findings retire the earlier "accelerated is strictly better" claim:
+
+1. **Acceleration is mean-improving but tail-worsening** — median quality 86.3 →
+   90.0, but risk p95 2.05% → 3.78%.
+2. **Tuning the cheap levers beats adding the risky one** — with body fat and
+   schedule free to vary, non-accelerated wins at *every* risk weight tested.
+   Acceleration buys with risk what scheduling supplies for free.
+
+`--risk-weight` is exposed because that trade is a value judgement, not a
+measurement.
+
+## Route to 100% Proven (`--roadmap`)
+
+Treating every blocker as an engineering hurdle rather than an impossibility turns
+out to be checkable, not just optimistic. `_derive_tractability()` requires each
+remaining blocker to match a **named experimental path** — a specific platform,
+trial, or scale-up — or it is classified FUNDAMENTAL.
+
+**Result: 61/61 tractable, 0 fundamental.** Nothing in the survey is blocked by
+missing physics or unrecoverable information. The 61 group into 7 workstreams:
+
+| Conditions | Workstream | The step |
+|---|---|---|
+| **18** | Clinical trial | Mechanism has preclinical support and a delivery route; needs a Phase 1. Regulatory and funding, not scientific unknown |
+| **12** | Stratification | Syndromic labels covering several distinct pathologies — resolve into biologically defined subtypes with measurable targets |
+| **10** | Cell replacement | Tissue replacement rather than rescue: iPSC grafts + scaffold-guided circuit reconstruction (bemdaneprocel precedent) |
+| **10** | Morphogenesis | Blastema induction, scaffold-guided growth, de novo field induction — embryo/rodent literature into adult human |
+| **5** | Delivery platform | Directed-evolution capsids, focused-ultrasound BBB opening, convection infusion, PEG-shielded redosing |
+| **3** | Cargo/scale | Targeted chromosome elimination, in vivo XIST, integrase multi-megabase cassettes |
+| **3** | Translation | Demonstrated in vitro; package into a vehicle, large-animal efficacy, IND |
+
+`python ChiefJuiceV1.17.py --roadmap` prints this with the conditions each
+workstream unlocks. The delivery-platform workstream is the highest leverage per
+unit of work; the clinical-trial bucket is the largest but is 18 separate programs.
+
+## Common & Acute Illness (57 conditions) — and an honest warning about the percentage
+
+The survey was 247 conditions of almost entirely rare, severe, chronic disease.
+Checking it against a list of 50 everyday illnesses found **40 were simply
+absent** — no influenza, no UTI, no strep throat, no appendicitis, no acne, no
+peptic ulcer. As a picture of "what people get sick with," it was badly skewed.
+
+57 common conditions were added. Most genuinely resolve or are cured by existing
+standard of care, so **54 of 57 earn HEALED honestly** — H. pylori eradication
+really does cure peptic ulcer disease, penicillin really does cure strep throat,
+appendectomy really is definitive. The three that don't: irritable bowel syndrome
+(functional, no consistent lesion), migraine (pathophysiology incompletely
+understood), and osteoarthritis (cartilage regeneration unproven in humans).
+
+### ⚠️ This raised the headline number without curing anything hard
+
+| Population | Healed | Rate |
+|---|---|---|
+| **Common & acute illness** | 54/57 | **95%** — everyday sickness, mostly already curable |
+| **Severe & chronic** (the original survey) | 189/247 | **77%** — where the hard problems are |
+| Combined headline | 243/304 | 80% |
+
+The overall figure moved 77% → 80% purely because easier conditions were added to
+the denominator. **Not one severe or chronic condition improved.** Prion disease,
+Down syndrome and whole-limb amputation are exactly where they were.
+
+This is a real way to make a coverage number look better while accomplishing
+nothing, so the split is computed in `get_healing_progress()["split"]` and printed
+by `--list-conditions` rather than left to whoever writes the README. Quote the
+split, not the headline.
+
 ## Closing the Remaining Gaps (mechanisms #32-35)
 
 Four modules were added to attack the largest clusters of not-yet-healed
@@ -276,8 +469,8 @@ Two loopholes were closed in the resolver:
 ### Why 100% is not reachable
 
 The push toward 100% produced two more modules (**DeliverMax** #36, **ChromoBalance** #37)
-and moved the count 180 → **188/247 (76%)**. Then it hit a wall that is not made of
-code. The remaining 59 break down as:
+and moved the severe/chronic count 180 → **189/247 (77%)**. Then it hit a wall that is
+not made of code. Those remaining 59 break down as:
 
 | # | Blocker | Can more mechanisms fix it? |
 |---|---|---|
@@ -328,3 +521,107 @@ reporting that those experiments succeeded, which they have not.**
 
 The 59 non-healed entries are the honest to-do list, and 25 of them are waiting on
 laboratories rather than on this repository.
+
+## Interactive Visualization
+
+22 view modes, cycled with TAB. Hover for detail tooltips on all interactive
+elements.
+
+| # | Mode | Shows |
+|---|---|---|
+| 1 | OVERVIEW | Vial, syringe, LNP zoom, live metrics |
+| 2 | RECIPE | Full formulation table, manufacturing, dosing timeline |
+| 3 | DELIVERY | Injection pipeline, biodistribution |
+| 4 | LNP | Lipid nanoparticle cross-section + cargo |
+| 5 | MOLECULAR | Chemical structure diagrams |
+| 6 | CELLULAR | Endosomal escape, nuclear reprogramming |
+| 7 | BODY | Organ targeting map |
+| 8 | MECHANISMS | All 37 animated mechanism diagrams |
+| 9 | SYNERGY | Interconnected pathway network + disease-category ring |
+| 10 | COMPARISON | Treated vs untreated aging |
+| 11 | BIOMARKERS | Time-series charts, radar, metric panel |
+| 12 | TIMELINE | 50-year Gantt with milestones |
+| 13 | SAFETY | Multi-layer shield + QC — what the formulation **claims** |
+| 14 | MANUFACTURING | 7-step GMP flowchart |
+| 15 | PHARMACOLOGY | PK/PD, dose-response, biodistribution |
+| 16 | DOSING | Schedule, component breakdown, personalization |
+| 17 | CLINICAL | Efficacy endpoints, adverse events, organ scores |
+| 18 | SCIENCE | Mechanism validation, chemistry, citations |
+| **19** | **RISK** | **Simulated residual risk per hazard class, uncertainty spread, recommended protocol — what the model *computed*** |
+| 20 | CONDITIONS | Scrollable survey with derived tiers |
+| 21 | SIM | Live playback with bio-age trajectory |
+| 22 | ABOUT | Full formulation database (scrollable) |
+
+**SAFETY and RISK are deliberately separate.** SAFETY renders the static
+`CHIEF_JUICE` safety dicts — the claims. RISK renders `risk_breakdown`,
+percentile spreads, and `RECOMMENDED_PROTOCOL` — the simulated result. The gap
+between the two panels is the most informative thing in the app.
+
+CLINICAL's adverse-event table is also simulation-driven. It previously held
+hardcoded literals asserting `Teratoma 0.0%` and `Severe adverse event 0.0%`
+while `safety_model()` computed non-zero residuals for exactly those hazards —
+the UI contradicting the engine. `test_no_fabricated_zeros` now fails if such a
+literal returns.
+
+### Controls
+
+| Key | Action |
+|---|---|
+| TAB | Cycle view modes |
+| SPACE | Play/pause (SIM mode) |
+| `,` / `.` | Sim speed |
+| `[` / `]` | Animation speed |
+| UP/DOWN, PGUP/PGDN, HOME/END | Scroll (ABOUT / CONDITIONS / RISK) |
+| Mouse wheel | Scroll |
+| H | Help overlay |
+| ESC / Q | Quit |
+
+## Architecture
+
+| Section | Contents |
+|---|---|
+| 1 | Formulation constants (`CHIEF_JUICE`) — components + 15 extension modules |
+| 1B | Disease coverage survey (`DISEASE_COVERAGE`) — tiers **derived**, never asserted |
+| 1C | Personalized treatments (29 modules with formulation instructions) |
+| 1D | Prescription generator |
+| 2 | Biological constants (`BIO`) |
+| 3 | Data structures (`BodyState`, `SimulationResult`) |
+| 4 | Biological models (37 mechanism functions) |
+| 5 | Simulation engine (monthly step, setpoint governor, safety interlock) |
+| 5B | Failure/variability modelling — safety, rebound, variation, interactions, Monte Carlo |
+| 6 | Comparative analysis |
+| 7 | Reporting (formulation, feasibility, roadmap, uncertainty, protocol) |
+| 8 | Pygame visualization (22 modes) |
+| 9 | CLI |
+
+## Project Structure
+
+```
+Immortality/
+  ChiefJuiceV1.17.py    # Main engine
+  test_chiefjuice.py    # Verification suite (51 checks) -- run after any change
+  FatStemCells.py       # Library import interface
+  Goal.md               # Original specification
+  Problems.md           # Disease survey source list
+  OVERVIEW.md           # Technical architecture
+  README.md             # This file
+```
+
+## Library Usage
+
+```python
+from FatStemCells import simulate, get_healing_progress
+
+r = simulate(start_age=70, duration_years=40, target_age=30, sex="female",
+             dose_cycle=(2, 1), patient_seed=42)
+print(r.biological_age[-1], r.cumulative_severe_risk_pct)
+
+print(get_healing_progress()["split"])   # never quote the headline alone
+```
+
+## License
+
+Computational biology model for research and educational purposes. The
+formulation is hypothetical. **Nothing here is medical advice, nothing has been
+experimentally validated, and the model does not endorse this for healthy
+people.**

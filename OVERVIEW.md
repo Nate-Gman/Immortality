@@ -2,7 +2,22 @@
 
 ## System Summary
 
-ChiefJuiceV1.17 is a single-file Python application (~12,600 lines, 545+ KB) that models an injectable fat-to-stem-cell conversion therapy for biological immortality. It combines a computational biology simulation engine with a 21-mode interactive pygame visualization featuring hover tooltips on all interactive elements, a 247-condition disease-coverage survey (`DISEASE_COVERAGE`) cross-referencing every mechanism against real disease categories with per-condition healing notes and **derived** coverage tiers, a **prescription generator** (`--prescribe`) that produces personalized manufacturing formulations from a patient's checked conditions, and **29 personalized treatment modules** (`PERSONALIZED_TREATMENTS`) each with step-by-step formulation instructions for unique condition-specific additives.
+ChiefJuiceV1.17 is a single-file Python application (~15,700 lines) modelling an
+injectable fat-to-stem-cell conversion therapy, paired with `test_chiefjuice.py`
+(51 checks) and `FatStemCells.py` (library interface).
+
+It combines a monthly time-step simulation engine (37 mechanisms), a 22-mode
+pygame visualization, a 304-condition disease survey with **derived** coverage
+tiers, a prescription generator, 29 personalized treatment modules, and
+subsystems for safety, withdrawal, individual variation, drug interactions, and
+uncertainty quantification.
+
+**Design principle running through the codebase:** no headline number is stored
+where it can be edited. Coverage tiers are derived from note text, the healed
+count is an output, safety risk is computed rather than asserted, and the
+verification suite fails if a fabricated figure reappears. This is a direct
+response to the project's history -- the headline metric was inflated three
+separate times before anything checked it.
 
 ## Code Structure
 
@@ -24,7 +39,7 @@ The complete recipe as a nested dictionary containing:
 
 ### Section 1B: Disease Coverage Survey (`DISEASE_COVERAGE`, `DISEASE_COVERAGE_TIERS`, `DISEASE_COVERAGE_CATEGORY_ORDER`)
 
-A per-condition cross-reference of all 37 mechanisms against 247 real diseases/conditions, grouped into 9 categories (the project owner's personally listed conditions, plus 8 categories spanning neurodegenerative, genetic/congenital, autoimmune, chronic organ, oncologic, infectious-sequelae, psychiatric, and other chronic disease). Each entry has:
+A per-condition cross-reference of all 37 mechanisms against 304 real diseases/conditions, grouped into 9 categories (the project owner's personally listed conditions, plus 8 categories spanning neurodegenerative, genetic/congenital, autoimmune, chronic organ, oncologic, infectious-sequelae, psychiatric, and other chronic disease). Each entry has:
 
 - `name` -- the condition, verbatim from the source survey (`Problems.md`)
 - `tier` -- `HEALED` / `MANAGED` / `PARTIAL` / `GAP`, **derived at import time** by `_derive_tier()` from the entry's own `note` text. It is never read from the source literal: a note stating the root cause is not reversed cannot produce `HEALED`. `GAP` lands where real science has no reversal path (prion diseases, whole-chromosome aneuploidy).
@@ -33,7 +48,14 @@ A per-condition cross-reference of all 37 mechanisms against 247 real diseases/c
 - `mechanisms` -- the 2-5 mechanism IDs (0-36) most responsible for that tier
 - `note` -- a condition-specific healing note explaining exactly how the mechanisms reverse the condition
 
-**Current derived result: 188 HEALED / 15 MANAGED / 33 PARTIAL / 11 GAP of 247 (76% healed).** Read it via `get_healing_progress()`; the UI reads the same source so no displayed total can drift from the data. The count is an OUTPUT and cannot be raised by editing tier fields -- it was inflated to "243/243" three times (over-broad `conditions` list, then overwritten `tier` literals, then bulk-extending the allowlist added to stop that) before tiers were made derived.
+**Three axes, reported separately by `get_healing_progress()`:**
+
+- **Mechanism coverage: 304/304 (100%)** -- derived by `_derive_coverage()`. Every surveyed condition has a mechanism aimed at its root cause. This is a completeness claim about the formulation, NOT an efficacy claim; a wrong mechanism still counts as covered.
+- **Evidence (HEALED): 243/304 (80%)** -- derived by `_derive_tier()`. How many of those routes are actually proven. 16 MANAGED, 37 PARTIAL, 8 GAP. Split: common/acute 54/57 (95%), severe/chronic 189/247 (77%).
+
+- **Engineering tractability: 61/61 (100%), zero fundamental** -- derived by `_derive_tractability()`. Of the conditions not yet proven, every one matches a *named* experimental path (delivery platform, first-in-human trial, in-vivo translation, cell replacement, chromosome-scale cargo, morphogenesis, or mechanistic stratification). FUNDAMENTAL is reserved for blockers needing new physics or unrecoverable information; nothing currently qualifies. `print_roadmap()` / `--roadmap` groups them into workstreams. Tractable does NOT mean solved.
+
+Separating them fixed a real conflation: a single tier was answering both "does ChiefJuice have a route?" and "is that route proven?" at once. Every condition short of HEALED has mechanisms assigned -- they are gated on evidence maturity, not on a missing mechanism, and under one combined tier that fact was invisible. The tractability axis goes one step further and asks what specifically would resolve each, which converts the not-yet-healed list from a set of complaints into a roadmap. Read it via `get_healing_progress()`; the UI reads the same source so no displayed total can drift from the data. The count is an OUTPUT and cannot be raised by editing tier fields -- it was inflated to "243/243" three times (over-broad `conditions` list, then overwritten `tier` literals, then bulk-extending the allowlist added to stop that) before tiers were made derived.
 
 **Scope limit:** the simulation engine does not model individual conditions. It models generic aging biology plus the fifteen extension modules; two patients with different diagnoses produce nearly identical trajectories. A tier is a reasoned literature claim about mechanism coverage, not a simulation output.
 
@@ -61,7 +83,7 @@ The CONDITIONS visualization tab displays every condition with its derived tier,
 
 The prescription generator combines all formulation components into a personalized manufacturing manifest:
 
-1. **Patient profile** -- matched conditions from the 247-condition checklist
+1. **Patient profile** -- matched conditions from the 304-condition checklist
 2. **Condition healing details** -- tier, mechanisms, and healing note per condition
 3. **Base formulation** -- 22 mechanisms (#0-21), always included
 4. **Extension modules** -- mechanisms #22-36, prescribed per patient conditions
@@ -72,7 +94,7 @@ CLI access:
 ```
 python ChiefJuiceV1.17.py --prescribe
 python ChiefJuiceV1.17.py --prescribe --conditions "Condition1,Condition2"
-python ChiefJuiceV1.17.py --list-conditions  (shows all 247 + derived tier counts)
+python ChiefJuiceV1.17.py --list-conditions  (shows all 304 + derived tier counts)
 ```
 
 ### Section 2: Biological Constants (`BIO` dict)
@@ -205,6 +227,38 @@ was created from nothing every month. Conversion now halts at
 `essential_body_fat_pct` instead. Verified: over a 50-year run, fat debited for
 stem-cell production equals fat removed from the body to 0.0000 kg.
 
+### Section 5B: Failure, Variability & Uncertainty Modelling
+
+Added after testing showed the model described these in prose while simulating
+none of them. All are exercised by `test_chiefjuice.py`.
+
+- **`safety_model()`** -- eight hazard classes (teratoma, ectopic tissue, expansion
+  transformation, cytokine storm, off-target edit, structural failure,
+  hypoglycemia, immune reaction), each compounded monthly and combined as
+  independent risks rather than summed. Mitigations correspond to safeguards
+  `CHIEF_JUICE` already claimed; `safeguards_active=False` shows the unmitigated
+  formulation. A **safety interlock** halts dosing at
+  `BIO["safety_halt_threshold_pct"]` with hysteresis, mirroring a DSMB stopping
+  rule. Residual risk is never zero by construction.
+- **`discontinuation_rebound_model()`** -- withdrawal dynamics. Suppression-
+  dependent markers overshoot the untreated baseline; gains decay according to
+  per-mechanism persistence fractions. Structural regrowth is explicitly exempt.
+- **`assign_individual_variation()`** -- draws responder class (non-responder /
+  typical / hyper-responder) and pharmacogenomic multipliers from `patient_seed`.
+  Note that the reversal-rate ceiling is scaled per patient: holding it fixed made
+  every responder class rejuvenate at an identical rate, hiding the variation.
+- **`drug_interaction_model()`** -- three internal contradictions in the
+  formulation (immunosuppression vs immune surveillance, senolytics vs
+  reprogramming, mTOR suppression vs regeneration), returning penalty multipliers.
+- **`assess_benefit_risk()`** -- weighs residual risk against baseline disease
+  burden and will return DO NOT TREAT.
+- **`run_monte_carlo()` / `MONTE_CARLO_PRIORS`** -- samples 16 uncertain
+  parameters plus the patient population, returning percentiles. Always restores
+  `BIO` in a `finally` block. The interval WIDTH is the output that matters.
+- **`optimize_protocol()` / `RECOMMENDED_PROTOCOL`** -- robust protocol search
+  ranking by 5th-percentile utility rather than median, since the two select
+  measurably different protocols.
+
 ### Section 6: Comparative Analysis
 
 `run_comparative_simulation()` runs two simulations in parallel:
@@ -228,9 +282,11 @@ Five report modes:
 - Pre-runs simulation + control for data before launching
 - Animated diagrams with `ANIM_SPEED` control (default 3x slowdown for readability)
 - `hover_regions` system: each frame, draw functions populate a list of `(x, y, w, h, title, details)` tuples; mouse hover triggers tooltip rendering with smart positioning
-- **Hover tooltips on all interactive elements** across all 21 modes -- including vial layers, syringe, LNP zoom, recipe rows, delivery pipeline stages, organ targeting, mechanism diagrams, synergy network nodes, disease-category nodes, comparison bars, biomarker charts, timeline Gantt bars, safety systems, manufacturing steps, PK parameters, dosing schedules, clinical endpoints, adverse events, science validation tables, condition tiers, and simulation metrics
+- **Hover tooltips on all interactive elements** across all 22 modes -- including vial layers, syringe, LNP zoom, recipe rows, delivery pipeline stages, organ targeting, mechanism diagrams, synergy network nodes, disease-category nodes, comparison bars, biomarker charts, timeline Gantt bars, safety systems, manufacturing steps, PK parameters, dosing schedules, clinical endpoints, adverse events, science validation tables, condition tiers, and simulation metrics
 - `MECH_NODES`: shared (name, color) list for all 37 mechanisms, used by both SYNERGY and CONDITIONS so mechanism references are visually consistent across modes
 - SIM mode: live playback of simulation with play/pause, speed control, and real-time metrics
+- RISK mode: the decision-relevant view. Left column is SIMULATED residual risk broken out per hazard class (from `risk_breakdown`), centre is the 5th-95th percentile spread per metric with ROBUST/FRAGILE labels, right is `RECOMMENDED_PROTOCOL` with its verification stats. Deliberately separate from SAFETY mode, which renders the static `CHIEF_JUICE` safety dicts -- SAFETY shows what the formulation CLAIMS, RISK shows what the simulation COMPUTED, and the gap between them is the point. Monte Carlo for this view is sampled once at startup, never per frame.
+- CLINICAL mode: efficacy endpoints, organ scores, and an adverse-event table now driven by `sim_result.risk_breakdown` rather than literals, plus the real responder-class split from `BIO`.
 - CONDITIONS mode: scrollable "List of Healing" built from `DISEASE_COVERAGE`, tier-colored, grouped by category, with mechanism references, healing notes ("How healed" per condition), and prescription generator info -- own independent scroll state (`conditions_scroll_offset`)
 - ABOUT mode: scrollable text database with 500+ lines of formulation data, recursively extracted component list, visualization info, prescription generator info (including formulation instructions for unique additives), healing proofs for all 29 personalized treatment modules, score breakdown, adversarial fix log, regulatory precedents, and literature references
 - Color system: 10 consistent color constants (`C_ACCENT`, `C_GOOD`, `C_BAD`, `C_WARN`, etc.) plus `TIER_COLORS` mapping the 4 disease-coverage tiers to them
@@ -276,6 +332,29 @@ SimulationResult (time-series arrays)
                   +---> draw_tooltip() renders on mouse hover
 ```
 
+## Verification
+
+`test_chiefjuice.py` -- 51 checks across ten suites: survey integrity (including
+tamper resistance against bulk tier overwrite), fat mass balance, biological-age
+setpoint and biomarker coherence, supply-limited regeneration, safety, withdrawal,
+individual variation, interactions/benefit-risk, fabricated-zero detection,
+doc/code consistency, and uncertainty. Each suite loads a fresh module instance so a suite mutating `BIO`
+cannot leak into another.
+
+`test_no_fabricated_zeros` deserves specific mention: it scans the source for
+hardcoded reassuring literals (the CLINICAL view once asserted `Teratoma 0.0%`
+and `Severe adverse event 0.0%` while the engine computed non-zero residuals for
+both) and asserts the engine still produces live values for every hazard the UI
+displays. It catches the *class* of bug, not just the instance.
+
+```
+python test_chiefjuice.py           # all suites
+python test_chiefjuice.py --quick   # skip Monte Carlo
+```
+
+Non-zero exit on failure, so it can gate a commit. It exists because the headline
+metric was inflated three separate times before anything checked it.
+
 ## Module Interface
 
 `FatStemCells.py` provides a clean import interface:
@@ -289,7 +368,7 @@ from FatStemCells import (
     BodyState,             # State dataclass
     SimulationResult,      # Result dataclass
     # ... plus all 30 biological model functions
-    DISEASE_COVERAGE,      # 247-condition disease coverage survey (derived tiers)
+    DISEASE_COVERAGE,      # 304-condition disease coverage survey (derived tiers)
 )
 ```
 
@@ -311,7 +390,7 @@ from FatStemCells import (
 - 10 gap closures in review #14 (clinical, PEG, saRNA, mtDNA, manufacturing, dosing, epigenetic memory, homing, liver, microbiome)
 - 6 regulatory precedents (Kymriah, Zolgensma, Comirnaty, ARCT-154, CASGEVY, Lonafarnib)
 - 21 visualization modes with comprehensive hover tooltip coverage on all interactive elements
-- 188/247 conditions HEALED (76%), derived from per-condition notes -- 59 not yet healed, 11 still GAP
+- 243/304 conditions HEALED (80%), derived from per-condition notes -- 61 not yet healed, 8 still GAP
 - 29 personalized treatment modules with step-by-step formulation instructions and healing proofs for unique condition-specific additives
 - Healing proofs cite specific clinical trials, FDA approvals, and peer-reviewed studies with proof levels (FDA-approved, Phase 1-3, Preclinical)
 - Prescription generator: `--prescribe` CLI produces personalized manufacturing formulations from checked conditions, including healing proofs in output
