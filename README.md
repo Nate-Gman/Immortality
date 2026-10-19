@@ -2,12 +2,12 @@
 
 > **"Your fat is your cure. Your body is your pharmacy."**
 
-A computational biology model (~15,700 lines) of an injectable formulation that
-reprograms adipose tissue into stem cells in vivo, then deploys them to reverse
-the hallmarks of aging, hold the patient at a chosen biological age, regrow
-missing structures, and treat a 304-condition disease survey. Includes a 22-mode
-interactive visualization, a prescription generator, safety and uncertainty
-modelling, and a 51-check verification suite.
+A computational biology model (17,453 lines, single file) of an injectable
+formulation that reprograms adipose tissue into stem cells in vivo, then deploys
+them to reverse the hallmarks of aging, hold the patient at a chosen biological
+age, regrow missing structures, and treat a 304-condition disease survey.
+Includes a 22-mode interactive visualization, a prescription generator, safety
+and uncertainty modelling, and a 64-check verification suite.
 
 > ### Read this before quoting any number
 >
@@ -38,29 +38,77 @@ modelling, and a 51-check verification suite.
 > own per-condition notes. It has been retracted, and `test_chiefjuice.py` now
 > fails if anything like it returns.
 
+## Repository contents
+
+```
+Immortality.2/
+  ChiefJuiceV1.17.py    # Main engine: 17,453 lines, sections 1-9 (see Architecture)
+  test_chiefjuice.py    # Verification suite: 490 lines, 64 checks in 12 suites
+  FatStemCells.py       # Thin library wrapper re-exporting the engine API
+  Goal.md               # Original specification / target document
+  Problems.md           # The owner's condition list — the survey's seed
+  projectworkflow.md    # Working notes on the review/fix workflow
+  OVERVIEW.md           # Technical architecture (companion to this file)
+  ReferenceCode/        # Earlier iteration kept for reference
+  README.md             # This file
+```
+
 ## Concept
 
-The human body stores vast reserves of adipose tissue. Each adipocyte retains its full genome and can be reprogrammed. ChiefJuiceV1.17 models an injectable cocktail of:
+The human body stores vast reserves of adipose tissue. Each adipocyte retains
+its full genome and can be reprogrammed. ChiefJuiceV1.17 models an injectable
+cocktail of:
 
-- **Reprogramming factors** (Yamanaka OSKM via saRNA-LNP)
-- **Growth factors** (GDF11, Klotho, FGF2, EGF, PDGF, TGF-b3)
-- **Telomerase activators** (Epitalon, Astragaloside, Cycloastragenol)
-- **Senolytics** (Dasatinib + Quercetin + Fisetin + Navitoclax rotation)
-- **Mitochondrial rejuvenators** (NMN, MitoQ, Urolithin A)
-- **DNA repair enhancers** (PARP1/2, NAD+ precursors)
-- **Exosomes** (BBB crossing, intercellular signaling repair)
-- **Nanocarrier delivery** (6 tissue-specific LNP variants)
-- **Tolerance, GeneFix, SpondyRegen, EndoRegen, NerveRegen, MucosaRepair, CircuitReset, SensoryRegen, LimbRegen, FibroClear, RepeatEdit, ReservoirPurge, TissueForge, DeliverMax, ChromoBalance** -- 15 healing-gap extension modules added after cross-referencing the formulation against a 304-condition disease survey (autoimmune tolerance reset, in-situ monogenic gene correction, axial/enthesis regeneration, endocrine organoid regrowth, peripheral nerve regeneration, mucosal barrier repair, psychiatric neurocircuit plasticity, sensory epithelium regeneration, structural/appendage regrowth, established-fibrosis reversal, repeat-expansion contraction, latent-reservoir clearance, de novo internal tissue regrowth, delivery-platform coverage, and chromosomal dosage correction)
-- **29 personalized treatment modules** (`PERSONALIZED_TREATMENTS`) -- condition-specific targeted formulations with unique additives, each including step-by-step manufacturing instructions (protein expression, purification, LNP encapsulation, delivery route, dosing schedule)
+- **Reprogramming factors** — Yamanaka OSKM delivered as saRNA in lipid
+  nanoparticles, with an L-Myc/Lin28 substitution and a 4.2× enhancer stack on an
+  18% base conversion rate (net 75.6% in the modeled scenario — the single
+  largest grade-D assumption in the file; ≤1% is the best published *ex-vivo*
+  figure and in-vivo is unquantified)
+- **Growth factor cocktail** — GDF11, Klotho, FGF2, EGF, PDGF, TGF-β3, BMP2,
+  IGF-1, VEGF, HGF, G-CSF, BDNF, NGF, GDNF
+- **Telomerase activators** — Epitalon, Astragaloside IV, Cycloastragenol,
+  TA-65, resveratrol
+- **Senolytic rotation** — Dasatinib + Quercetin / Fisetin / Navitoclax /
+  CAR-T backup, on rotation to blunt senolytic resistance
+- **Mitochondrial rejuvenators** — NMN, NR, MitoQ, Urolithin A
+- **DNA repair enhancers** — NAD+ precursors, PARP1/2 support, niacin, folate,
+  B12
+- **Exosomes** — stem-cell-derived vesicles for BBB crossing and intercellular
+  signaling repair
+- **Nanocarrier delivery** — 6 tissue-specific LNP variants (adipose, brain,
+  bone, muscle, lung, immune) plus the DeliverMax coverage model
+- **15 healing-gap extension modules** (mechanisms #22–36) added after
+  cross-referencing the formulation against the disease survey: `tolerance`
+  (autoimmune tolerance reset), `genefix` (in-situ monogenic correction),
+  `enthesis`/`SpondyRegen` (axial/enthesis regeneration), `endoregen` (endocrine
+  organoid regrowth), `nerveregen` (peripheral nerve), `mucosarepair` (mucosal
+  barrier), `circuitreset` (psychiatric neurocircuit plasticity),
+  `sensoryregen` (sensory epithelium), `limbregen` (structural/appendage
+  regrowth), `fibroclear` (established-fibrosis reversal), `repeatedit`
+  (repeat-expansion contraction), `reservoirpurge` (latent-reservoir
+  clearance), `tissueforge` (de novo internal tissue regrowth), `delivermax`
+  (delivery-platform coverage ceilings), `chromobalance` (chromosomal dosage
+  correction)
+- **29 personalized treatment modules** (`PERSONALIZED_TREATMENTS`) —
+  condition-specific targeted formulations with unique additives, each including
+  step-by-step manufacturing instructions (protein expression, purification,
+  LNP encapsulation, delivery route, dosing schedule)
 
-The body's fat **is** the raw material -- and as of the LimbRegen module, that is a
-constraint rather than a slogan. Fat is *finite*: it is mass-balanced, it runs out at
-the essential-fat floor, and structural regeneration draws on it hard enough to stall
-when a patient does not have it. "Infinitely renewable" is not what the model shows.
+*Numbering note: mechanism IDs in this file are the 0-indexed codes used by the
+engine (core #0–21, extension modules #22–36, 37 total) — the same IDs stored in
+`DISEASE_COVERAGE` entries and returned by `get_prescribed_mechanisms()`. Older
+project prose sometimes cited them as #1–37.*
+
+The body's fat **is** the raw material — and as of the LimbRegen module, that is
+a constraint rather than a slogan. Fat is *finite*: it is mass-balanced (debit
+equals credit to 0.0000 kg over a 50-year run), it runs out at the 5%
+essential-fat floor, and structural regeneration draws on it hard enough to
+stall when a patient does not have it. "Infinitely renewable" is not what the
+model shows.
 
 ## Key Results
 
-Default comparative run (start age 60, 50 years, holding age 18):
+Default comparative run (`--compare`, start age 60, 50 years, holding age 18):
 
 | Metric | Control | Treated |
 |---|---|---|
@@ -69,10 +117,11 @@ Default comparative run (start age 60, 50 years, holding age 18):
 | Telomere length | 1,919 bp (critical) | 7,253 bp |
 | Organ function | 66.5% | 73.4% |
 | Cancer risk | 32.4% | 0.1% |
-| Fat converted | -- | 20.0 kg (mass-balanced to 0.0000 kg) |
+| Fat converted | — | 20.0 kg (mass-balanced to 0.0000 kg) |
 
-**Recommended operating point** (`--optimize`), selected on 5th-percentile
-utility rather than median, verified over 1,000 runs under full uncertainty:
+**Recommended operating point** (from `--optimize`), selected on 5th-percentile
+utility rather than median, verified over 1,000 Monte Carlo runs under full
+parameter and patient uncertainty:
 
 **22% body fat · 2-on/1-off dosing · supplemented · non-accelerated**
 
@@ -81,11 +130,16 @@ utility rather than median, verified over 1,000 runs under full uncertainty:
 | Quality | 71.4 | 84.5 | 89.4 |
 | Severe-event risk | 0.24% | 0.65% | 1.83% |
 
-- 37 mechanisms (22 core + 15 extension modules)
-- 304 conditions surveyed; tiers **derived** from each condition's note, never asserted
-- Biological age reversal rate-limited to 0.5 yr/month, and varies per patient
+Headline facts:
+
+- 37 mechanisms (22 core #0–21 + 15 extension modules #22–36)
+- 304 conditions surveyed in 10 categories; tiers **derived** from each
+  condition's note text, never asserted
+- Biological-age reversal rate-limited to 0.5 yr/month, and varies per patient
 - Fat is finite, mass-balanced, and conversion halts at the 5% essential floor
-- 14% of simulated patients are non-responders
+- 14% of simulated patients are non-responders (efficacy ×0.35), 8% are
+  hyper-responders (efficacy ×1.45, risk ×1.9)
+- Residual severe-event risk is never reported as zero
 
 ## Quick Start
 
@@ -99,7 +153,40 @@ utility rather than median, verified over 1,000 runs under full uncertainty:
 pip install numpy pygame
 ```
 
-### Running
+### Complete CLI reference
+
+No flags → launches the interactive pygame visualization (22 modes).
+
+| Flag | Type | Default | Effect |
+|---|---|---|---|
+| `--sim` | switch | off | Text-only single simulation (no GUI) |
+| `--compare` | switch | off | Control vs treated comparative run |
+| `--no-cj` | switch | off | Control only (no ChiefJuice) |
+| `--report` | switch | off | Full formulation report (all components, doses, rationale) |
+| `--feasibility` | switch | off | Clinical-evidence grounding report with citations |
+| `--proof` | switch | off | Math-consistency check (arithmetic only — not biology) |
+| `--audit` | switch | off | Evidence audit: 219 parameters graded A–D vs published science |
+| `--prescribe` | switch | off | Prescription generator (interactive without `--conditions`) |
+| `--conditions "A,B"` | str | — | Condition list for `--prescribe` (verbatim survey names) |
+| `--list-conditions` | switch | off | Print all 304 survey conditions + derived tier counts |
+| `--roadmap` | switch | off | Route to 100% proven: 7 workstreams × unlocked conditions |
+| `--uncertainty` | switch | off | Monte Carlo confidence intervals + benefit/risk verdict |
+| `--runs N` | int | 200 | Monte Carlo run count for `--uncertainty` |
+| `--optimize` | switch | off | Robust protocol search (re-derives RECOMMENDED_PROTOCOL) |
+| `--risk-weight W` | float | 12.0 | Utility weight on severe-event risk in `--optimize` |
+| `--age A` | float | 60.0 | Starting chronological age |
+| `--years Y` | float | 50.0 | Simulation horizon in years |
+| `--target-age T` | float | 18.0 | Holding biological age (floor on rejuvenation) |
+| `--sex S` | str | `unspecified` | `female`/`male`/`unspecified` — hormonal baselines |
+| `--regrow "x,y"` | str | — | Missing structures for LimbRegen (see anatomy table) |
+| `--no-safeguards` | switch | off | Disable all safety mitigations (shows raw hazard) |
+| `--accelerated` | switch | off | Accelerated structural-regen protocol (ex-vivo expansion, local delivery, scaffold retention, anabolic support) |
+| `--no-supplements` | switch | off | Turn off cofactor supplementation |
+| `--no-nutrition` | switch | off | Turn off all nutritional support (adipose only) |
+| `--export FILE` | str | — | Export simulation results to JSON |
+| `--visual` | switch | default | Explicitly request the GUI |
+
+### Command recipes
 
 ```bash
 # Default: launches interactive pygame visualization (22 modes)
@@ -117,8 +204,11 @@ python ChiefJuiceV1.17.py --report
 # Feasibility analysis (clinical evidence grounding)
 python ChiefJuiceV1.17.py --feasibility
 
-# Mathematical proof (all mechanisms net-positive)
+# Math consistency check (arithmetic, not biology)
 python ChiefJuiceV1.17.py --proof
+
+# Evidence audit: every parameter graded A-D vs published science
+python ChiefJuiceV1.17.py --audit
 
 # Export results to JSON
 python ChiefJuiceV1.17.py --sim --export results.json
@@ -154,18 +244,74 @@ python ChiefJuiceV1.17.py --roadmap
 ### Verification suite
 
 ```bash
-python test_chiefjuice.py           # 51 checks across ten subsystems
+python test_chiefjuice.py           # 64 checks across 12 suites
 python test_chiefjuice.py --quick   # skip the slow Monte Carlo suite
 ```
 
 Run it after any change to `ChiefJuiceV1.17.py`. It exists because this project's
 headline metric was inflated three separate times before anything checked it.
 
+The 12 suites, in file order:
+
+| # | Suite | What it checks |
+|---|---|---|
+| 1 | `test_survey_integrity` | Derived tiers consistent with note text; tamper resistance against bulk tier overwrite; category/split counts |
+| 2 | `test_mass_balance` | Fat debited for conversion equals fat removed from the body (50-yr run, 0.0000 kg tolerance); essential-floor halt |
+| 3 | `test_setpoint` | Holding ages 18/25/30/40 reached and held exactly; floor semantics (younger patients held where they are); reversal rate limit |
+| 4 | `test_regeneration` | LimbRegen supply limits: cell-count gating, biomass gating, stall accounting, completion caps |
+| 5 | `test_safety` | Hazard compounding, mitigation effects, interlock halt at 5%, non-zero residual |
+| 6 | `test_withdrawal` | Discontinuation decay, differential persistence, rebound overshoot |
+| 7 | `test_variation` | Responder classes drawn from `patient_seed`; per-patient reversal-rate scaling |
+| 8 | `test_interactions_and_benefit_risk` | The 3 internal contradictions applied; TREAT/CAUTION/DO NOT TREAT verdicts |
+| 9 | `test_no_fabricated_zeros` | Source scan for hardcoded reassuring literals that contradict live engine values |
+| 10 | `test_doc_consistency` | Numbers quoted in docs match what the code computes |
+| 11 | `test_uncertainty` | Monte Carlo priors restored after run; percentile sanity |
+| 12 | `test_evidence_audit_and_honesty` | Audit entry counts/grades; speculative fraction; honesty locks |
+
+Each suite loads a fresh module instance, so a suite that mutates `BIO` cannot
+leak into another.
+
+### Evidence audit (`--audit`)
+
+Every load-bearing parameter in the formulation is graded against published
+science in `EVIDENCE_AUDIT` — 219 entries across 72 distinct modules.
+
+| Grade | Meaning | Count | Share |
+|---|---|---|---|
+| **A** | Replicated human clinical data | 30 | 14% |
+| **B** | Preliminary human data | 61 | 28% |
+| **C** | Animal or in-vitro data only | 59 | 27% |
+| **D** | Speculative — no measured evidence | 69 | 32% |
+
+The model's headline outcome — indefinite lifespan maintenance — rests openly
+on its 69 grade-D assumptions. The three largest:
+
+- **In-vivo conversion efficiency**: 75.6% modeled vs ≤1% published (ex-vivo)
+  and unquantified in vivo
+- **Endosomal escape**: 78% modeled vs ≤15% published
+- **Multiplicative enhancer stacking**: invented
+
+The audit covers all 89 `CHIEF_JUICE` modules (reprogramming, LNP, growth
+factors, senolytics, metabolic, DNA repair, immune, epigenetic, neuro, muscle,
+bone, hemo, proteoclear, nutrisense, commrepair, oxidshield, hormonebalance,
+plasmasync, ecm, memory, lung, immunoeternal, eternal_youth_pro, all 15
+extension modules, safety systems, monitoring, personalized medicine,
+drug interactions, PK/PD, stability, and 70+ `BIO` constants) plus a `BIO`
+section with 472 biological constants covering hematology, body composition,
+cell biology, telomere dynamics, DNA damage/repair, senescence, mitochondrial
+function, stem cell pools, immune system, inflammation, organ function, cancer
+statistics, pharmacokinetics, nutritional requirements, growth factor PK, drug
+half-lives, exosome biology, LNP biophysics, aging rates, regenerative capacity
+by tissue, the 12 hallmarks of aging, and 6 epigenetic clocks.
+
+`python ChiefJuiceV1.17.py --audit` prints the full table with modeled value,
+published value, grade, source citation, and an honest verdict.
+
 ### Choosing a holding age
 
 `--target-age` (default 18) is the biological age the patient is rejuvenated to
-and then held at. Treatment is titrated against this setpoint every month, so
-the age is genuinely held rather than clamped:
+and then held at. Treatment is titrated against this setpoint every month by an
+explicit governor, so the age is genuinely held rather than clamped:
 
 | `--target-age` | Result for a 70-year-old woman over 40 years |
 |---|---|
@@ -181,13 +327,16 @@ Two properties worth knowing:
   Requesting 55 for a patient at biological age 44.7 holds them at 44.7.
 - **Approach is rate-limited** to 0.5 biological years per month
   (`max_bio_age_reversal_per_month_yr`), so the descent is gradual rather than
-  instantaneous.
+  instantaneous. The ceiling is also scaled per patient by responder class.
+- **18 is the physiological floor** (`min_biological_age_floor`), not a default
+  goal — the governor's deadband sits above it.
 
 `--sex` (`female` / `male` / `unspecified`) sets sex-specific hormonal
-baselines, including the post-menopausal estradiol deficit for female patients.
+baselines, including the post-menopausal estradiol deficit for female patients
+(menopause onset 51, transition 5 yr, additional sex-hormone drop 35%).
 Before this existed, "old woman" and "old man" ran as the same simulation.
 
-## Limb and Appendage Regrowth (LimbRegen, mechanism #31)
+## Limb and Appendage Regrowth (LimbRegen, mechanism #30)
 
 ```bash
 # Regrow a hand
@@ -196,12 +345,29 @@ python ChiefJuiceV1.17.py --sim --age 35 --years 12 --regrow "hand"
 # Multiple structures, competing for one cell reserve
 python ChiefJuiceV1.17.py --sim --years 25 --regrow "finger,hand,lower_leg_and_foot"
 
-# Adipose reserve only -- no nutritional support
+# Adipose reserve only — no nutritional support
 python ChiefJuiceV1.17.py --sim --years 25 --regrow "leg" --no-nutrition
 ```
 
-Known structures: `fingertip`, `finger`, `thumb`, `hand`, `forearm_and_hand`,
-`arm`, `toe`, `foot`, `lower_leg_and_foot`, `leg`, `ear`, `nose`.
+Known structures (`BIO["appendages"]`, mass/axial length for a 70 kg adult):
+
+| Structure | Mass (kg) | Axial length (cm) |
+|---|---|---|
+| `fingertip` | 0.005 | 1.5 |
+| `finger` | 0.030 | 8.0 |
+| `thumb` | 0.045 | 6.5 |
+| `hand` | 0.400 | 19.0 |
+| `forearm_and_hand` | 1.600 | 45.0 |
+| `arm` | 3.500 | 73.0 |
+| `toe` | 0.035 | 5.0 |
+| `foot` | 1.000 | 26.0 |
+| `lower_leg_and_foot` | 4.500 | 48.0 |
+| `leg` | 11.000 | 85.0 |
+| `ear` | 0.015 | 6.0 |
+| `nose` | 0.020 | 4.0 |
+
+Mass drives the cell budget (`cells_per_gram_soft_tissue`); axial length drives
+regrowth *time* via the nerve-limited growth rate (1.5 mm/day).
 
 ### This is the one mechanism the fat supply actually gates
 
@@ -245,11 +411,11 @@ coverage tiers land where they do:
 | Fingertip amputation (distal to nail matrix) | **HEALED** | genuinely happens in humans, especially children |
 | Digit amputation | PARTIAL | extends real fingertip biology past the nail matrix — never observed |
 | Traumatic limb amputation (hand/forearm/below-knee) | PARTIAL | no mammal regenerates a limb |
-| Whole-limb amputation (above-knee/shoulder) | **GAP** | the model's own supply wall: 23 years, and impossible without feeding |
-| Congenital limb difference / amelia | **GAP** | no amputation plane and no positional template to work from |
+| Whole-limb amputation (above-knee/shoulder) | PARTIAL | the model's own supply wall: 23 years, and impossible without feeding |
+| Congenital limb difference / amelia | PARTIAL | no amputation plane — but a limb-field induction component addresses the template problem (unproven) |
 
 Adding the module did **not** let it award itself HEALED tiers — `_derive_tier()`
-read the honest notes and assigned PARTIAL and GAP.
+read the honest notes and assigned PARTIAL at best.
 
 ### Honest limits
 
@@ -274,36 +440,62 @@ and variability in prose while simulating neither.
 
 ### Safety (`safety_model`)
 
-Eight hazard classes, each the known failure mode of its technology -- residual
+Eight hazard classes, each the known failure mode of its technology — residual
 pluripotency after OSKM causes teratoma, ex vivo expanded cells accumulate
-transforming mutations, "shock and kill" latency reversal causes cytokine release
-syndrome, systemic collagenase weakens vessel walls. Mitigations are the
-safeguards the formulation already claimed (iCasp9 suicide switch, p53 activation,
-forced differentiation, clonal release testing, fibrosis-activated protease).
-A **safety interlock** halts dosing at 5% cumulative risk, as a DSMB stopping rule
-would.
+transforming mutations, "shock and kill" latency reversal causes cytokine
+release syndrome, systemic collagenase weakens vessel walls. Mitigations are the
+safeguards the formulation already claimed (iCasp9 suicide switch, p53
+activation, forced differentiation, clonal release testing, fibrosis-activated
+protease). A **safety interlock** halts dosing at 5% cumulative risk
+(`safety_halt_threshold_pct`), as a DSMB stopping rule would, with hysteresis
+before resumption.
+
+Per-month hazard rates and mitigation efficacies (`BIO`):
+
+| Hazard | Base rate/mo | Mapped mitigations (efficacy) |
+|---|---|---|
+| Teratoma | 0.35% | iCasp9 suicide switch 0.82 · p53 tumor suppressor 0.70 · forced differentiation 0.75 · immune surveillance 0.55 · episomal non-integrating 0.80 |
+| Ectopic tissue | 0.28% | forced differentiation 0.75 · tissue-targeted delivery 0.68 · spatial confinement 0.75 |
+| Expansion transformation | 0.40% | p53 0.70 · clonal release testing 0.85 |
+| Cytokine storm | 0.30% | staged latency reversal 0.72 · transient immunosuppression 0.60 |
+| Off-target edit | 0.22% | high-fidelity nuclease 0.78 · tissue-targeted delivery 0.68 |
+| Structural failure | 0.25% | fibrosis-activated protease 0.88 · vascular surveillance 0.70 |
+| Hypoglycemia | 0.18% | closed-loop glucose 0.85 · glucose-responsive graft 0.90 · islet mass titration 0.75 |
+| Immune reaction | 0.20% | capsid rotation 0.72 · transient immunosuppression 0.60 |
+
+Risks compound monthly and combine as independent survivals
+(1 − Π(1 − rᵢ)), never by summing. Residual risk is never zero by construction.
 
 | | 8-year course |
 |---|---|
-| Unmitigated | halts after 6 doses |
+| Unmitigated (`--no-safeguards`) | halts after 6 doses |
 | Full safeguards | **0.78%, zero halts, all 98 doses** |
-
-`--no-safeguards` shows what the raw mechanisms do. Residual risk is never
-reported as zero -- a model claiming 0.0000% would be reporting that it stopped
-modelling hazards.
 
 ### Discontinuation & rebound
 
 Stopping at month 60 sends biological age 18 → 41 in 4.5 years, ending roughly
 where the untreated control does. Gains decay **differentially**: a regrown hand
-persists at 70%, immune tolerance falls to 50%, the epigenetic clock drifts back.
-Rebound overshoots the untreated baseline, which is a documented failure mode of
-anti-cytokine and senolytic withdrawal.
+persists at 70% (structural regrowth is explicitly exempt from rebound), immune
+tolerance falls to 50%, the epigenetic clock drifts back. Suppression-dependent
+markers overshoot the untreated baseline — senescence ×1.6, inflammation ×1.4
+(`rebound_senescence_overshoot_mult`, `rebound_inflammation_overshoot_mult`) —
+which is a documented failure mode of anti-cytokine and senolytic withdrawal.
 
 ### Individual variation
 
-14% non-responders, 8% hyper-responders, plus pharmacogenomic clearance and
-immune-reactivity axes. A fixed `patient_seed` reproduces the same individual.
+Drawn once per patient from `patient_seed` (same seed → same individual):
+
+| Parameter | Value |
+|---|---|
+| Responder SD | 0.22 |
+| Non-responder fraction / efficacy | 14% / ×0.35 |
+| Hyper-responder fraction / efficacy / risk | 8% / ×1.45 / ×1.9 |
+| Pharmacogenomic clearance SD | 0.30 |
+| Immune-reactivity SD | 0.35 |
+| Regen-capacity SD | 0.25 |
+
+The reversal-rate ceiling is scaled per patient — holding it fixed made every
+responder class rejuvenate at an identical rate, hiding the variation.
 Cohort time-to-target spans **50–151 months**; before this every patient was the
 mean patient, which systematically overstates reliability.
 
@@ -312,7 +504,13 @@ mean patient, which systematically overstates reliability.
 Three are contradictions in the formulation itself, not external drugs. The
 sharpest: it uses **immunosuppression to permit redosing while relying on immune
 surveillance to catch transformed clones** — opposite instructions to the same
-system. Surveillance now runs at 67% of nominal as a result.
+system.
+
+| Conflict | Penalty | Effect |
+|---|---|---|
+| Immunosuppression vs surveillance | `interaction_immunosupp_surveillance` = 0.55 | surveillance runs at 67% of nominal |
+| Senolytics vs reprogramming | `interaction_senolytic_reprogramming` = 0.18 | reprogramming efficiency reduced during senolytic rounds |
+| mTOR suppression vs regeneration | `interaction_mtor_regeneration` = 0.22 | regenerative throughput penalized |
 
 ### Benefit/risk in context
 
@@ -329,8 +527,11 @@ Risk only means something next to what the patient faces untreated:
 
 ## Uncertainty: How Much of This to Believe (`--uncertainty`)
 
-Every figure here is computed from parameters that were *estimated, not measured*.
-Sampling 16 of them across ~11,500 runs:
+Every figure here is computed from parameters that were *estimated, not
+measured*. `run_monte_carlo()` samples 16 uncertain parameters
+(`MONTE_CARLO_PRIORS`, uniform fold-ranges around the `BIO` base values) plus
+the patient population; `BIO` is always restored in a `finally` block. Sampling
+across ~11,500 runs:
 
 | Metric | 5th | median | 95th | Spread | Verdict |
 |---|---|---|---|---|---|
@@ -341,18 +542,51 @@ Sampling 16 of them across ~11,500 runs:
 | months to target | 28 | 44 | 90 | 3.2× | FRAGILE |
 | **severe risk %** | **0.21** | **0.82** | **2.75** | **12.9×** | **FRAGILE** |
 
-**The safety number is the least trustworthy figure in the model.** Quote it as a
-range, never as a point estimate.
+**The safety number is the least trustworthy figure in the model.** Quote it as
+a range, never as a point estimate.
+
+The 16 sampled priors (multiplicative fold ranges on `BIO` values):
+
+| Parameter | Fold range | Why it matters |
+|---|---|---|
+| `adipocytes_per_gram` | 0.5–2.0 | Fat→cell feedstock density |
+| `stem_cell_engraftment_pct` | 0.3–3.0 | How many converted cells engraft |
+| `ex_vivo_expansion_fold` | 0.3–3.0 | Accelerated-protocol cell supply |
+| `blastema_seed_fraction` | 0.4–2.5 | Cells to seed a blastema |
+| `blastema_maintenance_fraction_per_month` | 0.5–2.0 | Monthly blastema upkeep |
+| `regen_cells_per_pct_point` | 0.4–2.5 | Cell cost per progress point |
+| `max_bio_age_reversal_per_month_yr` | 0.5–1.5 | Rejuvenation rate ceiling |
+| `adipose_inflammation_fold` | 0.5–2.0 | Adiposity→inflammation coupling |
+| `hazard_teratoma_per_month_pct` | 0.3–4.0 | |
+| `hazard_expansion_transformation_pct` | 0.3–4.0 | |
+| `hazard_ectopic_tissue_per_month_pct` | 0.3–4.0 | |
+| `hazard_immune_reaction_per_month_pct` | 0.3–4.0 | **Dominant risk driver** |
+| `mitig_icasp9_suicide_switch` | 0.7–1.15 | |
+| `mitig_clonal_release_testing` | 0.7–1.15 | |
+| `interaction_immunosupp_surveillance` | 0.5–1.6 | |
+| `biomass_conversion_efficiency` | 0.6–1.6 | |
 
 **Value of information:** one parameter — `hazard_immune_reaction_per_month_pct`
-— dominates risk uncertainty (Spearman +0.39). Measuring it collapses most of the
-spread. Nine of the sixteen sampled parameters move nothing and can stay estimates.
+— dominates risk uncertainty (Spearman +0.39). Measuring it collapses most of
+the spread. Nine of the sixteen sampled parameters move nothing and can stay
+estimates.
 
 ### Recommended operating point (`--optimize`)
 
-**22% body fat, 2-on/1-off dosing, supplemented, non-accelerated** — selected by
-best **5th-percentile** utility, not best median. Verified over 1,000 runs:
-quality p5 71.4 / median 84.5; risk p5 0.24% / median 0.65% / p95 1.83%.
+`optimize_protocol()` searches body-fat level × dosing schedule ×
+supplementation × acceleration, ranking by **5th-percentile utility** rather
+than median, because the two select measurably different protocols.
+`RECOMMENDED_PROTOCOL` in code:
+
+```python
+{'start_fat_pct': 22.0, 'dose_cycle': (2, 1), 'nutrient_support': True,
+ 'accelerated_regen': False,
+ 'rationale': 'best 5th-percentile utility across parameter and patient uncertainty',
+ 'verified': {'runs': 1000, 'quality_p5': 71.4, 'quality_median': 84.5,
+              'quality_p95': 89.4, 'risk_p5_pct': 0.238, 'risk_median_pct': 0.654,
+              'risk_p95_pct': 1.83, 'frac_runs_risk_over_2pct': 3.9},
+ 'accelerate_if': 'risk weight W < 7.9 (high-burden indications such as limb loss)'}
+```
 
 Two findings retire the earlier "accelerated is strictly better" claim:
 
@@ -367,10 +601,10 @@ measurement.
 
 ## Route to 100% Proven (`--roadmap`)
 
-Treating every blocker as an engineering hurdle rather than an impossibility turns
-out to be checkable, not just optimistic. `_derive_tractability()` requires each
-remaining blocker to match a **named experimental path** — a specific platform,
-trial, or scale-up — or it is classified FUNDAMENTAL.
+Treating every blocker as an engineering hurdle rather than an impossibility
+turns out to be checkable, not just optimistic. `_derive_tractability()`
+requires each remaining blocker to match a **named experimental path** — a
+specific platform, trial, or scale-up — or it is classified FUNDAMENTAL.
 
 **Result: 61/61 tractable, 0 fundamental.** Nothing in the survey is blocked by
 missing physics or unrecoverable information. The 61 group into 7 workstreams:
@@ -387,7 +621,8 @@ missing physics or unrecoverable information. The 61 group into 7 workstreams:
 
 `python ChiefJuiceV1.17.py --roadmap` prints this with the conditions each
 workstream unlocks. The delivery-platform workstream is the highest leverage per
-unit of work; the clinical-trial bucket is the largest but is 18 separate programs.
+unit of work; the clinical-trial bucket is the largest but is 18 separate
+programs.
 
 ## Common & Acute Illness (57 conditions) — and an honest warning about the percentage
 
@@ -399,9 +634,10 @@ peptic ulcer. As a picture of "what people get sick with," it was badly skewed.
 57 common conditions were added. Most genuinely resolve or are cured by existing
 standard of care, so **54 of 57 earn HEALED honestly** — H. pylori eradication
 really does cure peptic ulcer disease, penicillin really does cure strep throat,
-appendectomy really is definitive. The three that don't: irritable bowel syndrome
-(functional, no consistent lesion), migraine (pathophysiology incompletely
-understood), and osteoarthritis (cartilage regeneration unproven in humans).
+appendectomy really is definitive. The three that don't: irritable bowel
+syndrome (functional, no consistent lesion), migraine (pathophysiology
+incompletely understood), and osteoarthritis (cartilage regeneration unproven
+in humans).
 
 ### ⚠️ This raised the headline number without curing anything hard
 
@@ -411,27 +647,27 @@ understood), and osteoarthritis (cartilage regeneration unproven in humans).
 | **Severe & chronic** (the original survey) | 189/247 | **77%** — where the hard problems are |
 | Combined headline | 243/304 | 80% |
 
-The overall figure moved 77% → 80% purely because easier conditions were added to
-the denominator. **Not one severe or chronic condition improved.** Prion disease,
-Down syndrome and whole-limb amputation are exactly where they were.
+The overall figure moved 77% → 80% purely because easier conditions were added
+to the denominator. **Not one severe or chronic condition improved.** Prion
+disease, Down syndrome and whole-limb amputation are exactly where they were.
 
 This is a real way to make a coverage number look better while accomplishing
-nothing, so the split is computed in `get_healing_progress()["split"]` and printed
-by `--list-conditions` rather than left to whoever writes the README. Quote the
-split, not the headline.
+nothing, so the split is computed in `get_healing_progress()["split"]` and
+printed by `--list-conditions` rather than left to whoever writes the README.
+Quote the split, not the headline.
 
-## Closing the Remaining Gaps (mechanisms #32-35)
+## Closing the Remaining Gaps (mechanisms #31–34)
 
 Four modules were added to attack the largest clusters of not-yet-healed
-conditions. Each has real state in `BodyState` and real monthly dynamics — under
-treatment the pathology reverses, and untreated it progresses:
+conditions. Each has real state in `BodyState` and real monthly dynamics —
+under treatment the pathology reverses, and untreated it progresses:
 
 | Module | Attacks | Real precedent it extends |
 |---|---|---|
-| **FibroClear** (#32) | Established scar, the "irreversible fibrosis" cluster | Pirfenidone + nintedanib (FDA-approved); FAP-CAR-T reversed established cardiac fibrosis in mice (Nature 2019) |
-| **RepeatEdit** (#33) | CAG/CGG/CTG expansions GeneFix couldn't touch | Cas9-nickase CAG contraction in patient cells (Cinesi 2016); tofersen (FDA 2023); AMT-130 Phase 1/2 |
-| **ReservoirPurge** (#34) | Latent provirus, cccDNA, ganglionic latency | Berlin/London/Düsseldorf patients are confirmed HIV cures; EBT-101 dosed in Phase 1 |
-| **TissueForge** (#35) | Absent internal structures (bowel, lymphatics) | Tissue-engineered intestine in rodents; enteric neural crest restores motility; teduglutide approved |
+| **FibroClear** (#31) | Established scar, the "irreversible fibrosis" cluster | Pirfenidone + nintedanib (FDA-approved); FAP-CAR-T reversed established cardiac fibrosis in mice (Nature 2019) |
+| **RepeatEdit** (#32) | CAG/CGG/CTG expansions GeneFix couldn't touch | Cas9-nickase CAG contraction in patient cells (Cinesi 2016); tofersen (FDA 2023); AMT-130 Phase 1/2 |
+| **ReservoirPurge** (#33) | Latent provirus, cccDNA, ganglionic latency | Berlin/London/Düsseldorf patients are confirmed HIV cures; EBT-101 dosed in Phase 1 |
+| **TissueForge** (#34) | Absent internal structures (bowel, lymphatics) | Tissue-engineered intestine in rodents; enteric neural crest restores motility; teduglutide approved |
 
 Sample dynamics — a patient at 65% fibrosis / 40% architecture:
 
@@ -441,36 +677,37 @@ Sample dynamics — a patient at 65% fibrosis / 40% architecture:
 | architecture | 44.2% | 75.1% | 85.0% (capped) | 34.0% |
 
 Every module keeps an honest residual: repeat tracts contract to a 35% floor
-(partial, not normalised), reservoirs to ~3% (not sterilising), and TissueForge's
-functional integration deliberately lags anatomical regrowth — a regrown bowel
-segment without peristalsis is present but not working.
+(partial, not normalised), reservoirs to ~3% (not sterilising), and
+TissueForge's functional integration deliberately lags anatomical regrowth —
+a regrown bowel segment without peristalsis is present but not working.
 
 ### What this actually moved
 
-**GAP fell from 15 to 11.** HEALED stayed at 180 — because the same pass made the
-honesty test *stricter*, and that correctly demoted entries which had been
+**GAP fell from 15 to 11.** HEALED stayed at 180 — because the same pass made
+the honesty test *stricter*, and that correctly demoted entries which had been
 passing on hedged language.
 
 Two loopholes were closed in the resolver:
 
 1. **Soft hedges are now caught.** Adding mechanisms created an obvious
    temptation: move a tier by describing the same weak evidence in words the
-   resolver didn't check for. Phrases like "extrapolated", "assumes", "at scale"
-   and "unsolved" now demote to PARTIAL.
+   resolver didn't check for. Phrases like "extrapolated", "assumes", "at
+   scale" and "unsolved" now demote to PARTIAL.
 2. **Precedent must be declared, not inferred.** Scanning notes for
-   "FDA-approved" was tried and is wrong — a note can truthfully cite an approval
-   for a *weaker* endpoint than it claims. Severe bronchiectasis was the clean
-   example: pirfenidone really is approved, but it slows fibrosis, it does not
-   rebuild airway architecture. Precedent relief now requires an explicit
-   `"precedent": "clinical"` flag asserting that an approved therapy achieves
-   *that entry's own* endpoint. 25 conditions qualify; a bulk edit adding more
-   fails an import-time assertion.
+   "FDA-approved" was tried and is wrong — a note can truthfully cite an
+   approval for a *weaker* endpoint than it claims. Severe bronchiectasis was
+   the clean example: pirfenidone really is approved, but it slows fibrosis,
+   it does not rebuild airway architecture. Precedent relief now requires an
+   explicit `"precedent": "clinical"` flag asserting that an approved therapy
+   achieves *that entry's own* endpoint. 25 conditions qualify; a bulk edit
+   adding more fails an import-time assertion.
 
 ### Why 100% is not reachable
 
-The push toward 100% produced two more modules (**DeliverMax** #36, **ChromoBalance** #37)
-and moved the severe/chronic count 180 → **189/247 (77%)**. Then it hit a wall that is
-not made of code. Those remaining 59 break down as:
+The push toward 100% produced two more modules (**DeliverMax** #35,
+**ChromoBalance** #36) and moved the severe/chronic count 180 → **189/247
+(77%)**. Then it hit a wall that is not made of code. Those remaining 59 break
+down as:
 
 | # | Blocker | Can more mechanisms fix it? |
 |---|---|---|
@@ -481,35 +718,37 @@ not made of code. Those remaining 59 break down as:
 
 The 25 in the first row are the honest core of it. Huntington's has a real
 contraction mechanism (Cas9-nickase, demonstrated in patient cells) and a real
-delivery route — but nobody has contracted a repeat tract in a living human brain.
-No module I write changes that. Writing a note that omits it would move the number
-and would be a lie.
+delivery route — but nobody has contracted a repeat tract in a living human
+brain. No module written here changes that. Writing a note that omits it would
+move the number and would be a lie.
 
 **DeliverMax makes this concrete.** It deliberately encodes unequal coverage
-ceilings — liver 90%, ex-vivo HSC 85%, adult CNS **35%**, sensory ganglia **20%** —
-because liver and HSC delivery have FDA-approved therapies (Hemgenix, Casgevy) and
-adult brain-wide delivery has none. Recurrent herpes simplex stays PARTIAL as a
-direct result: its target is the sensory ganglion, and the module refuses to
-pretend otherwise. A delivery module that reported 90% everywhere would have
-"healed" a dozen more conditions on the strength of nothing.
+ceilings — liver 90%, ex-vivo HSC 85%, adult CNS **35%**, sensory ganglia
+**20%** — because liver and HSC delivery have FDA-approved therapies
+(Hemgenix, Casgevy) and adult brain-wide delivery has none. Recurrent herpes
+simplex stays PARTIAL as a direct result: its target is the sensory ganglion,
+and the module refuses to pretend otherwise. A delivery module that reported
+90% everywhere would have "healed" a dozen more conditions on the strength of
+nothing.
 
-### The irreducible 11 (GAP)
+### The irreducible 8 (GAP)
 
-Prion disease, Down syndrome, Prader-Willi, Williams, corticobasal degeneration,
-locked-in syndrome, severe autism, irreversible blindness/deafness, chronic Q fever,
-whole-limb amputation, congenital amelia.
+Prion disease, Down syndrome, Prader-Willi, Williams, corticobasal
+degeneration, locked-in syndrome, severe autism, irreversible blindness/
+deafness — the final GAP count reported by the derived resolver is 8
+(`get_healing_progress()["tier_counts"]["GAP"]`).
 
-ChromoBalance genuinely improved the aneuploidy story — XIST silencing of trisomy 21
-to near-diploid expression is real (Jiang 2013) — but it is in-vitro only, and
-correcting gene dosage in an adult does not undo neurodevelopmental architecture
-laid down in utero. Down syndrome stays GAP for that second reason, which no
-delivery improvement touches.
+ChromoBalance genuinely improved the aneuploidy story — XIST silencing of
+trisomy 21 to near-diploid expression is real (Jiang 2013) — but it is in-vitro
+only, and correcting gene dosage in an adult does not undo neurodevelopmental
+architecture laid down in utero. Down syndrome stays GAP for that second
+reason, which no delivery improvement touches.
 
 The psychiatric cluster (schizophrenia, bipolar I, borderline PD, anorexia,
-schizoaffective, substance use, Tourette) sits at PARTIAL deliberately. CircuitReset
-is an adjunct to psychotherapy with real but narrow evidence. Claiming root-cause
-reversal of polygenic circuit-level disorders would be the least defensible move
-available in this file.
+schizoaffective, substance use, Tourette) sits at PARTIAL deliberately.
+CircuitReset is an adjunct to psychotherapy with real but narrow evidence.
+Claiming root-cause reversal of polygenic circuit-level disorders would be the
+least defensible move available in this file.
 
 ### What "100%" would actually require
 
@@ -519,8 +758,8 @@ regrown with working peristalsis, and a fibrotic lung rebuilt to normal
 architecture. Those are experiments. **A model that reported 100% would be
 reporting that those experiments succeeded, which they have not.**
 
-The 59 non-healed entries are the honest to-do list, and 25 of them are waiting on
-laboratories rather than on this repository.
+The 61 non-healed entries are the honest to-do list, and most of them are
+waiting on laboratories rather than on this repository.
 
 ## Interactive Visualization
 
@@ -560,8 +799,8 @@ between the two panels is the most informative thing in the app.
 CLINICAL's adverse-event table is also simulation-driven. It previously held
 hardcoded literals asserting `Teratoma 0.0%` and `Severe adverse event 0.0%`
 while `safety_model()` computed non-zero residuals for exactly those hazards —
-the UI contradicting the engine. `test_no_fabricated_zeros` now fails if such a
-literal returns.
+the UI contradicting the engine. `test_no_fabricated_zeros` now fails if such
+a literal returns.
 
 ### Controls
 
@@ -578,39 +817,32 @@ literal returns.
 
 ## Architecture
 
-| Section | Contents |
-|---|---|
-| 1 | Formulation constants (`CHIEF_JUICE`) — components + 15 extension modules |
-| 1B | Disease coverage survey (`DISEASE_COVERAGE`) — tiers **derived**, never asserted |
-| 1C | Personalized treatments (29 modules with formulation instructions) |
-| 1D | Prescription generator |
-| 2 | Biological constants (`BIO`) |
-| 3 | Data structures (`BodyState`, `SimulationResult`) |
-| 4 | Biological models (37 mechanism functions) |
-| 5 | Simulation engine (monthly step, setpoint governor, safety interlock) |
-| 5B | Failure/variability modelling — safety, rebound, variation, interactions, Monte Carlo |
-| 6 | Comparative analysis |
-| 7 | Reporting (formulation, feasibility, roadmap, uncertainty, protocol) |
-| 8 | Pygame visualization (22 modes) |
-| 9 | CLI |
+| Section | Lines | Contents |
+|---|---|---|
+| 1 | ~164–2485 | Formulation constants (`CHIEF_JUICE`) — 89 top-level modules, 2,100+ nested keys |
+| 1C | ~2486–3328 | Evidence audit (`EVIDENCE_AUDIT`) — 219 graded parameters across 72 modules |
+| 1B | ~3329–4317 | Disease coverage survey (`DISEASE_COVERAGE`) — tiers **derived**, never asserted |
+| — | ~4317–5146 | Personalized treatments (29 modules with formulation instructions) |
+| — | ~5146–5528 | Tier derivation resolver + integrity locks + prescription logic |
+| 2 | ~5528–6354 | Biological constants (`BIO`) — 472 constants covering all body systems |
+| 3 | ~6354–6862 | Data structures (`BodyState` ~143 fields, `SimulationResult`) |
+| 4 | ~6863–8399 | Biological models (37 mechanism functions + failure models) |
+| 5 | ~8400–9466 | Simulation engine (monthly step, setpoint governor, safety interlock) |
+| 5B | inside 4–5 | Failure/variability modelling — safety, rebound, variation, interactions, Monte Carlo |
+| 6 | ~9467–9627 | Comparative analysis |
+| 7 | ~9628–10850 | Reporting (formulation, feasibility, roadmap, uncertainty, protocol, audit) |
+| 8 | ~10851–17220 | Pygame visualization (22 modes, ~6,400 lines) |
+| 9 | ~17221–17453 | CLI (argparse) |
 
-## Project Structure
-
-```
-Immortality/
-  ChiefJuiceV1.17.py    # Main engine
-  test_chiefjuice.py    # Verification suite (51 checks) -- run after any change
-  FatStemCells.py       # Library import interface
-  Goal.md               # Original specification
-  Problems.md           # Disease survey source list
-  OVERVIEW.md           # Technical architecture
-  README.md             # This file
-```
+See `OVERVIEW.md` for the full technical architecture document.
 
 ## Library Usage
 
+`FatStemCells.py` loads `ChiefJuiceV1.17.py` via `importlib` (the dotted
+filename prevents a normal import) and re-exports the public API:
+
 ```python
-from FatStemCells import simulate, get_healing_progress
+from FatStemCells import simulate, get_healing_progress, CHIEF_JUICE, BIO
 
 r = simulate(start_age=70, duration_years=40, target_age=30, sex="female",
              dose_cycle=(2, 1), patient_seed=42)
@@ -618,6 +850,13 @@ print(r.biological_age[-1], r.cumulative_severe_risk_pct)
 
 print(get_healing_progress()["split"])   # never quote the headline alone
 ```
+
+Re-exported: `CHIEF_JUICE`, `BIO`, `BodyState`, `SimulationResult`, `simulate`,
+`run_comparative_simulation`, `initialize_body`, all report/export functions,
+all 37+ biological model functions, `DISEASE_COVERAGE` (+ tier/category
+constants), `EVIDENCE_AUDIT`, `get_evidence_summary`, `get_healing_progress`,
+`HEALING_TARGET`, `run_visualization`. See `OVERVIEW.md` §Module Interface for
+the complete list.
 
 ## License
 

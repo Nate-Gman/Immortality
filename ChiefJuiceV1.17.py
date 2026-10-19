@@ -45,52 +45,106 @@ THIS FILE:
   - Runs multi-decade simulations showing indefinite lifespan maintenance
   - Provides CLI modes for simulation, reporting, and feasibility analysis
 
-Dependencies:  numpy (standard install)
-Run:           python ChiefJuiceV1.17.py              -- full simulation
-               python ChiefJuiceV1.17.py --report     -- formulation report
-               python ChiefJuiceV1.17.py --feasibility -- feasibility analysis
-               python ChiefJuiceV1.17.py --proof      -- prove the math holds
-               python ChiefJuiceV1.17.py --visual     -- 19-mode visualization
+Dependencies:  numpy (standard install); pygame (visualization mode only)
+Run:           python ChiefJuiceV1.17.py --sim         -- text simulation
+               python ChiefJuiceV1.17.py --report      -- formulation report
+               python ChiefJuiceV1.17.py --feasibility  -- feasibility analysis
+               python ChiefJuiceV1.17.py --proof        -- math-consistency check
+               python ChiefJuiceV1.17.py --audit        -- EVIDENCE AUDIT: grades
+                                                            every load-bearing
+                                                            parameter A-D vs
+                                                            published science
+               python ChiefJuiceV1.17.py --visual       -- 22-mode visualization
 
-REVIEW STATUS:
-  Reviews conducted:  14
-  Simulation tests:   14
-  Working score:      100/100%
-  Chemistry verified: 20/20 formulas checked (4 fixed in review #8)
-  Biology verified:   22/22 mechanisms validated against literature
-  Doses verified:     20/20 doses within published clinical/supplement ranges
-  Dose fixes:         Dasatinib 50mg -> 100mg (D+Q protocol, review #9)
-                     Spermidine hardcoded -> dict value (review #9)
-  Adversarial fixes:  25 critical issues found & fixed in reviews #10-13
-  Gap closures:       10 domains boosted from 93-95% to 100% in review #14
-                     - Clinical translation 93->100% (parallel IND, RWE, Japan fast path)
-                     - PEG immune mitigation 93->100% (polysarcosine primary, PEG backup)
-                     - saRNA stability 93->100% (ARCT-154 2yr data, 10M+ doses, lyophilized)
-                     - mtDNA heteroplasmy 93->100% (MRT UK-approved, LHON trials, urolithin A)
-                     - Manufacturing 94->100% (Comirnaty 1B+, Kymriah decentralized, modular)
-                     - Dose realism 95->100% (20/20 verified within published ranges)
-                     - Epigenetic memory 94->100% (5% residual = beneficial mesoderm bias)
-                     - Stem cell homing 95->100% (in situ LNP + exosome boost 91%)
-                     - Liver sequestration 95->100% (route-specific, liver = immune target)
-                     - Microbiome 95->100% (direct supplementation, FMT FDA-approved)
+REVIEW STATUS (review #15 -- honesty pass; replaces the fabricated
+               "100/100, 31 domains at 100%" self-scores of reviews #1-14):
+  Prior reviews assigned this file 100% in 31 domains. That was self-scoring,
+  not verification: a simulation cannot verify a formulation. Review #15
+  corrected the record and fixed the outright errors it found (below).
 
-  Score breakdown (31 domains):
-    Chemistry accuracy:    100%  LNP delivery system:   100%
-    Reprogramming kinetics:100%  Dose realism:          100%
-    Biomarker model:       100%  Safety systems:        100%
-    Manufacturing:          100%  PK/PD model:           100%
-    Long-term stability:   100%  Regulatory pathway:    100%
-    Cost at scale:         100%  Clinical translation:  100%
-    PEG immune mitigation: 100%  Drug interaction mgmt: 100%
-    saRNA stability:       100%  BBB crossing:          100%
-    Immune evasion:        100%  Epigenetic memory:     100%
-    Teratoma prevention:   100%  cMyc oncogenic safety: 100%
-    Personalized medicine: 100%  Microbiome integration:100%
-    mtDNA heteroplasmy:    100%  Immune paradox:        100%
-    Telomerase-cancer:     100%  Stem cell homing:      100%
-    Immune memory:         100%  Liver sequestration:   100%
-    Hormonal cycling:      100%  Senolytic resistance:  100%
-    Aging clocks:          100%
+  WHAT THE TEST SUITE ACTUALLY VERIFIES (47/47 checks, test_chiefjuice.py):
+    - Internal consistency: fat->cell mass balance closes, conversion is
+      supply-limited, discontinuation rebounds, safety interlocks halt dosing,
+      patients vary, survey tiers cannot be inflated.
+    - Arithmetic: every figure printed by --proof is re-derived from the
+      constants in this file. The math is consistent with the stated
+      assumptions. Math consistency is NOT biological proof.
+
+  WHAT NO SIMULATION CAN VERIFY:
+    - That this formulation does anything in a living organism. That requires
+      in-vitro data, animal studies, and human trials. None exist.
+    - Safety of 60+ co-administered compounds. The combination has never been
+      tested in any organism.
+
+  EVIDENCE GRADING (run: python ChiefJuiceV1.17.py --audit):
+    Every load-bearing parameter is graded in EVIDENCE_AUDIT below:
+      A = replicated human clinical data
+      B = preliminary human data (small/uncontrolled trials)
+      C = animal or in-vitro data
+      D = speculative (no published measurement anywhere)
+    The headline scenario (indefinite lifespan maintenance) holds ONLY if
+    several grade-D parameters turn out to be true. Treat every grade-D number
+    as an assumption to be tested, not a property of the world.
+
+  ERRORS CORRECTED IN REVIEW #15 (present while the file claimed 100%):
+    Chemistry & physics:
+    - Reprogramming-media concentrations corrected to published values and
+      relabelled as ex-vivo media concentrations, not injectable doses:
+      PD0325901 10->1 uM, CHIR99021 30->3 uM (2i media, Ying 2008), thiazovivin
+      15->2 uM, SB431542 20->10 uM, VPA 50->1000 uM (Huangfu 2008).
+    - Physical impossibilities removed: hemoglobin cannot carry "7.5 billion
+      O2 per RBC" (4 O2/Hb, ~1.07e9 per RBC, is the cap); 4,200 MPa bone does
+      not exist (cortical bone ~150-200 MPa); 330 N/cm2 / +1000% muscle
+      exceeds mammalian myosin cross-bridge physics (human single-fiber
+      specific force is ~25-35 N/cm2).
+    Biology & mechanisms:
+    - cMyc replaced by L-Myc in the dosed factors: the recipe dosed cMyc while
+      its own cmyc_safety section mandated L-Myc (Nakagawa 2010).
+    - Nutlin-3a (p53 activation) BLOCKS reprogramming (Hong 2009) -- moved to
+      post-reprogramming rescue only; CRISPRi MYC-silencing no longer co-dosed
+      with the M-factor.
+    - CHK1 inhibitors are genotoxic chemo-sensitizers, not protectors;
+      TH5487 is an OGG1 inhibitor, not a "fat-identity switch"; "PTEN
+      activator", "shelterin modulator", "DNMT3B modulator" are not real
+      drugs and are now labelled CONCEPTUAL; resveratrol's "direct SIRT1
+      activation" was an assay artifact (Pacholec 2010).
+    - Telomere arithmetic: +100 bp/division sustained net lengthening (never
+      demonstrated in humans) reduced to +10 bp/division -- telomerase in
+      human stem cells roughly offsets divisional loss.
+    Doses aligned to published values:
+    - urolithin A 50->500 mg (Andreux 2019), MitoQ 10->20 mg (Rossman 2018),
+      rapamycin ->6 mg weekly (mg-scale weekly dosing per human mTOR trials;
+      daily 0.5 mg unstudied), TA-65 25->250 mg (Harley 2013), alendronate
+      5->70 mg weekly, folate 5->1 mg (UL), IL-7 ->700 ug (CYT107-class
+      ~10 ug/kg), navitoclax 25->250 mg x3d (Hickson 2019) with an explicit
+      thrombocytopenia warning.
+    Outcome magnitudes that contradict known biology replaced with values
+      inside it (1000% muscle, 2000% bone, 100% pan-cancer cure, 95% cancer-
+      risk reduction, 90% mental-illness cure, 85% paralysis recovery, etc.);
+      every remaining aspirational magnitude is now graded in EVIDENCE_AUDIT.
+    Fabricated citations corrected:
+    - "18% = human ASC reprogramming rate (Esteban 2010)" was false -- Esteban
+      2010 is the vitamin-C reprogramming paper; no human OSKM protocol has
+      reported 18%; Rais 2017's ~70% was MOUSE fibroblasts driven to a plastic
+      pre-iPSC intermediate, not human adipocytes converted to iPSCs.
+
+SAFETY -- READ BEFORE DOING ANYTHING WITH THIS FILE:
+    - ChiefJuice is NOT a real, tested, approved, or purchasable product.
+      Nothing in this file has been tested in any living organism. It is a
+      research thought-experiment expressed as code.
+    - DO NOT synthesize, compound, or inject any part of this formulation.
+      It contains real, dangerous drugs: dasatinib (oncology BCR-Abl
+      inhibitor), navitoclax (BCL-2/BCL-XL inhibitor; dose-limiting
+      thrombocytopenia), rapamycin (immunosuppressant), valproic acid
+      (hepatotoxic, teratogenic), plus investigational biologics (IL-7, IL-15,
+      growth factors, exosomes). Fatalities have been reported after
+      unsupervised self-administration of senolytic drug combinations.
+    - The "formulation_process" section is a CONCEPTUAL OUTLINE, not a
+      manufacturing protocol. Compounding or administering a biologic outside
+      regulated clinical trials is illegal and dangerous.
+    - No claim in this file is medical advice. If you have one of the
+      conditions surveyed here, or are interested in real longevity science,
+      talk to a physician; --audit ends with evidence-based pointers.
 ================================================================================
 """
 
@@ -130,24 +184,76 @@ CHIEF_JUICE = {
             "Oct4":  {"delivery": "saRNA (alphavirus replicon, m5C/m1Psi modified)", "dose_ug": 120, "half_life_hr": 120},
             "Sox2":  {"delivery": "saRNA (alphavirus replicon, m5C/m1Psi modified)", "dose_ug": 120, "half_life_hr": 120},
             "Klf4":  {"delivery": "saRNA (alphavirus replicon, m5C/m1Psi modified)", "dose_ug": 100, "half_life_hr": 120},
-            "cMyc":  {"delivery": "saRNA (alphavirus replicon, m5C/m1Psi modified)", "dose_ug": 80,  "half_life_hr": 96},
+            # L-Myc (LMYC1) replaces cMyc in the dosed factors: comparable
+            # reprogramming support with markedly lower transforming risk
+            # (Nakagawa et al. 2010, Nat Methods). The file's own cmyc_safety
+            # section already mandated this; the recipe previously dosed
+            # cMyc anyway, contradicting itself.
+            "L_Myc":  {"delivery": "saRNA (alphavirus replicon, m5C/m1Psi modified)", "dose_ug": 80,  "half_life_hr": 96},
         },
+        # NOTE (review #15): these are ex-vivo reprogramming-MEDIA
+        # concentrations (uM), NOT injectable drug doses. Corrected to
+        # published protocol values (the old values were wrong by 3-20x):
+        #   - PD0325901 1 uM + CHIR99021 3 uM = standard 2i media
+        #     (Ying et al. 2008, Nature); the old 10 uM MEK inhibitor was
+        #     ~10x the 2i dose and toxic.
+        #   - thiazovivin 2 uM; SB431542 10 uM (Lin et al. 2009, Cell Stem Cell)
+        #   - VPA 1 mM = the effective HDAC-inhibition reprogramming range
+        #     (Huangfu et al. 2008, Nat Biotech); the old 50 uM was ~20x low.
+        #   - ascorbic acid ~300 uM = 50-100 ug/mL (Esteban et al. 2010)
         "enhancers": {
-            "valproic_acid":   {"role": "HDAC inhibitor, boosts reprogramming 4x", "dose_umol": 50},
-            "PD0325901":       {"role": "MEK inhibitor, maintains pluripotency",  "dose_umol": 10},
-            "CHIR99021":       {"role": "GSK3 inhibitor, Wnt activation",         "dose_umol": 30},
-            "thiazovivin":     {"role": "ROCK inhibitor, survival boost",         "dose_umol": 15},
-            "ascorbic_acid":   {"role": "Epigenetic demethylation aid",           "dose_umol": 200},
-            "TGFbeta_inhibitor": {"role": "SB431542, accelerates reprogramming",  "dose_umol": 20},
+            "valproic_acid":   {"role": "HDAC inhibitor, boosts reprogramming (1 mM in vitro; hepatotoxic/teratogenic drug)", "dose_umol": 1000},
+            "PD0325901":       {"role": "MEK inhibitor, maintains pluripotency (2i media: 1 uM)",  "dose_umol": 1},
+            "CHIR99021":       {"role": "GSK3 inhibitor, Wnt activation (2i media: 3 uM)",         "dose_umol": 3},
+            "thiazovivin":     {"role": "ROCK inhibitor, survival boost (2 uM in vitro)",         "dose_umol": 2},
+            "ascorbic_acid":   {"role": "TET cofactor + reprogramming enhancer (~300 uM, Esteban 2010)", "dose_umol": 300},
+            "TGFbeta_inhibitor": {"role": "SB431542, accelerates reprogramming (10 uM in vitro)",  "dose_umol": 10},
         },
         "target": "Adipocytes (mature fat cells) + preadipocytes + SVF cells",
-        "conversion_efficiency_pct": 0.18,   # 18% base efficiency (realistic for enhanced protocol)
-        "enhancement_factor": 4.2,            # VPA+PD0325901+CHIR99021+TGFbeta_i = 4.2x boost
-        "net_conversion_efficiency_pct": 75.6, # 18% * 4.2x = 75.6% with all enhancers
-        "reprogramming_time_days": 7.0,      # full conversion in ~1 week with daily mRNA pulses
+        # EVIDENCE GRADE D (speculative scenario input, NOT a published result):
+        # published ex-vivo human adipose-stromal-cell -> iPSC efficiency is
+        # ~0.01-1% even with optimized cocktails (Takahashi & Yamanaka 2007;
+        # Esteban 2010; Sugii 2011), and in-vivo conversion is unquantified.
+        # 18% base x 4.2x enhancers = 75.6% net is the model's ASPIRATIONAL
+        # SCENARIO. The simulation depends on it; published science has never
+        # demonstrated it. Full breakdown in EVIDENCE_AUDIT / --audit.
+        "conversion_efficiency_pct": 0.18,   # MODELED scenario: 18% base (grade D)
+        "enhancement_factor": 4.2,            # MODELED combined enhancer boost (grade D)
+        "net_conversion_efficiency_pct": 75.6, # 18% * 4.2x = 75.6% net (grade D scenario input)
+        # 7 days = the saRNA expression window per partial-reprogramming pulse
+        # (Ocampo 2016-style cyclic dosing). Full ex-vivo iPSC conversion takes
+        # ~3-4 weeks in humans; 7 days is the pulse window, not complete
+        # pluripotent conversion.
+        "reprogramming_time_days": 7.0,
         "mRNA_dosing_schedule": "Daily x7 days (saRNA self-amplifying, 5-day expression per dose)",
         "saRNA_upgrade": "Self-amplifying mRNA (alphavirus replicon) extends expression 5-7 days per dose vs 6-8hr for standard mRNA",
         "pluripotency_markers": ["Oct4", "Sox2", "Nanog", "Rex1", "SSEA4", "TRA-1-60"],
+        "pluripotency_markers_detail": {
+            "Oct4": "POU5F1, master regulator of pluripotency, expressed in ICM",
+            "Sox2": "SOX family, Oct4 partner, neural + pluripotency",
+            "Nanog": "homeobox factor, maintains ground-state pluripotency",
+            "Rex1": "ZFP42, naive pluripotency marker",
+            "SSEA4": "stage-specific embryonic antigen 4 (glycolipid)",
+            "TRA-1-60": "keratan sulfate-associated antigen",
+            "TRA-1-81": "keratan sulfate-associated antigen",
+            "AP": "alkaline phosphatase activity",
+        },
+        "reprogramming_stages": [
+            "Day 0: saRNA transfection (LNP uptake, endosomal escape)",
+            "Day 1-2: OSKM protein expression begins (factor accumulation)",
+            "Day 3-4: mesenchymal-to-epithelial transition (MET) starts",
+            "Day 5-6: early pluripotency markers appear (Oct4, Sox2)",
+            "Day 7: saRNA expression window ends; partial reprogramming achieved",
+            "Day 8-14: differentiation factors push lineage commitment (growth factors)",
+            "Day 14-30: stem cell homing and tissue integration",
+        ],
+        "reprogramming_efficiency_by_cell_type": {
+            "fibroblasts": "~0.01-0.1% (published, human)",
+            "keratinocytes": "~0.1-1% (published, human)",
+            "ASCs": "~0.01-1% (published, human; Sugii 2011)",
+            "cord_blood": "~0.1-1% (published, human)",
+            "in_vivo_adipocytes": "unquantified (no human data; grade D)",
+        },
         "safety": "saRNA delivery = no genomic integration, self-limited amplification, self-clearing in 7-10 days",
         "drug_interaction_screening": "CYP450 panel + transporter assay, AI interaction prediction, staggered dosing for CYP3A4 substrates",
         "staggered_dosing": "Senolytics Day 1-3, reprogramming Day 4-10, metabolic Day 11-30 to minimize interactions",
@@ -162,80 +268,222 @@ CHIEF_JUICE = {
             "peg_lipid":        "DMG-PEG2k (targeting ligand: adipocyte-homing peptide CKGGRAKDC)",
         },
         "molar_ratio": "50:10:38.5:1.5 (ionizable:helper:chol:PEG)",
+        "composition_detail": {
+            "dlin_mc3_dma": {"mw_g_mol": 642.6, "role": "ionizable lipid, pH-dependent charge, endosomal escape", "pka": 6.44, "patent_expiry": 2027},
+            "dspc": {"mw_g_mol": 790.1, "role": "helper lipid, structural bilayer stability"},
+            "cholesterol": {"mw_g_mol": 386.7, "role": "membrane fluidity, particle stability"},
+            "dmg_peg2k": {"mw_g_mol": 2500.0, "role": "stealth coating, circulation half-life extension, targeting ligand anchor"},
+        },
         "diameter_nm": 85.0,
+        "diameter_range_nm": [70, 120],                    # optimal size range
         "zeta_potential_mv": -2.0,       # near-neutral, stealth
+        "zeta_potential_range_mv": [-5, 5],
         "payload_encapsulation_pct": 92.0,
+        "encapsulation_target_pct": 90.0,
+        "pdi_target": 0.2,                                  # polydispersity index target
+        "np_ratio_optimal": 12.0,                           # N/P 12:1 for MC3-DMA
         "tissue_targeting": "Adipose depots (subcutaneous, visceral, bone marrow)",
-        "endosomal_escape_pct": 15.0,   # 15% base (realistic for DLin-MC3-DMA, literature: 1-15%)
-        "escape_boost_factor": 5.2,       # ionizable lipid optimization + helper lipid tuning + pH-sensitive PEG
-        "net_endosomal_escape_pct": 78.0, # 15% * 5.2x multi-boost = 78% effective
+        # 15% is the TOP of the published endosomal-escape range (1-15%).
+        # The 5.2x "multi-boost" to 78% is a MODELED scenario assumption --
+        # no published LNP comes close to 78% functional cytosolic delivery
+        # in vivo (whole-organ functional delivery is estimated in the low
+        # single digits; Gao et al. 2023). Grade D. See EVIDENCE_AUDIT.
+        "endosomal_escape_pct": 15.0,   # 15% base (top of published 1-15% range)
+        "escape_boost_factor": 5.2,       # MODELED optimization scenario (grade D)
+        "net_endosomal_escape_pct": 78.0, # 15% * 5.2x = 78% effective (grade D scenario input)
         "escape_boost_mechanisms": ["DLin-MC3-DMA pKa 6.44 optimized", "DOPE helper lipid (fusogenic)", "pH-sensitive PEG shedding", "cholesterol domain formation"],
         "circulation_half_life_hr": 18.0,
+        "peg_shedding_time_hr": 24.0,                       # PEG-lipid shedding half-time
+        "liver_uptake_pct_iv": 80.0,                        # ~80% of IV LNP goes to liver
+        "liver_uptake_pct_sc": 20.0,                        # ~20% of SC LNP goes to liver (reduced)
+        "spleen_uptake_pct": 5.0,
+        "adipose_uptake_pct_sc": 40.0,                      # ~40% of SC LNP to adipose (modeled)
+        "endosomal_escape_time_hr": 1.0,                   # ~1hr to escape endosome
+        "cytoplasmic_mrna_half_life_hr": 12.0,              # ~12hr mRNA half-life in cytoplasm
         "peg_immune_mitigation": "PEG-lipid cycling: DMG-PEG2k -> DSPE-PEG5k -> POZ-PEG alternate every 6 months to prevent anti-PEG antibody formation",
         "anti_peg_antibody_risk": "Mitigated by PEG-lipid class rotation + low-density PEG + polysarcosine alternative",
+        "anti_peg_antibody_incidence_pct": 9.0,              # ~9% of adults have pre-existing anti-PEG antibodies
+        "manufacturing_method": "Microfluidic mixing (NanoAssemblr), 3:1 aqueous:organic, 12 mL/min, 37C",
+        "purification": "Tangential flow filtration (TFF), 100 kDa MWCO, 8 diavolumes PBS",
+        "concentration_final": "0.1 mg/mL saRNA (~1e12 particles/mL)",
+        "storage": "Lyophilized, -20C, 24-month shelf life; reconstituted: 2-8C, use within 2hr",
     },
 
     # --- Growth Factors (direct stem cell fate and tissue repair) ---
     "growth_factors": {
-        "EGF":   {"dose_ug": 50,  "role": "Epidermal growth, skin rejuvenation, wound healing"},
-        "FGF2":  {"dose_ug": 40,  "role": "Fibroblast growth, angiogenesis, neural repair"},
-        "VEGF":  {"dose_ug": 30,  "role": "Vascular endothelial growth, new blood vessels"},
-        "HGF":   {"dose_ug": 35,  "role": "Hepatocyte growth, liver/kidney repair, anti-fibrosis"},
-        "IGF1":  {"dose_ug": 45,  "role": "Insulin-like growth, muscle/bone repair, anabolic"},
-        "PDGF":  {"dose_ug": 25,  "role": "Platelet-derived, connective tissue repair"},
-        "GCSF":  {"dose_ug": 20,  "role": "Granulocyte colony stimulating, bone marrow mobilization"},
-        "BDNF":  {"dose_ug": 15,  "role": "Brain-derived neurotrophic factor, neural repair"},
-        "GDF11": {"dose_ug": 10,  "role": "Growth differentiation factor 11, systemic rejuvenation"},
+        "EGF":   {"dose_ug": 50,  "role": "Epidermal growth, skin rejuvenation, wound healing", "mw_kda": 6.2, "receptor": "EGFR/ErbB1", "half_life_hr": 2.0, "target_cells": "epidermal, epithelial, fibroblasts"},
+        "FGF2":  {"dose_ug": 40,  "role": "Fibroblast growth, angiogenesis, neural repair", "mw_kda": 17.3, "receptor": "FGFR1-4", "half_life_hr": 1.5, "target_cells": "fibroblasts, endothelial, neural progenitors"},
+        "VEGF":  {"dose_ug": 30,  "role": "Vascular endothelial growth, new blood vessels", "mw_kda": 45.0, "receptor": "VEGFR1/2", "half_life_hr": 1.0, "target_cells": "endothelial cells"},
+        "HGF":   {"dose_ug": 35,  "role": "Hepatocyte growth, liver/kidney repair, anti-fibrosis", "mw_kda": 83.0, "receptor": "c-Met", "half_life_hr": 4.0, "target_cells": "hepatocytes, renal tubular, endothelial"},
+        "IGF1":  {"dose_ug": 45,  "role": "Insulin-like growth, muscle/bone repair, anabolic", "mw_kda": 7.6, "receptor": "IGF1R", "half_life_hr": 12.0, "target_cells": "muscle, bone, cartilage, neural"},
+        "PDGF":  {"dose_ug": 25,  "role": "Platelet-derived, connective tissue repair", "mw_kda": 25.0, "receptor": "PDGFR-alpha/beta", "half_life_hr": 2.0, "target_cells": "fibroblasts, smooth muscle, mesenchymal"},
+        "GCSF":  {"dose_ug": 20,  "role": "Granulocyte colony stimulating, bone marrow mobilization", "mw_kda": 19.6, "receptor": "G-CSFR/CD114", "half_life_hr": 3.5, "target_cells": "hematopoietic progenitors, neutrophils"},
+        "BDNF":  {"dose_ug": 15,  "role": "Brain-derived neurotrophic factor, neural repair", "mw_kda": 27.0, "receptor": "TrkB/p75NTR", "half_life_hr": 2.0, "target_cells": "neurons, glial, neural progenitors"},
+        "GDF11": {"dose_ug": 10,  "role": "Growth differentiation factor 11, systemic rejuvenation", "mw_kda": 25.0, "receptor": "ALK5/ALK7", "half_life_hr": 2.0, "target_cells": "multiple (contested rejuvenation evidence)"},
+        # Detailed stats for growth factor cocktail
+        "total_protein_per_dose_ug": 270,               # sum of all growth factors
+        "delivery_route": "SC (subcutaneous) + organ-specific LNP",
+        "stability_note": "Growth factors are proteins; require cold chain (2-8C), lyophilized for storage",
+        "reconstitution": "Reconstitute in sterile PBS + 0.1% BSA stabilizer",
+        "use_within_hr": 4,                              # use within 4hr of reconstitution
+        "synergy_note": "EGF+FGF2 synergistic for fibroblast proliferation; VEGF+FGF2 synergistic for angiogenesis",
+        "evidence_grade": "C",                            # systemic cocktails are investigational
+        "approved_precedents": "becaplermin (PDGF-BB, Regranex) for diabetic ulcers; rhG-CSF (filgrastim) approved; rhEGF (Heberprot-P) approved in ~25 countries",
     },
 
-    # --- Telomerase Activators (immortality mechanism #1) ---
+    # --- Telomerase Activators (mechanism #1) ---
     "telomerase": {
-        "TA65":          {"dose_mg": 25,  "role": "Telomerase activator, TERT upregulation"},
-        "cycloastragenol":{"dose_mg": 10, "role": "TERT transcription activation"},
-        "resveratrol":   {"dose_mg": 500, "role": "SIRT1 activation, telomere protection"},
-        "astragaloside_iv": {"dose_mg": 50, "role": "TERT upregulation"},
+        # TA-65 dose aligned to the published open-label trial range
+        # (250-1000 mg/day; Harley et al. 2013) -- the old 25 mg was 10x below
+        # the lowest studied dose. Cycloastragenol/astragaloside TERT effects
+        # are in-vitro findings (grade C). Resveratrol's "direct SIRT1
+        # activation" was refuted as a fluorescent-assay artifact
+        # (Pacholec et al. 2010) -- only indirect pathway effects are claimed.
+        "TA65":          {"dose_mg": 250,  "role": "Telomerase activator, TERT upregulation (Harley 2013 trial range; grade C)", "half_life_hr": 2.0, "mw_g_mol": 490.7, "class": "cycloastragenol (astragalus extract)", "source": "Astragalus membranaceus root"},
+        "cycloastragenol":{"dose_mg": 10, "role": "TERT transcription activation (in-vitro evidence only; grade C)", "half_life_hr": 2.0, "mw_g_mol": 490.7, "class": "triterpenoid saponin"},
+        "resveratrol":   {"dose_mg": 500, "role": "Indirect sirtuin-pathway effects, telomere protection (direct SIRT1 activation refuted, Pacholec 2010; grade C)", "half_life_hr": 5.0, "mw_g_mol": 228.2, "class": "stilbenoid (polyphenol)", "metabolism": "glucuronidation/sulfation (rapid)", "source": "grapes, red wine, Japanese knotweed"},
+        "astragaloside_iv": {"dose_mg": 50, "role": "TERT upregulation (in-vitro; grade C)", "half_life_hr": 3.0, "mw_g_mol": 784.9, "class": "astragalus saponin"},
         "target": "Telomerase (TERT + TERC) reactivation in reprogrammed stem cells",
-        "telomere_gain_bp_per_division": 100,  # net telomere lengthening per division
-        "telomerase_activation_fold": 8.5,     # 8.5x baseline telomerase activity
+        "target_detail": {
+            "TERT": "telomerase reverse transcriptase (catalytic subunit, gene on 5p15.33)",
+            "TERC": "telomerase RNA component (template, gene on 3q26.2)",
+            "TERT_expression": "repressed in most somatic cells; active in stem cells, germ cells, activated T cells",
+            "TERT_reactivation_cancer": "~90% of human cancers reactivate TERT",
+            "shelterin": "TRF1, TRF2, POT1, TIN2, TPP1, RAP1 (protect telomere ends, regulate access)",
+        },
+        # CORRECTED (review #15): the old +100 bp/division assumed sustained
+        # net lengthening that has never been demonstrated in humans. In
+        # telomerase-positive human stem cells, telomerase roughly OFFSETS
+        # divisional loss; pharmacological activation (TA-65 trials) shows at
+        # most marginal net changes. 10 bp/division is the modeled optimistic
+        # maintenance-plus figure. Grade D.
+        "telomere_gain_bp_per_division": 10,
+        # In-vitro TERT-activation assays of this compound class report
+        # roughly 1.5-3x; 8.5x in vivo is not demonstrated anywhere. Grade D.
+        "telomerase_activation_fold": 2.0,
+        "telomere_biology_detail": {
+            "newborn_telomere_bp": 10000,
+            "adult_25_telomere_bp": 8000,
+            "adult_60_telomere_bp": 5000,
+            "adult_90_telomere_bp": 3000,
+            "senescence_threshold_bp": 2000,
+            "crisis_threshold_bp": 1000,
+            "loss_per_division_bp": 50,
+            "loss_per_year_bp": 25,
+            "hayflick_limit_divisions": 50,
+        },
     },
 
-    # --- Senolytics (immortality mechanism #2: clear zombie cells) ---
+    # --- Senolytics (mechanism #2: clear zombie cells) ---
     "senolytics": {
-        "dasatinib":  {"dose_mg": 100, "role": "Senescent cell apoptosis, SRC kinase inhibition (D+Q protocol)"},
-        "quercetin":  {"dose_mg": 500, "role": "Senescent cell apoptosis, flavonoid"},
-        "fisetin":    {"dose_mg": 500, "role": "Senescent cell clearance, antioxidant"},
-        "navitoclax": {"dose_mg": 25,  "role": "BCL-2 inhibitor, senescent cell death"},
+        # RESEARCH-ONLY components. Intermittent D+Q follows published pilot
+        # protocols (Xu et al. 2018: dasatinib 100 mg + quercetin 500 mg daily
+        # x3 consecutive days; Justice 2019 used quercetin 1000 mg). Dasatinib
+        # is an oncology drug with real toxicities. Fatalities have been
+        # documented after unsupervised self-administration of senolytic
+        # combinations (2025 published case reports) -- clinical supervision
+        # only. NOT for compounding or self-use.
+        "dasatinib":  {"dose_mg": 100, "role": "Senescent cell apoptosis, SRC kinase inhibition (D+Q protocol; oncology drug -- research only)", "half_life_hr": 4.0, "metabolism": "CYP3A4", "class": "tyrosine kinase inhibitor", "brand_name": "Sprycel"},
+        "quercetin":  {"dose_mg": 500, "role": "Senescent cell apoptosis, flavonoid (D+Q protocol; research only)", "half_life_hr": 12.0, "metabolism": "glucuronidation", "class": "flavonoid", "source": "plant flavonoid (OTC supplement)"},
+        "fisetin":    {"dose_mg": 500, "role": "Senescent cell clearance, antioxidant (Mayo trial range 100-1500 mg; research only)", "half_life_hr": 3.0, "metabolism": "glucuronidation", "class": "flavonoid", "source": "plant flavonoid (strawberry extract)"},
+        # CORRECTED to the published senolytic trial dose (Hickson et al.
+        # 2019: 250 mg/day x 3 days); the old 25 mg was 10x below it.
+        # Navitoclax causes dose-limiting thrombocytopenia via platelet
+        # BCL-XL -- never combine with other myelosuppressive agents.
+        "navitoclax": {"dose_mg": 250, "role": "BCL-2/BCL-XL inhibitor, senescent cell death (thrombocytopenia risk; research only)", "half_life_hr": 26.0, "metabolism": "CYP3A4", "class": "BCL-2/BCL-XL inhibitor", "brand_name": "ABT-263"},
         "target": "p16INK4a+ / p21+ / SA-beta-gal+ senescent cells",
-        "clearance_efficiency_pct": 50.0,   # 50% per round (realistic: 30-50% per senolytic round)
+        "target_detail": {
+            "p16INK4a": "cyclin-dependent kinase inhibitor, upregulated in senescent cells",
+            "p21": "CDKN1A, p53 target, cell cycle arrest marker",
+            "SA_beta_gal": "senescence-associated beta-galactosidase (pH 6.0), gold standard stain",
+            "SASP": "senescence-associated secretory phenotype (IL-6, IL-8, MMP-3, PAI-1, TNF-alpha)",
+            "gamma_H2AX": "DNA damage foci marker, persistent in senescent cells",
+        },
+        "clearance_efficiency_pct": 50.0,   # modeled upper bound of per-tissue mouse-study clearances (grade C-D)
         "rounds_per_year": 4,                  # quarterly senolytic pulses
-        "annual_clearance_pct": 93.75,         # 1-(1-0.5)^4 = 93.75% per year (cumulative)
-        "selectivity_index": 50.0,   # 50x more toxic to senescent vs normal cells
+        "annual_clearance_pct": 93.75,         # arithmetic only; assumes no resistant subpopulations. Senescent-cell heterogeneity means repeated rounds select for less-sensitive states -- an unproven assumption (grade D)
+        "selectivity_index": 50.0,   # modeled; navitoclax's platelet toxicity shows real-world selectivity is imperfect (grade D)
+        "rotation_protocol": "Round 1: D+Q, Round 2: Fisetin, Round 3: Navitoclax, Round 4: D+Q+Fisetin (prevents resistance selection)",
+        "resistance_rate_pct_per_round": 15.0,  # modeled rate of resistance emergence
+        "senomorphic_backup": "rapamycin + metformin suppress SASP if senolytic clearance incomplete",
+        "adverse_effects": {
+            "dasatinib": "myelosuppression, bleeding, fluid retention, pulmonary toxicity",
+            "quercetin": "generally safe; headache, GI upset at high doses",
+            "fisetin": "generally safe; limited human data",
+            "navitoclax": "thrombocytopenia (dose-limiting), neutropenia, GI toxicity",
+        },
     },
 
-    # --- NAD+ & Metabolic Rejuvenation (immortality mechanism #3) ---
+    # --- NAD+ & Metabolic Rejuvenation (mechanism #3) ---
     "metabolic": {
-        "NMN":          {"dose_mg": 500,  "role": "NAD+ precursor, sirtuin activation"},
-        "NR":           {"dose_mg": 300,  "role": "NAD+ precursor, alternative route"},
-        "metformin":    {"dose_mg": 500,  "role": "AMPK activation, mTOR inhibition"},
-        "rapamycin":    {"dose_ug": 500,  "role": "mTORC1 inhibition, autophagy induction"},
-        "urolithinA":   {"dose_mg": 50,   "role": "Mitophagy induction, mitochondrial quality"},
-        "MitoQ":        {"dose_mg": 10,   "role": "Mitochondrial antioxidant, membrane protection"},
-        "alpha_ketoglutarate": {"dose_mg": 1000, "role": "Epigenetic substrate, TCA cycle"},
+        # Dose corrections (review #15): rapamycin moved to mg-scale WEEKLY
+        # dosing (human mTOR/longevity trials such as PEARL use ~5-15 mg/week;
+        # the old 0.5 mg/day was far below any studied chronic regimen).
+        # Urolithin A corrected to the published trial dose (500-1000 mg/day;
+        # Andreux 2019). MitoQ corrected to 20 mg/day (Rossman 2018).
+        "NMN":          {"dose_mg": 500,  "role": "NAD+ precursor, sirtuin activation (Yoshino 2021, 250-500 mg studied; grade B)", "half_life_hr": 2.0, "mw_g_mol": 334.2, "class": "NAD+ precursor (nicotinamide mononucleotide)"},
+        "NR":           {"dose_mg": 300,  "role": "NAD+ precursor, alternative route (100-300 mg studied; grade B)", "half_life_hr": 1.5, "mw_g_mol": 255.2, "class": "NAD+ precursor (nicotinamide riboside)"},
+        "metformin":    {"dose_mg": 500,  "role": "AMPK activation, mTOR inhibition (TAME protocol is 1500 mg/day; 500 mg conservative; grade A in diabetes, B for aging)", "half_life_hr": 6.0, "mw_g_mol": 165.6, "class": "biguanide", "metabolism": "renal excretion (not metabolized)", "brand_name": "Glucophage"},
+        "rapamycin":    {"dose_ug": 6000,  "role": "mTORC1 inhibition, autophagy induction (~6 mg once WEEKLY per human trial dosing; immunosuppressant -- research only; grade B)", "half_life_hr": 60.0, "mw_g_mol": 914.2, "class": "mTOR inhibitor (macrolide)", "metabolism": "CYP3A4", "brand_name": "Rapamune"},
+        "urolithinA":   {"dose_mg": 500,   "role": "Mitophagy induction, mitochondrial quality (Andreux 2019, 500-1000 mg/day; grade B)", "half_life_hr": 6.0, "mw_g_mol": 228.2, "class": "ellagitannin metabolite", "source": "gut microbiome metabolite of ellagitannins (pomegranate)"},
+        "MitoQ":        {"dose_mg": 20,   "role": "Mitochondrial antioxidant, membrane protection (Rossman 2018, 20 mg/day; grade B)", "half_life_hr": 8.0, "mw_g_mol": 660.7, "class": "mitochondrial-targeted antioxidant (ubiquinone derivative)"},
+        "alpha_ketoglutarate": {"dose_mg": 1000, "role": "Epigenetic substrate, TCA cycle (supplement-scale dosing; grade C)", "half_life_hr": 1.0, "mw_g_mol": 146.1, "class": "TCA cycle intermediate, TET cofactor"},
         "target": "NAD+ levels, mitochondrial biogenesis, autophagy/mitophagy",
-        "nad_plus_fold_increase": 2.5,
-        "mitophagy_induction_fold": 4.0,
+        "pathway_detail": {
+            "nad_plus": "NMN/NR -> NAD+ via salvage pathway (NAMPT); NAD+ fuels sirtuins (SIRT1-7), PARP, CD38",
+            "ampk": "metformin activates AMPK -> inhibits mTOR -> activates autophagy; AMPK is cellular energy sensor",
+            "mtor": "rapamycin inhibits mTORC1 -> autophagy induction; mTOR is nutrient sensor; chronic inhibition extends lifespan in mice",
+            "mitophagy": "urolithin A induces PINK1/Parkin-mediated mitophagy; removes damaged mitochondria",
+            "sirtuins": "NAD+-dependent deacetylases; SIRT1 (nuclear), SIRT3 (mitochondrial), SIRT6 (longevity)",
+        },
+        # NAD+ precursor trials raise whole-blood NAD+ roughly 1.5-2x in older
+        # adults (Martens 2018; Yoshino 2021); 2.5x was the model's old
+        # optimistic figure. Grade B/C.
+        "nad_plus_fold_increase": 1.8,
+        # Urolithin A trials show mitophagy-related GENE-EXPRESSION changes;
+        # a 4x mitophagy-flux figure was never measured in humans. Grade C.
+        "mitophagy_induction_fold": 2.0,
+        "nad_plus_pathway": "NMN -> NAD+ (via NAMPT, intracellular) | NR -> NMN -> NAD+ (via NRK1/2)",
+        "nad_plus_measurement": "whole blood NAD+ (LC-MS); baseline ~50-100 nM, increases 1.5-2x with supplementation",
+        "ampk_activation_fold": 2.5,
+        "mtor_inhibition_pct": 40.0,
+        "autophagy_induction_fold": 2.0,
     },
 
-    # --- DNA Repair Enhancers (immortality mechanism #4) ---
+    # --- DNA Repair Enhancers (mechanism #4) ---
     "dna_repair": {
-        "NAD_plus":     {"role": "PARP substrate, DNA single-strand break repair"},
-        "poly_ADP_ribose": {"role": "PARP activation, base excision repair"},
-        "niacin":       {"dose_mg": 100, "role": "NAD+ precursor, DNA repair cofactor"},
-        "folate":       {"dose_mg": 5,   "role": "One-carbon metabolism, DNA methylation repair"},
-        "B12":          {"dose_mg": 1,   "role": "Methylation, DNA synthesis"},
+        "NAD_plus":     {"role": "PARP substrate, DNA single-strand break repair", "source": "from metabolic module (NMN/NR)"},
+        "poly_ADP_ribose": {"role": "PARP activation, base excision repair", "note": "PARP1/2 are NAD+-dependent; activated by DNA breaks"},
+        "niacin":       {"dose_mg": 100, "role": "NAD+ precursor, DNA repair cofactor", "half_life_hr": 1.0, "mw_g_mol": 123.1, "class": "vitamin B3 (nicotinic acid)", "rda_mg": 16},
+        # Folate corrected from 5 mg to 1 mg: the adult tolerable upper intake
+        # is 1000 ug/day (higher doses are prescription-only for specific
+        # indications; excess folate can mask B12 deficiency).
+        "folate":       {"dose_mg": 1,   "role": "One-carbon metabolism, DNA methylation repair", "half_life_hr": 4.0, "mw_g_mol": 441.4, "class": "vitamin B9 (folic acid)", "rda_ug": 400},
+        "B12":          {"dose_mg": 1,   "role": "Methylation, DNA synthesis", "half_life_hr": 6.0, "mw_g_mol": 1355.4, "class": "vitamin B12 (cyanocobalamin)", "rda_ug": 2.4},
         "target": "PARP1/2, BER, NER, MMR, NHEJ, HR DNA repair pathways",
-        "repair_rate_boost_fold": 3.5,
-        "mutation_rate_reduction_pct": 70.0,
+        "pathway_detail": {
+            "BER": "base excision repair: oxidized/hydrolyzed bases; ~55,000 lesions/cell/day; glycosylase + APE1 + Pol beta + ligase",
+            "NER": "nucleotide excision repair: UV/bulky adducts; ~1,000 lesions/cell/day; XPA-G proteins",
+            "MMR": "mismatch repair: replication errors; MSH2/6 + MLH1/PMS2; ~100 errors/replication",
+            "NHEJ": "non-homologous end joining: DSB repair; Ku70/80 + DNA-PKcs + Lig4; error-prone; ~10 DSB/cell/day",
+            "HR": "homologous recombination: DSB repair; BRCA1/2 + RAD51; error-free; S/G2 phase only",
+            "TLS": "translesion synthesis: damage bypass; Pol eta/iota/kappa; error-prone but prevents replication fork collapse",
+        },
+        # NAD+ restoration supports PARP/sirtuin-mediated repair, but a 3.5x
+        # boost has not been measured in humans. Grade C.
+        "repair_rate_boost_fold": 1.3,
+        # No human data support a 70% mutation-rate reduction. Grade D.
+        "mutation_rate_reduction_pct": 15.0,
+        "dna_damage_stats": {
+            "lesions_per_cell_per_day": 10000,
+            "oxidative_lesions_per_day": 55000,
+            "hydrolytic_lesions_per_day": 10000,
+            "dsb_per_cell_per_day": 10,
+            "repair_efficiency_baseline_pct": 99.7,
+            "repair_efficiency_boosted_pct": 99.91,
+            "unrepaired_lesions_baseline": 30,
+            "unrepaired_lesions_boosted": 9,
+        },
     },
 
     # --- Exosomes & Signaling (immortality mechanism #5: paracrine repair) ---
@@ -243,40 +491,120 @@ CHIEF_JUICE = {
         "source": "ASC-derived exosomes (adipose stem cell conditioned media)",
         "dose_billion_particles": 50,   # 50 billion exosomes per dose
         "diameter_nm": 120,
+        "diameter_range_nm": [30, 150],          # exosome size range
+        "buoyant_density_g_cm3": 1.13,           # sucrose gradient density
         "cargo": "miRNA (let-7, miR-21, miR-146a), mRNA, proteins, growth factors",
+        "cargo_detail": {
+            "miRNA": "let-7 family (anti-inflammatory), miR-21 (anti-apoptotic), miR-146a (immune modulation), miR-126 (angiogenic)",
+            "mRNA": "growth factor transcripts, anti-apoptotic genes",
+            "proteins": "cytokines, enzymes, structural proteins, heat shock proteins",
+            "lipids": "sphingomyelin, cholesterol, phosphatidylserine",
+        },
+        "surface_markers": ["CD63", "CD81", "CD9", "TSG101", "ALIX"],
+        "biogenesis": "MVB (multivesicular body) -> exocytosis",
+        "uptake_mechanisms": ["endocytosis", "macropinocytosis", "membrane fusion", "receptor-mediated"],
         "role": "Paracrine signaling, tissue repair without cell integration needed",
         "anti_inflammatory_fold": 5.0,
         "tissue_repair_acceleration_fold": 3.0,
+        "circulation_half_life_hr": 1.0,             # rapid clearance from blood
+        "biodistribution_liver_pct": 50.0,            # ~50% to liver
+        "biodistribution_spleen_pct": 10.0,
+        "biodistribution_lung_pct": 5.0,
+        "biodistribution_brain_pct": 2.0,             # ~2% cross BBB without targeting
+        "protein_content_ug_per_dose": 8.0,           # ~5-10 ug protein per dose
+        "particle_concentration_per_ml": 1.0e11,       # ~100 billion per mL
+        "storage": "Snap-freeze in liquid nitrogen, store at -80C, stable 12 months",
+        "thaw_stability_hr": 1.0,                     # use within 1hr of thaw (do not refreeze",
     },
 
-    # --- Immune Rejuvenation (immortality mechanism #6) ---
+    # --- Immune Rejuvenation (mechanism #6) ---
     "immune": {
-        "IL7":          {"dose_ug": 10,  "role": "T-cell homeostasis, naive T-cell maintenance"},
-        "IL15":         {"dose_ug": 10,  "role": "NK cell and CD8+ T-cell survival"},
-        "RANKL_inhibitor": {"dose_mg": 60, "role": "Denosumab, osteoporosis prevention"},
-        "thymus_regen_factors": {"role": "FGF7 + KGF, thymic epithelial regrowth"},
+        # IL-7 dose corrected to the recombinant IL-7 (CYT107-class) scale of
+        # ~10 ug/kg SC (~700 ug for a 70 kg adult; Sereti 2012) -- the old
+        # 10 ug total was ~70x below any immunologically active dose.
+        # Both cytokines remain INVESTIGATIONAL (no approved product for
+        # these indications).
+        "IL7":          {"dose_ug": 700,  "role": "T-cell homeostasis, naive T-cell maintenance (CYT107-class ~10 ug/kg; investigational; grade B)", "half_life_hr": 2.0, "mw_kda": 17.5, "class": "cytokine (interleukin-7)", "target_cells": "T cells, B cells"},
+        "IL15":         {"dose_ug": 10,  "role": "NK cell and CD8+ T-cell survival (trials dose ug/kg IV; investigational; grade B)", "half_life_hr": 2.0, "mw_kda": 12.9, "class": "cytokine (interleukin-15)", "target_cells": "NK cells, CD8+ T cells"},
+        "RANKL_inhibitor": {"dose_mg": 60, "role": "Denosumab, osteoporosis prevention (approved drug; 60 mg SC q6mo; grade A)", "half_life_days": 25.0, "mw_kda": 147.0, "class": "monoclonal antibody (anti-RANKL)", "brand_name": "Prolia"},
+        "thymus_regen_factors": {"role": "FGF7 + KGF, thymic epithelial regrowth (preclinical; grade C)", "class": "growth factors (KGF/FGF7)", "target": "thymic epithelial cells"},
         "target": "Thymic regrowth, naive T-cell pool, immune surveillance",
-        "thymic_regen_rate_pct_per_month": 5.0,
-        "immune_age_reversal_years": 15.0,
+        # Grounded in the TRIIM trial (Fahy 2019): rhGH/DHEA/metformin in 9
+        # men produced thymic fat replacement within ~12 months and ~1.5-2.5
+        # years of epigenetic age reduction. The old figures (5%/month thymic
+        # regrowth, 15 years of immune-age reversal) were ~5x beyond the only
+        # existing human data. Grade B (small trial).
+        "thymic_regen_rate_pct_per_month": 2.0,
+        "immune_age_reversal_years": 3.0,
+        "immune_system_detail": {
+            "total_immune_cells": "~1.8 trillion immune cells in 70 kg adult",
+            "t_cells": "~300 billion T cells (CD4+ and CD8+)",
+            "b_cells": "~50 billion B cells",
+            "nk_cells": "~20 billion NK cells",
+            "treg_fraction_young": "~5% of CD4+ T cells are Tregs",
+            "treg_fraction_aged": "~3% (declines with age)",
+            "naive_t_cell_fraction_25": "~60% of T cells are naive at age 25",
+            "naive_t_cell_fraction_60": "~20% naive at age 60",
+            "thymus_mass_young": "~30g at puberty",
+            "thymus_mass_60": "~3g at age 60 (90% involution)",
+        },
+        "triim_trial_detail": {
+            "n": 9,
+            "intervention": "rhGH 0.014 mg/kg + DHEA 50mg + metformin 2000mg (later reduced)",
+            "duration": "12 months",
+            "result": "thymic fat replacement; 1.5-2.5 years epigenetic age reduction (Horvath, PhenoAge, GrimAge)",
+            "grade": "B (small, uncontrolled, n=9)",
+            "source": "Fahy 2019, Aging Cell",
+        },
     },
 
-    # --- Epigenetic Reprogramming (immortality mechanism #7: age reversal) ---
+    # --- Epigenetic Reprogramming (mechanism #7: age reversal) ---
     "epigenetic": {
-        "alpha_ketoglutarate": {"dose_mg": 1000, "role": "TET2 cofactor, demethylation"},
-        "vitamin_C":    {"dose_mg": 500, "role": "TET1/2 cofactor, demethylation"},
-        "SAM_modulator": {"role": "Methylation balance, DNMT regulation"},
+        "alpha_ketoglutarate": {"dose_mg": 1000, "role": "TET2 cofactor, demethylation (grade C)", "half_life_hr": 1.0, "mw_g_mol": 146.1, "class": "TCA cycle intermediate, TET dioxygenase cofactor"},
+        "vitamin_C":    {"dose_mg": 500, "role": "TET1/2 cofactor, demethylation (grade C)", "half_life_hr": 1.5, "mw_g_mol": 176.1, "class": "ascorbic acid (vitamin C)", "rda_mg": 90},
+        "SAM_modulator": {"role": "Methylation balance, DNMT regulation", "note": "S-adenosylmethionine is the universal methyl donor; DNMT1/3A/3B maintain methylation"},
         "target": "DNA methylation clocks (Horvath, GrimAge, PhenoAge)",
-        "epigenetic_age_reversal_years_per_dose": 0.5,
-        "reprogramming_partial": "OSKM pulsed at low dose = partial reprogramming (no teratoma risk)",
+        "target_detail": {
+            "horvath_2013": "pan-tissue clock, 353 CpG sites, most validated (Horvath 2013, Genome Biology)",
+            "grimage": "predicts mortality/morbidity, ~1030 CpG sites (Lu 2019, Aging)",
+            "phenoage": "phenotypic age, 513 CpG sites (Levine 2018, Aging)",
+            "dunedinpace": "rate-of-aging clock, 173 CpG sites, most intervention-responsive (Belsky 2022, eLife)",
+        },
+        # 0.25 yr/dose at monthly dosing = ~3 yr/yr of reversal -- still
+        # 1.5-2x the most optimistic human data (TRIIM: ~1.5-2.5 yr over 12
+        # months of daily intervention; cyclic OSK in mice: Ocampo 2016).
+        # The old 0.5 yr/dose (6 yr/yr) had no human basis. Grade C/D.
+        "epigenetic_age_reversal_years_per_dose": 0.25,
+        "reprogramming_partial": "OSKM pulsed at low dose = partial reprogramming (REDUCED teratoma risk vs continuous expression -- not zero risk)",
+        "epigenetic_mechanism_detail": {
+            "demethylation": "TET1/2/3 oxidize 5mC -> 5hmC -> 5fC -> 5caC -> unmodified C (requires alpha-KG + Fe2+ + vitamin C)",
+            "methylation": "DNMT1 (maintenance), DNMT3A/3B (de novo); SAM is methyl donor",
+            "histone_modifications": "H3K4me3 (active), H3K27me3 (repressive), H3K9me3 (heterochromatin), acetylation (active)",
+            "partial_reprogramming": "cyclic OSK/OSKM at low dose reverses epigenetic age without full pluripotency (Ocampo 2016, Cell)",
+        },
     },
 
     # --- ECM & Tissue Remodeling ---
     "ecm": {
-        "hyaluronic_acid": {"dose_mg": 50, "role": "ECM hydration, skin/joint repair"},
-        "collagen_peptides": {"dose_mg": 1000, "role": "Collagen synthesis substrate"},
-        "MMP_inhibitor":  {"role": "TIMP-mimetic, prevent ECM degradation"},
-        "LOX_activator":  {"role": "Lysyl oxidase, collagen crosslinking"},
+        "hyaluronic_acid": {"dose_mg": 50, "role": "ECM hydration, skin/joint repair", "mw_kda": 1000.0, "half_life_hr": 24.0, "tissue": "skin, joints, vitreous"},
+        "collagen_peptides": {"dose_mg": 1000, "role": "Collagen synthesis substrate", "mw_kda": 3.0, "source": "bovine/marine hydrolyzed collagen type I/III", "absorption_pct": 90.0},
+        "MMP_inhibitor":  {"role": "TIMP-mimetic, prevent ECM degradation", "note": "no approved MMP-inhibitor drug; MMP inhibitors failed in cancer trials (musculoskeletal toxicity)"},
+        "LOX_activator":  {"role": "Lysyl oxidase, collagen crosslinking", "note": "LOX modulators are preclinical; LOX promotes crosslinking but also tumor invasion"},
         "target": "Extracellular matrix integrity, tissue scaffold repair",
+        "ecm_components_detail": {
+            "collagen_types": ["I (bone/skin/tendon)", "II (cartilage)", "III (skin/vessels)", "IV (basement membrane)", "V (placenta/hair)", "VI (interstitial)", "VII (anchoring fibrils)", "IX (cartilage)", "X (hypertrophic cartilage)", "XI (cartilage)", "XII (decorin-associated)"],
+            "elastin": "provides tissue elasticity; elastin does not regenerate in adults",
+            "fibronectin": "cell adhesion, wound healing scaffold",
+            "laminin": "basement membrane component",
+            "proteoglycans": "aggrecan (cartilage), perlecan (basement membrane), versican",
+            "glycosaminoglycans": "hyaluronic acid, chondroitin sulfate, heparan sulfate, dermatan sulfate, keratan sulfate",
+        },
+        "collagen_synthesis_rate_young_g_per_day": 3.0,    # ~3g collagen synthesized per day in young adult
+        "collagen_decline_per_year_pct": 1.0,                # ~1% collagen loss per year after 25
+        "elastin_regen_capacity": "very limited (elastin does not meaningfully regenerate in adults)",
+        "mmp_activity_increase_per_year_pct": 1.5,           # MMP activity increases with age (tissue degradation)
+        "timp_activity_decline_per_year_pct": 1.0,            # TIMP activity declines with age
+        "ecm_turnover_days": 80.0,                            # ~80-day ECM protein turnover
     },
 
     # --- Safety & Anti-Tumor Safeguards ---
@@ -290,202 +618,360 @@ CHIEF_JUICE = {
         "contraindications": ["Active cancer", "Severe immunosuppression", "Pregnancy", "Sepsis"],
     },
 
-    # --- OncoSafe TelomereSync 3.0 -- Anti-Oncogenic Safeguards (immortality mechanism #8) ---
+    # --- OncoSafe -- Anti-Oncogenic Safeguards (mechanism #8) ---
     "oncoshield": {
-        "p53_checkpoint_enhancer": {"dose_mg": 0.5, "role": "Nutlin-3a, p53 activation prevents teratoma"},
-        "PTEN_activator": {"dose_mg": 2.0, "role": "PTEN upregulation, PI3K/AKT pathway suppression"},
-        "CRISPRi_oncogene_suppressor": {"dose_ug": 5, "role": "CRISPR interference silencing KRAS, MYC oncogenes"},
-        "CHK1_inhibitor": {"dose_mg": 1.0, "role": "Checkpoint kinase 1 inhibition, forces cancer cell apoptosis"},
-        "shelterin_modulator": {"dose_mg": 0.5, "role": "TRF1/TRF2 optimization, telomere structure protection"},
-        "epigenetic_safeguard": {"dose_mg": 1.0, "role": "DNMT3B modulation, prevents oncogenic methylation patterns"},
-        "biosensor_nanoparticles": {"dose_mg": 0.1, "role": "Real-time ctDNA and tumor marker surveillance"},
-        "ctDNA_probes": {"dose_ug": 2, "role": "Circulating tumor DNA detection, early cancer warning"},
-        "target": "Multi-layer cancer prevention: oncogene suppression + tumor suppressor activation + surveillance",
-        "cancer_risk_reduction_pct": 95.0,
-        "teratoma_prevention_efficiency_pct": 99.5,
-        "monitoring_sensitivity_pct": 98.0,
+        # REVIEW #15 CORRECTIONS. Previously this section contained internal
+        # contradictions, drugs that do not exist, and a 95% cancer-risk-
+        # reduction claim with no supporting literature. Honest status:
+        #  - p53 activation BLOCKS reprogramming (Hong 2009): rescue-only,
+        #    never co-dosed with OSKM pulses.
+        #  - "PTEN activator", "shelterin modulator", "DNMT3B modulator":
+        #    no such drugs exist -- retained as CONCEPTUAL design ideas.
+        #  - CHK1 inhibitors are genotoxic chemo-sensitizers; they would ADD
+        #    DNA damage to healthy tissue. Removed from the routine dose.
+        #  - CRISPRi MYC/KRAS silencing: contingency arm only, triggered by
+        #    ctDNA evidence -- never co-dosed with the OSKM M-factor
+        #    (simultaneous MYC silencing would abort reprogramming).
+        "p53_checkpoint_enhancer": {"dose_mg": 0.5, "role": "Nutlin-3a, POST-reprogramming rescue only (eliminates residual pluripotent cells); p53 activation during reprogramming would abort it (Hong 2009)"},
+        "PTEN_pathway_support": {"dose_mg": None, "role": "CONCEPTUAL: no validated small-molecule PTEN activator exists; design idea only"},
+        "CRISPRi_oncogene_suppressor": {"dose_ug": 5, "role": "Contingency arm only (activated on rising ctDNA): CRISPRi silencing of KRAS/MYC; never co-dosed with OSKM pulses"},
+        "chk1_layer": {"dose_mg": 0, "role": "REMOVED (review #15): CHK1 inhibitors are genotoxic chemo-sensitizers, not cancer preventives"},
+        "shelterin_modulator": {"dose_mg": None, "role": "CONCEPTUAL: no 'shelterin modulator' drug exists; design idea only"},
+        "epigenetic_safeguard": {"dose_mg": None, "role": "CONCEPTUAL: no DNMT3B-modulating drug exists for this purpose"},
+        "biosensor_nanoparticles": {"dose_mg": None, "role": "CONCEPTUAL: in-body real-time ctDNA nanosensors do not exist; external liquid biopsy is the real analog"},
+        "ctDNA_probes": {"dose_ug": 0, "role": "Replaced by external serial liquid-biopsy monitoring (see ctDNA_surveillance)"},
+        "ctDNA_surveillance": {"role": "External serial ctDNA panels + annual whole-body MRI. ctDNA early-detection sensitivity is ~40-70% and stage-dependent (Cohen 2018, CancerSEEK) -- the old 98% figure was false"},
+        "target": "Cancer-risk MANAGEMENT: surveillance + senescent-burden reduction + rescue switches. No pharmacologic combination is validated to prevent cancer outright",
+        # Modeled modest net reduction from SASP/senescent-burden lowering and
+        # earlier detection. No chemoprevention stack is proven to reduce
+        # cancer risk by 95%. Grade D.
+        "cancer_risk_reduction_pct": 25.0,
+        # Aligned with the explicit hazard/mitigation model in BIO (teratoma
+        # hazard 0.35%/mo unmitigated; iCasp9 / forced differentiation /
+        # non-integrating delivery leave a small residual). "Zero teratoma
+        # risk" is not honest for in-vivo OSKM exposure (Abad 2013). Grade D.
+        "teratoma_prevention_efficiency_pct": 90.0,
+        # Stage-dependent ctDNA detection sensitivity (Cohen 2018). Grade B
+        # for the assays themselves; grade D for this application.
+        "monitoring_sensitivity_pct": 55.0,
     },
 
-    # --- NeuroRejuvenex / NeuroRegenex -- Brain & Nervous System (immortality mechanism #9) ---
+    # --- NeuroRejuvenex / NeuroRegenex -- Brain & Nervous System (mechanism #9) ---
     "neuro": {
-        # NeuroRejuvenex components (brain repair)
-        "BDNF_enhancer": {"dose_ug": 50, "role": "Brain-derived neurotrophic factor, neurogenesis"},
-        "NGF_enhancer": {"dose_ug": 30, "role": "Nerve growth factor, neuron survival"},
-        "GDNF_enhancer": {"dose_ug": 20, "role": "Glial-derived neurotrophic factor, dopamine neurons"},
-        "dancing_molecules_biomaterial": {"dose_mg": 5, "role": "Supramolecular polymer, spinal cord repair"},
-        "cell_permeable_peptides": {"dose_mg": 2, "role": "Axon regeneration, crossing scar tissue"},
+        # NeuroRejuvenex components (brain repair). All growth-factor and
+        # exosome entries are investigational; "dancing molecules" are an
+        # IMPLANTABLE supramolecular scaffold for spinal-cord injury research
+        # (Stupp lab), not a systemic injectable. GDF11 "rejuvenation" is
+        # contested (Sinha 2014 vs Egerman 2015 reanalyses).
+        "BDNF_enhancer": {"dose_ug": 50, "role": "Brain-derived neurotrophic factor, neurogenesis (investigational; grade C)"},
+        "NGF_enhancer": {"dose_ug": 30, "role": "Nerve growth factor, neuron survival (investigational; grade C)"},
+        "GDNF_enhancer": {"dose_ug": 20, "role": "Glial-derived neurotrophic factor, dopamine neurons (investigational; grade C)"},
+        "dancing_molecules_biomaterial": {"dose_mg": 5, "role": "Supramolecular polymer scaffold for LOCAL spinal-cord injury repair (implant research, not a systemic injectable; grade C)"},
+        "cell_permeable_peptides": {"dose_mg": 2, "role": "Axon regeneration, crossing scar tissue (preclinical; grade C)"},
         # NeuroRegenex components (nervous system repair)
-        "stem_cell_exosomes_neural": {"dose_billion": 150, "role": "Neural-specific exosomes, paralysis cure"},
-        "electrical_stimulation_mimetic": {"dose_mg": 10, "role": "Mimics electrical stimulation for axon growth"},
-        "GDF11_neural_peptide": {"dose_mg": 0.5, "role": "Growth differentiation factor 11, neural rejuvenation"},
-        "NRF2_neural_inducer": {"dose_mg": 25, "role": "Antioxidant, neuroinflammation reduction"},
-        "mito_enzyme_conjugate": {"dose_mg": 5, "role": "Mitochondrial enzyme, neural energy support"},
-        "RYK_inhibitor": {"dose_mg": 2, "role": "RYK gene inhibition, Wnt pathway for axon regrowth"},
-        "schwann_cell_mimetic": {"dose_mg": 5, "role": "Schwann cell transplant mimetic, myelination"},
-        "vagus_nerve_stim_mimetic": {"dose_mg": 3, "role": "Vagus nerve stimulation, anti-inflammatory"},
+        "stem_cell_exosomes_neural": {"dose_billion": 150, "role": "Neural-specific exosomes (paralysis recovery is MODELED, not demonstrated in humans; grade C-D)"},
+        "electrical_stimulation_mimetic": {"dose_mg": 10, "role": "Mimics electrical stimulation for axon growth (conceptual; grade D)"},
+        "GDF11_neural_peptide": {"dose_mg": 0.5, "role": "Growth differentiation factor 11, neural rejuvenation (contested evidence; grade C-D)"},
+        "NRF2_neural_inducer": {"dose_mg": 25, "role": "Antioxidant, neuroinflammation reduction (grade C)"},
+        "mito_enzyme_conjugate": {"dose_mg": 5, "role": "Mitochondrial enzyme, neural energy support (conceptual; grade D)"},
+        "RYK_inhibitor": {"dose_mg": 2, "role": "RYK suppression derepresses Wnt-mediated axon regrowth (preclinical; grade C)"},
+        "schwann_cell_mimetic": {"dose_mg": 5, "role": "Schwann cell transplant mimetic, myelination (conceptual; grade D)"},
+        "vagus_nerve_stim_mimetic": {"dose_mg": 3, "role": "Vagus nerve stimulation, anti-inflammatory (real VNS is a device, not a molecule; conceptual; grade D)"},
         # Neurotransmitter optimization
-        "acetylcholine_booster": {"dose_mg": 5, "role": "Donepezil analog, cholinesterase inhibitor"},
-        "dopamine_modulator": {"dose_mg": 2, "role": "Dopamine pathway optimization"},
-        "serotonin_balancer": {"dose_mg": 2, "role": "Serotonin regulation, mood stability"},
-        "target": "Brain repair, neural regeneration, myelination, paralysis cure, mental health",
-        "neurogenesis_rate_pct_per_month": 8.0,
-        "myelination_repair_rate_pct_per_month": 5.0,
-        "cognitive_function_reversal_years": 20.0,
-        "paralysis_recovery_pct": 85.0,
-        "mental_illness_cure_pct": 90.0,
+        "acetylcholine_booster": {"dose_mg": 5, "role": "Cholinesterase inhibitor class (donepezil is real/approved for dementia symptoms; grade A for dementia symptoms, not cure)"},
+        "dopamine_modulator": {"dose_mg": 2, "role": "Dopamine pathway optimization (conceptual as dosed; grade D)"},
+        "serotonin_balancer": {"dose_mg": 2, "role": "Serotonin regulation, mood stability (conceptual as dosed; grade D)"},
+        "target": "Brain repair, neural regeneration, myelination, paralysis recovery (modeled), mental-health support (modeled)",
+        "target_detail": {
+            "neurogenesis": "hippocampal dentate gyrus (adult neurogenesis debated; ~700 new neurons/day in young adults, Sorrells 2018 vs Boldrini 2018)",
+            "myelination": "oligodendrocyte progenitor cells (OPCs) -> myelinating oligodendrocytes; clemastine accelerates (Grade B, Green 2017)",
+            "synaptic_plasticity": "BDNF/TrkB pathway, long-term potentiation (LTP), dendritic spine formation",
+            "axonal_regen": "CNS axons do not regenerate (CNS inhibitors + scar); PNS axons regrow ~1mm/day",
+            "paralysis": "spinal cord injury: scar + cyst cavity; no human regeneration from complete transection",
+        },
+        # CORRECTED (review #15): adult human hippocampal neurogenesis is
+        # heavily debated (Sorrells 2018 vs later counter-evidence); 8%/month
+        # had no basis. 2%/month remains a MODELED optimistic assumption.
+        "neurogenesis_rate_pct_per_month": 2.0,
+        "myelination_repair_rate_pct_per_month": 3.0,
+        "cognitive_function_reversal_years": 5.0,
+        # No human paralysis reversal from any of these components exists;
+        # 40% recovery is a MODELED optimistic extrapolation of preclinical
+        # scaffold/exosome work. Grade D.
+        "paralysis_recovery_pct": 40.0,
+        # No growth-factor cocktail cures mental illness. 25% is a MODELED
+        # supportive-effect figure. Grade D. (Problem list conditions like
+        # PTSD remain psychiatric-care conditions.)
+        "mental_illness_cure_pct": 25.0,
+        "neuroanatomy_detail": {
+            "neuron_count_adult": 86000000000,
+            "synapse_count_adult": 100000000000000,
+            "brain_mass_grams": 1400,
+            "hippocampal_volume_ml": 3.5,
+            "neuron_loss_per_year": 100000,
+            "hippocampal_decline_per_year_pct": 0.5,
+            "myelination_young_pct": 100.0,
+            "myelination_decline_per_year_pct": 0.4,
+            "white_matter_decline_per_year_pct": 0.3,
+            "cortical_thickness_decline_per_year_pct": 0.2,
+        },
     },
 
-    # --- MyoForce / ApexForce -- Muscle Fiber Strength Enhancement (immortality mechanism #10) ---
+    # --- MyoForce / ApexForce -- Muscle Fiber Strength Enhancement (mechanism #10) ---
     "muscle": {
-        "myostatin_inhibitor": {"dose_ug": 5, "role": "Follistatin analog GYM329, specific force +100-200%"},
-        "myofibril_packing_enhancer": {"dose_ug": 10, "role": "Targeted Yamanaka factors, myofibril density +200%"},
-        "calcium_handling_optimizer": {"dose_mg": 5, "role": "SERCA/ryanodine receptor enhancer, Ca2+ dynamics +100%"},
-        "fiber_type_shift_inducer": {"dose_mg": 10, "role": "PGC-1a activator, Type IIX conversion +100%"},
-        "neural_adaptation_mimetic": {"dose_mg": 10, "role": "Neuromuscular junction enhancer, activation +70%"},
-        "mito_efficiency_booster": {"dose_mg": 500, "role": "Urolithin A analog, ATP for sustained force +50%"},
-        "cross_bridge_kinetics_enhancer": {"dose_mg": 5, "role": "Actin-myosin super-optimizer, +100% efficiency"},
-        "sarcomere_structural_optimizer": {"dose_mg": 5, "role": "Titin enhancer, elasticity/force +100%"},
-        "anti_hypertrophy_modulator": {"dose_mg": 4, "role": "15-PGDH inhibitor, caps mass gain at <5%"},
-        "NRF2_muscle_inducer": {"dose_mg": 25, "role": "Antioxidant, protects strength gains"},
-        "p53_muscle_booster": {"dose_mg": 0.5, "role": "Anti-oncogenic safeguard"},
-        "target": "Maximum theoretical specific force per muscle fiber (1000% increase, ~300 N/cm2)",
+        # CORRECTED (review #15): the old targets (+100-200% specific force,
+        # 330 N/cm2, +1000%) exceed mammalian myosin cross-bridge physics.
+        # Human single-fiber specific force is ~25-35 N/cm2; resistance
+        # training yields ~15-25% strength gains in months; anti-myostatin
+        # trials in humans produce modest mass gains only. Modeled target is
+        # now 50 N/cm2 / +25% -- still optimistic, but inside known biology.
+        "myostatin_inhibitor": {"dose_ug": 5, "role": "Anti-myostatin mAb class (GYM329 is real; trials dose mg/kg IV; human trials show modest mass gains, small strength effects; grade B)"},
+        "myofibril_packing_enhancer": {"dose_ug": 10, "role": "Targeted Yamanaka factors, myofibril density (conceptual; grade D)"},
+        "calcium_handling_optimizer": {"dose_mg": 5, "role": "SERCA/ryanodine receptor enhancer, Ca2+ dynamics (conceptual; grade D)"},
+        "fiber_type_shift_inducer": {"dose_mg": 10, "role": "PGC-1a activator, Type IIX shift (exercise does this; pharmacologic dosing conceptual; grade C)"},
+        "neural_adaptation_mimetic": {"dose_mg": 10, "role": "Neuromuscular junction enhancer (conceptual; grade D)"},
+        "mito_efficiency_booster": {"dose_mg": 500, "role": "Urolithin A analog, ATP for sustained force (Andreux 2019; grade B)"},
+        "cross_bridge_kinetics_enhancer": {"dose_mg": 5, "role": "Actin-myosin kinetics (no known compound achieves this; conceptual; grade D)"},
+        "sarcomere_structural_optimizer": {"dose_mg": 5, "role": "Titin modulation (conceptual; grade D)"},
+        "anti_hypertrophy_modulator": {"dose_mg": 4, "role": "15-PGDH inhibitor (real preclinical rejuvenation target, Palla 2021; grade C)"},
+        "NRF2_muscle_inducer": {"dose_mg": 25, "role": "Antioxidant pathway support (grade C)"},
+        "p53_muscle_booster": {"dose_mg": 0.5, "role": "Rescue-only anti-oncogenic layer (not co-dosed with reprogramming)"},
+        "target": "Specific force per muscle fiber raised toward 50 N/cm2 (+25% vs baseline ~30 N/cm2; modeled optimistic)",
         "baseline_specific_force_n_per_cm2": 30.0,
-        "max_specific_force_n_per_cm2": 330.0,
-        "strength_increase_pct": 1000.0,
+        "max_specific_force_n_per_cm2": 50.0,
+        "strength_increase_pct": 25.0,
         "hypertrophy_cap_pct": 5.0,
         "regeneration_months": 6.0,
+        "muscle_biology_detail": {
+            "fiber_types": {
+                "type_I": "slow oxidative, red, fatigue-resistant, ~40% in untrained",
+                "type_IIa": "fast oxidative, pink, moderate fatigue",
+                "type_IIx": "fast glycolytic, white, fatigable, ~10% in untrained",
+                "type_IIb": "fastest (rodents only; humans have IIx as fastest)",
+            },
+            "muscle_fiber_count_adult": 600000000000,
+            "muscle_mass_kg_70kg": 28.0,
+            "specific_force_young_n_per_cm2": 30.0,
+            "specific_force_at_60_n_per_cm2": 10.8,
+            "sarcopenia_rate_per_year_pct": 1.0,
+            "satellite_cell_count_per_fiber_young": 5.0,
+            "satellite_cell_count_per_fiber_aged": 1.5,
+            "myostatin_role": "negative regulator of muscle mass; myostatin knockout -> 2x muscle in mice/cattle",
+            "resistance_training_strength_gain_pct": 15.0,
+            "resistance_training_mass_gain_pct": 10.0,
+        },
     },
 
-    # --- OsteoMax -- Bone Strength Enhancement (immortality mechanism #11) ---
+    # --- OsteoMax -- Bone Strength Enhancement (mechanism #11) ---
     "bone": {
-        "teriparatide_analog": {"dose_ug": 20, "role": "PTH fragment, osteoblast stimulation, +500% trabecular density"},
-        "abaloparatide_analog": {"dose_ug": 80, "role": "PTH-related peptide, cortical thickness +500%"},
-        "CCN3_hormone_analog": {"dose_mg": 0.5, "role": "Maternal Brain Hormone, osteoblast-driven density +500%"},
-        "alendronate_bisphosphonate": {"dose_mg": 5, "role": "Resorption inhibition, mineral density +500%"},
-        "denosumab_analog": {"dose_mg": 60, "role": "RANKL inhibitor, fracture resistance +500%"},
-        "sclerostin_inhibitor": {"dose_mg": 210, "role": "Romosozumab analog, bone formation +500%"},
-        "hydrogel_biomaterial": {"dose_mg": 10, "role": "Rapid mineralization, matrix formation +500%"},
-        "vibration_therapy_mimetic": {"dose_mg": 10, "role": "Mechanical stimulation, regeneration +400%"},
-        "vitamin_D3_conjugate": {"dose_ug": 50, "role": "Mineral absorption, calcium homeostasis +300%"},
-        "stem_cell_activator_bone": {"dose_mg": 0.5, "role": "GDF11/biglycan/decorin, marrow regeneration +400%"},
-        "NRF2_bone_inducer": {"dose_mg": 25, "role": "Antioxidant, matrix protection +300%"},
-        "p53_bone_booster": {"dose_mg": 0.5, "role": "Anti-oncogenic safeguard"},
-        "target": "Maximum theoretical bone strength (2000-5000% increase, ~4-10 GPa compressive)",
+        # CORRECTED (review #15): the old targets (+500% density per agent,
+        # 4,200 MPa / +2000%) are physically impossible. Cortical bone
+        # compressive strength is ~150-200 MPa; no biological material exists
+        # at GPa scale. Real approved anabolic/antiresorptive agents gain
+        # ~5-15% BMD per year (Forteo/Tymlos/Evenity/Prolia trial data).
+        # Alendronate corrected to the approved 70 mg weekly dose (old: 5 mg).
+        "teriparatide_analog": {"dose_ug": 20, "role": "PTH(1-34), osteoblast stimulation (~6-10% lumbar BMD/yr in Forteo trials; approved daily dose; grade A)"},
+        "abaloparatide_analog": {"dose_ug": 80, "role": "PTHrP analog, cortical + trabecular gains (~9% BMD/yr in Tymlos trials; approved; grade A)"},
+        "CCN3_hormone_analog": {"dose_mg": 0.5, "role": "CCN3 'maternal brain hormone' osteoblast factor (real 2023 discovery; PRECLINICAL only; grade C)"},
+        "alendronate_bisphosphonate": {"dose_mg": 70, "role": "Resorption inhibition (~5-8% BMD over 1-2 yrs; approved 70 mg WEEKLY; grade A)"},
+        "denosumab_analog": {"dose_mg": 60, "role": "RANKL inhibitor (~6-10% BMD/yr; approved 60 mg q6mo; grade A)"},
+        "sclerostin_inhibitor": {"dose_mg": 210, "role": "Romosozumab-class, bone formation (~10-15% BMD/yr; approved 210 mg monthly; grade A)"},
+        "hydrogel_biomaterial": {"dose_mg": 10, "role": "Local mineralization scaffold (preclinical; grade C)"},
+        "vibration_therapy_mimetic": {"dose_mg": 10, "role": "Mechanical stimulation analog (low-magnitude vibration data are mixed; grade C)"},
+        "vitamin_D3_conjugate": {"dose_ug": 50, "role": "Mineral absorption, calcium homeostasis (50 ug = 2000 IU; grade A at this dose)"},
+        "stem_cell_activator_bone": {"dose_mg": 0.5, "role": "GDF11/biglycan/decorin marrow support (contested/preclinical; grade C-D)"},
+        "NRF2_bone_inducer": {"dose_mg": 25, "role": "Antioxidant pathway support (grade C)"},
+        "p53_bone_booster": {"dose_mg": 0.5, "role": "Rescue-only anti-oncogenic layer (not co-dosed with reprogramming)"},
+        "target": "Bone compressive strength raised toward 230 MPa (+15% vs ~200 MPa young cortical baseline; modeled optimistic)",
         "baseline_compressive_strength_mpa": 200.0,
-        "max_compressive_strength_mpa": 4200.0,
-        "strength_increase_pct": 2000.0,
+        "max_compressive_strength_mpa": 230.0,
+        "strength_increase_pct": 15.0,
         "size_change_pct": 0.0,
         "marrow_function_preserved_pct": 100.0,
         "regeneration_months": 6.0,
+        "bone_biology_detail": {
+            "bone_types": {
+                "cortical": "compact bone, ~80% of skeletal mass, compressive strength ~150-200 MPa",
+                "trabecular": "spongy bone, ~20% of skeletal mass, compressive strength ~5-10 MPa",
+            },
+            "bone_mass_kg_70kg": 4.5,
+            "peak_bmd_age": 30,
+            "bmd_decline_per_year_pct": 0.7,
+            "osteoporosis_t_score": -2.5,
+            "fracture_threshold_mpa": 50.0,
+            "fracture_risk_osteoporosis_mult": 3.0,
+            "bone_turnover_pct_per_year": 10.0,
+            "osteoblast_function": "bone formation (PTH, teriparatide stimulate)",
+            "osteoclast_function": "bone resorption (RANKL, denosumab inhibits)",
+            "sclerostin_role": "Wnt antagonist; romosozumab inhibits -> bone formation",
+            "approved_drug_bmd_gains": {
+                "teriparatide": "~6-10% lumbar BMD/yr (Forteo trials)",
+                "abaloparatide": "~9% BMD/yr (Tymlos trials)",
+                "alendronate": "~5-8% BMD over 1-2 yrs (Fosamax trials)",
+                "denosumab": "~6-10% BMD/yr (Prolia trials)",
+                "romosozumab": "~10-15% BMD/yr (Evenity trials)",
+            },
+        },
     },
 
-    # --- ImmunoEternal -- Lifetime Immune Engineering (immortality mechanism #12) ---
+    # --- ImmunoEternal -- Lifetime Immune Engineering (mechanism #12) ---
     "immunoeternal": {
-        "CRISPR_HSC_editor": {"dose_ug": 5, "role": "CRISPR-Cas9 mRNA, HSC editing for permanent immune upgrades"},
-        "CCN3_immune_stimulator": {"dose_mg": 0.5, "role": "HSC activity boost, immune stem cell stimulation"},
-        "CART_NK_mRNA": {"dose_ug": 10, "role": "Engineered T/NK cells, broad pathogen/cancer targeting"},
-        "RNAi_autoimmunity_silencer": {"dose_mg": 5, "role": "PD-1 enhancers, prevents autoimmune over-reaction"},
-        "HSCT_mimetic": {"dose_mg": 2, "role": "G-CSF analog, immune system reset"},
-        "NK_cell_booster": {"dose_mg": 1, "role": "IL-15 analog, innate enhancement, rapid pathogen clearance"},
-        "memory_cell_optimizer": {"dose_mg": 1, "role": "IL-7, T/B cell longevity, lifetime immune memory"},
-        "NRF2_immune_inducer": {"dose_mg": 25, "role": "Antioxidant, reduces immunosenescence"},
-        "p53_immune_booster": {"dose_mg": 0.5, "role": "Anti-oncogenic safeguard"},
-        "target": "One-time HSC gene edit for lifetime super-immunity (infections, cancer, autoimmunity)",
-        "immune_age_reversal_years": 40.0,
-        "autoimmune_resistance_pct": 95.0,
-        "pathogen_resistance_pct": 90.0,
-        "cancer_surveillance_pct": 95.0,
-        "lifetime_effect": True,
+        # CORRECTED (review #15): in-vivo HSC editing is NOT routine-therapy
+        # technology. The only approved HSC edit (CASGEVY) is ex-vivo with
+        # myeloablative conditioning. "PD-1 enhancers" was backwards: PD-1
+        # AGONISM suppresses autoimmunity (antagonism triggers it) --
+        # peresolimab Phase 2 (Stein 2023) is the real precedent.
+        "CRISPR_HSC_editor": {"dose_ug": 5, "role": "CRISPR-Cas9 mRNA, HSC editing -- CONCEPTUAL as an in-vivo routine dose; approved precedent (CASGEVY) is ex-vivo with myeloablative conditioning (grade B for the platform, D for this use)"},
+        "CCN3_immune_stimulator": {"dose_mg": 0.5, "role": "HSC activity boost (preclinical; grade C)"},
+        "CART_NK_mRNA": {"dose_ug": 10, "role": "Engineered T/NK cells, pathogen/cancer targeting -- CAR-T is real/approved for specific CD19+ hematologic cancers only (grade A for the platform in its niche; grade D as broad-spectrum dosing)"},
+        "RNAi_autoimmunity_silencer": {"dose_mg": 5, "role": "PD-1 AGONISM: stimulating the PD-1 checkpoint suppresses autoimmune over-reaction (peresolimab Phase 2, Stein 2023; grade B). An antagonist would do the opposite"},
+        "HSCT_mimetic": {"dose_mg": 2, "role": "G-CSF analog, HSC mobilization (G-CSF is real/approved; 'immune system reset' via transplant is major procedure, not a mimetic; grade D)"},
+        "NK_cell_booster": {"dose_mg": 1, "role": "IL-15 pathway, innate enhancement (investigational; trials dose ug/kg IV; grade B)"},
+        "memory_cell_optimizer": {"dose_mg": 1, "role": "IL-7 pathway, T/B cell survival (CYT107-class ug/kg dosing; grade B)"},
+        "NRF2_immune_inducer": {"dose_mg": 25, "role": "Antioxidant, reduces immunosenescence markers (grade C)"},
+        "p53_immune_booster": {"dose_mg": 0.5, "role": "Rescue-only anti-oncogenic layer (not co-dosed with reprogramming)"},
+        "target": "Immune engineering for infection/cancer/autoimmunity resistance (MODELED; one-time lifetime 'super-immunity' is conceptual)",
+        "immune_age_reversal_years": 5.0,
+        "autoimmune_resistance_pct": 30.0,
+        "pathogen_resistance_pct": 30.0,
+        "cancer_surveillance_pct": 40.0,
+        "lifetime_effect": "Conceptual (grade D)",
     },
 
-    # --- MemoMax -- Memory Enhancement (immortality mechanism #13) ---
+    # --- MemoMax -- Memory Enhancement (mechanism #13) ---
     "memory": {
-        "CI994_HDAC_inhibitor": {"dose_mg": 5, "role": "Gene activation, memory consolidation, synaptic plasticity"},
-        "methylene_blue": {"dose_mg": 10, "role": "ATP boost, mental clarity, razor-sharp focus"},
-        "J147_nootropic": {"dose_mg": 20, "role": "Neuroprotective, cognitive decline reversal"},
-        "Dihexa": {"dose_mg": 3, "role": "Synaptogenic, neural repair, memory connections"},
-        "Noopept": {"dose_mg": 15, "role": "Learning enhancement, brain resilience"},
-        "donepezil_analog": {"dose_mg": 5, "role": "Cholinesterase inhibitor, acetylcholine boost"},
-        "GL_II_73": {"dose_mg": 10, "role": "Memory restoration, gene expression repair"},
-        "NRF2_memory_inducer": {"dose_mg": 25, "role": "Antioxidant, lifelong neuron protection"},
-        "p53_memory_booster": {"dose_mg": 0.5, "role": "Anti-oncogenic safeguard"},
-        "target": "Maximum theoretical memory (eidetic recall, 1000%+ enhancement, dementia reversal)",
-        "memory_capacity_increase_pct": 1000.0,
-        "recall_speed_increase_pct": 500.0,
-        "dementia_reversal_pct": 95.0,
-        "learning_acceleration_fold": 10.0,
+        # CORRECTED (review #15): CI994/methylene-blue nootropic claims are
+        # preclinical (HDACi memory enhancement: aged-mice data); J147,
+        # Dihexa, GL-II-73 are preclinical compounds. "1000% memory /
+        # 95% dementia reversal" is fantasy: NO known therapy reverses
+        # established dementia. Donepezil treats symptoms modestly.
+        "CI994_HDAC_inhibitor": {"dose_mg": 5, "role": "HDAC inhibition, memory consolidation (aged-mice data; preclinical for this use; grade C)"},
+        "methylene_blue": {"dose_mg": 10, "role": "Mitochondrial electron carrier; low-dose human studies are small (grade B-C)"},
+        "J147_nootropic": {"dose_mg": 20, "role": "Neuroprotective curcumin derivative (PRECLINICAL only; grade C)"},
+        "Dihexa": {"dose_mg": 3, "role": "Synaptogenic peptide (PRECLINICAL only; hepatotoxicity concerns; grade C)"},
+        "Noopept": {"dose_mg": 15, "role": "Nootropic (Russian clinical data, limited quality; grade C)"},
+        "donepezil_analog": {"dose_mg": 5, "role": "Cholinesterase inhibitor (approved; modest symptomatic benefit in dementia; grade A for symptoms, NOT cure)"},
+        "GL_II_73": {"dose_mg": 10, "role": "BDNF-pathway benzodiazepine derivative (preclinical; grade C)"},
+        "NRF2_memory_inducer": {"dose_mg": 25, "role": "Antioxidant pathway support (grade C)"},
+        "p53_memory_booster": {"dose_mg": 0.5, "role": "Rescue-only anti-oncogenic layer (not co-dosed with reprogramming)"},
+        "target": "Memory support + dementia-risk reduction (MODELED; not dementia reversal)",
+        "memory_capacity_increase_pct": 20.0,
+        "recall_speed_increase_pct": 15.0,
+        "dementia_reversal_pct": 10.0,
+        "learning_acceleration_fold": 2.0,
     },
 
-    # --- PulmoMax -- Lung Repair & Enhancement (immortality mechanism #14) ---
+    # --- PulmoMax -- Lung Repair & Enhancement (mechanism #14) ---
     "lung": {
-        "stem_cell_activator_alveolar": {"dose_ug": 10, "role": "Alveolar progenitor reprogramming, gas exchange repair"},
-        "HIF2_inhibitor": {"dose_mg": 5, "role": "PT-2385 analog, fibrosis reversal, elasticity restoration"},
-        "ECM_scaffold_hydrogel": {"dose_mg": 10, "role": "Lung niche support, gas exchange structure"},
-        "anti_inflammatory_RNAi_lung": {"dose_mg": 5, "role": "Cytokine suppression, disease prevention"},
-        "vascular_optimizer": {"dose_mg": 2, "role": "Angiogenic factors, blood flow for oxygenation"},
-        "NRF2_lung_inducer": {"dose_mg": 25, "role": "Antioxidant, oxidative stress protection"},
-        "p53_lung_booster": {"dose_mg": 0.5, "role": "Anti-oncogenic safeguard"},
-        "target": "Maximum theoretical lungs (300%+ gas exchange, infinite repair, disease immunity)",
-        "gas_exchange_efficiency_increase_pct": 300.0,
-        "fibrosis_reversal_pct": 90.0,
-        "disease_resistance_pct": 95.0,
-        "regeneration_rate_pct_per_month": 10.0,
+        # CORRECTED (review #15): approved antifibrotics (nintedanib,
+        # pirfenidone) SLOW decline (~50%); established fibrosis is largely
+        # irreversible. Belzutifan (HIF2i) is approved for VHL-associated
+        # renal tumors, not fibrosis -- repurposing is investigational.
+        "stem_cell_activator_alveolar": {"dose_ug": 10, "role": "Alveolar progenitor support (no published human alveolar reprogramming; grade D)"},
+        "HIF2_inhibitor": {"dose_mg": 5, "role": "HIF2 inhibitor (belzutifan is approved for VHL renal tumors; fibrosis repurposing is INVESTIGATIONAL; grade B platform, D for this use)"},
+        "ECM_scaffold_hydrogel": {"dose_mg": 10, "role": "Lung niche scaffold (preclinical; grade C)"},
+        "anti_inflammatory_RNAi_lung": {"dose_mg": 5, "role": "Cytokine suppression (investigational; grade C)"},
+        "vascular_optimizer": {"dose_mg": 2, "role": "Angiogenic support (VEGF pulmonary delivery risks vascular leak; grade D)"},
+        "NRF2_lung_inducer": {"dose_mg": 25, "role": "Antioxidant pathway support (grade C)"},
+        "p53_lung_booster": {"dose_mg": 0.5, "role": "Rescue-only anti-oncogenic layer (not co-dosed with reprogramming)"},
+        "target": "Gas-exchange support + fibrosis slowdown (MODELED; not established-fibrosis reversal)",
+        "gas_exchange_efficiency_increase_pct": 20.0,
+        "fibrosis_reversal_pct": 25.0,
+        "disease_resistance_pct": 30.0,
+        "regeneration_rate_pct_per_month": 3.0,
     },
 
-    # --- OncoCure / OncoEradicate -- Active Cancer Cure (immortality mechanism #15) ---
+    # --- OncoCure / OncoEradicate -- Active Cancer Response (mechanism #15) ---
     "oncocure": {
-        "CRISPR_oncogene_corrector": {"dose_ug": 5, "role": "CRISPR-Cas9, TP53/KRAS mutation correction"},
-        "mRNA_vaccine_payload": {"dose_ug": 10, "role": "Universal antigen targeting, T-cell training"},
-        "CART_NK_killer_mRNA": {"dose_ug": 10, "role": "Engineered immune killers for solid tumors + blood cancers"},
-        "RNAi_oncogene_silencer": {"dose_mg": 5, "role": "PD-L1 suppression, disables cancer evasion"},
-        "angiogenesis_inhibitor": {"dose_mg": 5, "role": "Bevacizumab analog, starves tumors of blood supply"},
-        "exercise_mimicking_compound": {"dose_mg": 10, "role": "Metabolic targeting, tumor stress enhancement"},
-        "NRF2_oncocure_inducer": {"dose_mg": 25, "role": "Detoxification, carcinogen clearance, prevention"},
-        "p53_oncocure_booster": {"dose_mg": 0.5, "role": "Anti-oncogenic safeguard, apoptosis induction"},
-        "target": "One-time cure for all cancers (100% efficacy: immune reprogramming + tumor modulation + genomic correction)",
-        "cure_efficacy_pct": 100.0,
-        "recurrence_prevention_pct": 99.0,
-        "solid_tumor_response_pct": 95.0,
-        "blood_cancer_response_pct": 98.0,
-        "metastatic_cancer_response_pct": 90.0,
+        # CORRECTED (review #15): "100% cure for all cancers" is fantasy.
+        # Real anchors: CAR-T achieves complete responses in specific CD19+
+        # hematologic malignancies; solid-tumor response rates remain low;
+        # no pan-cancer therapy exists. Figures below are modeled upper
+        # bounds for a hypothetical multi-modal response -- grade D.
+        "CRISPR_oncogene_corrector": {"dose_ug": 5, "role": "CRISPR correction of TP53/KRAS-mutant clones (contingency concept; grade D)"},
+        "mRNA_vaccine_payload": {"dose_ug": 10, "role": "Tumor-antigen mRNA vaccine (real platform; indication-specific; grade B platform)"},
+        "CART_NK_killer_mRNA": {"dose_ug": 10, "role": "Engineered immune killers (approved in CD19+ hematologic cancers only; grade A in niche, D as pan-cancer)"},
+        "RNAi_oncogene_silencer": {"dose_mg": 5, "role": "PD-L1 suppression (real IO mechanism exists as approved mAbs for specific cancers; grade A in niche)"},
+        "angiogenesis_inhibitor": {"dose_mg": 5, "role": "Bevacizumab-class VEGF blockade (approved for specific indications; grade A in niche)"},
+        "exercise_mimicking_compound": {"dose_mg": 10, "role": "Metabolic tumor stress (conceptual; grade D)"},
+        "NRF2_oncocure_inducer": {"dose_mg": 25, "role": "Detoxification pathway support (grade C)"},
+        "p53_oncocure_booster": {"dose_mg": 0.5, "role": "Rescue-only layer"},
+        "target": "Multi-modal cancer response support (MODELED; NOT a pan-cancer cure)",
+        "cure_efficacy_pct": 35.0,
+        "recurrence_prevention_pct": 50.0,
+        "solid_tumor_response_pct": 20.0,
+        "blood_cancer_response_pct": 50.0,
+        "metastatic_cancer_response_pct": 15.0,
     },
 
-    # --- HemoMax -- Oxygen Capacity Enhancement (immortality mechanism #16) ---
+    # --- HemoMax -- Oxygen Capacity Enhancement (mechanism #16) ---
     "hemo": {
-        "CRISPR_hemoglobin_editor": {"dose_ug": 5, "role": "High-affinity hemoglobin variants, 6-8 O2 per molecule"},
-        "synthetic_carrier_nanoparticles": {"dose_mg": 100, "role": "Perfluorocarbon/fullerene analogs, 5-10x O2 capacity"},
-        "HSC_activator_erythropoiesis": {"dose_mg": 2, "role": "Erythropoietin analog, super-RBC production"},
-        "NRF2_hemo_inducer": {"dose_mg": 25, "role": "Antioxidant, prevents hemolysis"},
-        "p53_hemo_booster": {"dose_mg": 0.5, "role": "Anti-oncogenic safeguard"},
-        "target": "Maximum theoretical O2 per RBC (~5-10 billion O2, 500-1000% increase)",
+        # CORRECTED (review #15) -- this was a flat chemistry error:
+        # hemoglobin binds a MAXIMUM of 4 O2 per molecule (~270 million Hb
+        # per RBC -> ~1.07e9 O2 per RBC). "6-8 O2 per molecule" and
+        # "7.5 billion O2 per RBC / +650%" are physically impossible.
+        # High-affinity Hb variants shift the dissociation curve (and can
+        # IMPAIR tissue O2 release); EPO raises RBC COUNT with real
+        # thrombosis/hypertension risks. Perfluorocarbon O2 carriers have
+        # repeatedly failed clinical safety.
+        "CRISPR_hemoglobin_editor": {"dose_ug": 5, "role": "Hb editing exists for sickle/thal (CASGEVY, ex-vivo) -- it does NOT raise per-cell O2 capacity in healthy Hb; grade A in niche, D here"},
+        "synthetic_carrier_nanoparticles": {"dose_mg": 100, "role": "Perfluorocarbon-class O2 carriers: NO approved product exists (hemoglobin-based carriers failed safety trials; grade D)"},
+        "HSC_activator_erythropoiesis": {"dose_mg": 2, "role": "Erythropoietin analog raises RBC count (approved drug with hypertension/thrombosis risks; ESA misuse is banned in sport; grade A in niche)"},
+        "NRF2_hemo_inducer": {"dose_mg": 25, "role": "Antioxidant, hemolysis reduction support (grade C)"},
+        "p53_hemo_booster": {"dose_mg": 0.5, "role": "Rescue-only anti-oncogenic layer (not co-dosed with reprogramming)"},
+        "target": "O2 capacity support via RBC mass/quality (MODELED; per-RBC O2 capacity is chemically capped)",
         "baseline_o2_per_rbc_billion": 1.0,
-        "max_o2_per_rbc_billion": 7.5,
-        "o2_capacity_increase_pct": 650.0,
-        "rbc_lifespan_increase_pct": 50.0,
+        "max_o2_per_rbc_billion": 1.1,
+        "o2_capacity_increase_pct": 10.0,
+        "rbc_lifespan_increase_pct": 15.0,
+        "hematology_detail": {
+            "rbc_count_per_uL": 5000000,
+            "total_rbc_count_70kg": 25000000000000,
+            "hb_molecules_per_rbc": 270000000,
+            "o2_binding_sites_per_hb": 4,
+            "max_o2_per_rbc": 1080000000,
+            "hb_concentration_g_dL": 15.0,
+            "hb_per_rbc_pg": 30.0,
+            "rbc_lifespan_days": 120,
+            "rbc_production_rate_per_day": 200000000000,
+            "blood_volume_ml_70kg": 5000,
+            "plasma_volume_ml_70kg": 3000,
+            "reticulocyte_pct_baseline": 1.5,
+        },
     },
 
     # --- EternalYouth Pro Enhancements (additions to existing mechanisms) ---
     "eternal_youth_pro": {
-        "anti_necrotic_compound": {"dose_mg": 5, "role": "Necroptosis inhibition, prevents unregulated cell death"},
-        "epitalon_peptide": {"dose_mg": 0.5, "role": "Telomere stabilization, lifespan extension"},
-        "CCN3_hormone_analog": {"dose_mg": 0.5, "role": "Regeneration, anti-wrinkle, anti-gray hair, bone/muscle boost"},
-        "exercise_mimicking_compound": {"dose_mg": 10, "role": "Metabolic targeting, mTOR pathway synergy"},
-        "spermidine": {"dose_mg": 5, "role": "Autophagy booster, protein clearance"},
-        "target": "Enhanced anti-aging: necroptosis inhibition + telomere stabilization + hormone rejuvenation",
-        "necroptosis_inhibition_pct": 90.0,
+        # CORRECTED (review #15): necroptosis inhibitors are preclinical, and
+        # necroptosis is ALSO tumor-suppressive -- blanket inhibition carries
+        # risk. Epitalon is grade D (preclinical peptide; no robust human
+        # lifespan data). Cosmetic outcomes are MODELED, not demonstrated.
+        "anti_necrotic_compound": {"dose_mg": 5, "role": "Necroptosis inhibition (preclinical; blanket necroptosis blockade is tumor-risk-relevant; grade C-D)"},
+        "epitalon_peptide": {"dose_mg": 0.5, "role": "Telomere stabilization peptide (grade D: preclinical, limited-quality human data)"},
+        "CCN3_hormone_analog": {"dose_mg": 0.5, "role": "CCN3 regeneration factor (real 2023 discovery, preclinical; cosmetic roles are MODELED; grade C)"},
+        "exercise_mimicking_compound": {"dose_mg": 10, "role": "Metabolic targeting, mTOR pathway synergy (conceptual; exercise itself is the real evidence; grade D)"},
+        "spermidine": {"dose_mg": 5, "role": "Autophagy booster, protein clearance (human trials used 1.2-6 mg/day -- safe; grade B)"},
+        "target": "Enhanced anti-aging: necroptosis modulation + telomere support + hormone support (modeled)",
+        "necroptosis_inhibition_pct": 40.0,
         "telomere_stabilization_fold": 1.5,
-        "wrinkle_reduction_pct": 80.0,
-        "gray_hair_reversal_pct": 75.0,
+        "wrinkle_reduction_pct": 40.0,
+        "gray_hair_reversal_pct": 30.0,
     },
 
     # --- AdipoStem Pro Enhancements (enhanced fat-to-stem-cell conversion) ---
     "adipostem_pro": {
-        "modified_yamanaka_cocktail": {"dose_ug": 12, "role": "OCT4/SOX2/KLF4/Rarg/Lrh1, enhanced reprogramming"},
-        "EV_payload_beige": {"dose_billion": 150, "role": "Beige adipocyte-derived EVs, signaling amplification"},
-        "TH5487_analog": {"dose_mg": 8, "role": "Protein switch-off, inhibits white fat identity"},
-        "TET2_activator": {"dose_mg": 3, "role": "Ascorbic acid derivative, demethylation enhancement"},
-        "anti_reversion_peptide": {"dose_mg": 2, "role": "Prevents return to adipocyte state, stabilizes stem phenotype"},
-        "target": "Enhanced fat-to-stem-cell conversion (60-80% efficiency, stable stem cell phenotype)",
+        # CORRECTED (review #15): TH5487 was misattributed. It is an OGG1
+        # inhibitor (blocks oxidatively-damaged-DNA-driven inflammatory gene
+        # expression) -- NOT a "white-fat identity switch". Rarg+Lrh1 IS a
+        # real reprogramming enhancement for episomal vectors (Schlaeger
+        # 2015). The 75% "enhanced conversion efficiency" is the same grade-D
+        # scenario assumption as the main conversion parameter.
+        "modified_yamanaka_cocktail": {"dose_ug": 12, "role": "OCT4/SOX2/KLF4/Rarg/Lrh1, enhanced episomal reprogramming (Schlaeger 2015; grade C)"},
+        "EV_payload_beige": {"dose_billion": 150, "role": "Beige adipocyte-derived EVs, signaling amplification (preclinical; grade C)"},
+        "TH5487_analog": {"dose_mg": 8, "role": "OGG1 inhibitor: reduces oxidative-DNA-damage-driven inflammatory signaling (preclinical; grade C) -- NOT a fat-identity switch"},
+        "TET2_activator": {"dose_mg": 3, "role": "Ascorbic acid derivative, TET dioxygenase support (grade C)"},
+        "anti_reversion_peptide": {"dose_mg": 2, "role": "Prevents return to adipocyte state (CONCEPTUAL; grade D)"},
+        "target": "Enhanced fat-to-stem-cell conversion (MODELED 75% scenario efficiency -- grade D; published ex-vivo range is ~0.01-1%)",
         "enhanced_conversion_efficiency_pct": 75.0,
         "anti_reversion_efficiency_pct": 95.0,
         "metabolic_switch_rate_pct": 80.0,
@@ -493,7 +979,13 @@ CHIEF_JUICE = {
 
     # --- Cumulative Stacking Model (cross-mechanism synergy) ---
     "stacking": {
-        "description": "Mechanisms interact additively and multiplicatively for exponential rejuvenation",
+        "description": "Mechanisms interact additively and multiplicatively for modeled rejuvenation",
+        # EVIDENCE NOTE (review #15): every synergy factor below is a MODELED
+        # assumption (grade D). Real cross-mechanism interactions are not
+        # known to act as multiplicative bonuses -- homeostatic regulation
+        # (negative feedback) usually DAMPS stacking, and some pairs (e.g.
+        # mTOR inhibition vs tissue regeneration) actively conflict, as the
+        # interaction model in BIO acknowledges.
         "telomere_epigenetic_synergy": 1.5,
         "telomere_senolytic_synergy": 1.3,
         "epigenetic_senolytic_synergy": 1.4,
@@ -512,8 +1004,8 @@ CHIEF_JUICE = {
 
     # --- Monitoring & AI Personalization ---
     "monitoring": {
-        "biosensor_nanoparticles": {"dose_mg": 0.1, "role": "Real-time biomarker surveillance"},
-        "ctDNA_probes": {"dose_ug": 2, "role": "Circulating tumor DNA detection"},
+        "biosensor_nanoparticles": {"dose_mg": 0.1, "role": "Real-time biomarker surveillance", "note": "in-body real-time nanosensors are conceptual; external liquid biopsy is the real analog"},
+        "ctDNA_probes": {"dose_ug": 2, "role": "Circulating tumor DNA detection", "note": "replaced by external serial liquid-biopsy monitoring"},
         "epigenetic_clock_monitoring": True,
         "telomere_length_monitoring": True,
         "organ_function_panel": True,
@@ -525,6 +1017,38 @@ CHIEF_JUICE = {
         "ai_dose_optimization": True,
         "personalization_frequency": "monthly",
         "adaptive_dose_range_pct": 20.0,
+        "biomarker_panel_detail": {
+            "epigenetic_clocks": ["DunedinPACE", "GrimAge", "PhenoAge", "Horvath 2013"],
+            "telomere": ["qPCR telomere length", "Flow-FISH"],
+            "senescence": ["p16INK4a qPCR", "SASP panel (IL-6, TNF-alpha, MMP-3, PAI-1)"],
+            "metabolic": ["NAD+ (LC-MS)", "insulin sensitivity (HOMA-IR)", "IGF-1", "AMPK activity"],
+            "inflammation": ["CRP", "IL-6", "TNF-alpha", "NfL (neurodegeneration)", "GDF15 (mito stress)"],
+            "organ_function": ["eGFR (kidney)", "ALT/AST (liver)", "LVEF (heart)", "FEV1 (lung)", "BMD (bone)"],
+            "immune": ["naive T cells", "Treg fraction", "thymic output (TREC)", "CMV-specific T cells"],
+            "cancer": ["ctDNA (liquid biopsy)", "AFP", "whole-body MRI annual"],
+            "hormonal": ["DHEA", "free testosterone/estradiol", "TSH/T3/T4", "GH/IGF-1", "melatonin metabolites"],
+            "stem_cell": ["circulating CD34+ count", "CFU assays"],
+            "neural": ["cognitive testing (MoCA)", "hippocampal volume (MRI)", "NfL", "BDNF"],
+            "muscle": ["grip strength", "gait speed", "appendicular lean mass (DXA)"],
+            "bone": ["DXA BMD", "TBS (trabecular bone score)", "FRAX score"],
+            "oxygen": ["SpO2 (continuous)", "VO2max", "hemoglobin", "reticulocyte count"],
+            "microbiome": ["16S rRNA sequencing", "SCFA quantification", "calprotectin"],
+        },
+        "total_biomarkers_tracked": 42,
+        "wearable_monitoring": {
+            "apple_watch": "HRV, VO2max, ECG, fall detection",
+            "oura_ring": "sleep stages, HRV, body temperature, respiratory rate",
+            "cgm": "continuous glucose monitoring (Dexcom, Abbott Freestyle Libre)",
+            "withings": "blood pressure, ECG, body composition scale",
+            "whoop": "recovery score, strain, sleep, HRV",
+        },
+        "digital_twin": "AI digital twin integrates 42 blood biomarkers + wearable data + 4 epigenetic clocks (concept; dosing-prediction accuracy unvalidated)",
+        "monitoring_frequency_detail": {
+            "weekly": ["ctDNA (during loading)", "ANA/dsDNA (during loading)", "blood counts"],
+            "monthly": ["full 42-biomarker panel", "epigenetic clocks", "TDM drug levels", "immune panel"],
+            "quarterly": ["senolytic response", "telomere length", "organ function MRI", "microbiome 16S"],
+            "annual": ["whole-body MRI", "bone density (DXA)", "cognitive assessment", "vaccine titers"],
+        },
     },
 
     # --- ProteoClear: Proteostasis Restoration (Hallmark #4) ---
@@ -545,6 +1069,13 @@ CHIEF_JUICE = {
         "protein_folding_efficiency_pct": 90.0,
         "amyloid_reduction_pct": 70.0,
         "tau_reduction_pct": 70.0,
+        "proteostasis_detail": {
+            "autophagy_pathway": "ATG5/ATG7 -> phagophore -> autophagosome -> lysosome fusion -> degradation",
+            "proteasome": "26S proteasome: 20S core + 19S caps; degrades ubiquitinated proteins",
+            "chaperones": "HSP70 (refolding), HSP90 (stabilization), HSP60 (mitochondrial)",
+            "aggregates": "amyloid-beta (Alzheimer's), alpha-synuclein (Parkinson's), tau (Alzheimer's), huntingtin (Huntington's)",
+            "approved_precedents": "lecanemab removes ~26% amyloid over 18 months (Eisai 2023); no approved therapy removes tau or alpha-synuclein",
+        },
     },
 
     # --- NutriSense: Nutrient Sensing Optimization (Hallmark #8) ---
@@ -567,69 +1098,89 @@ CHIEF_JUICE = {
 
     # --- CommRepair: Intercellular Communication (Hallmark #9) ---
     "commrepair": {
-        "target": "Intercular communication, young plasma factors, signaling repair",
+        # CORRECTED (review #15): GDF11 "rejuvenation" is contested (Sinha
+        # 2014 vs Egerman 2015 reanalyses; assay-specificity disputes).
+        # TIMP2 and b2M findings are from mouse parabiosis/plasma work.
+        # The AMBROSIA young-plasma trial was halted amid FDA warning (2019);
+        # human "young factor" rejuvenation is NOT established.
+        "target": "Intercellular communication, plasma-factor support, signaling repair (modeled)",
         "components": {
-            "timp2_mimetic":          {"dose_mg": 1,   "role": "Young blood factor mimetic, cognitive enhancement"},
-            "gdf11_peptide":          {"dose_ug": 5,   "role": "Growth differentiation factor 11, tissue rejuvenation"},
-            "anti_b2m_antibody":      {"dose_mg": 0.5, "role": "Beta-2-microglobulin clearance, pro-aging factor removal"},
-            "anti_il6_antibody":      {"dose_mg": 1,   "role": "IL-6 neutralization, SASP/inflammation reduction"},
-            "exosome_therapy":        {"dose_ug": 50,  "role": "ASC-derived exosomes, paracrine signaling repair"},
+            "timp2_mimetic":          {"dose_mg": 1,   "role": "Young-plasma factor analog (mouse cognition data, Castellano 2017; preclinical; grade C)"},
+            "gdf11_peptide":          {"dose_ug": 5,   "role": "GDF11 (contested rejuvenation evidence; grade C-D)"},
+            "anti_b2m_antibody":      {"dose_mg": 0.5, "role": "Beta-2-microglobulin clearance (mouse aging data; preclinical; grade C)"},
+            "anti_il6_antibody":      {"dose_mg": 1,   "role": "IL-6 neutralization (real approved anti-IL6/tocilizumab-class drugs exist; grade A in indicated diseases)"},
+            "exosome_therapy":        {"dose_ug": 50,  "role": "ASC-derived exosomes, paracrine signaling (investigational; grade C)"},
         },
-        "signaling_repair_pct_per_month": 15.0,
-        "young_plasma_factor_restoration_pct": 80.0,
-        "pro_aging_factor_removal_pct": 70.0,
-        "intercellular_communication_efficiency_pct": 90.0,
+        "signaling_repair_pct_per_month": 5.0,
+        "young_plasma_factor_restoration_pct": 30.0,
+        "pro_aging_factor_removal_pct": 30.0,
+        "intercellular_communication_efficiency_pct": 40.0,
     },
 
     # --- OxidShield: Oxidative Stress / ROS Defense ---
     "oxidshield": {
-        "target": "ROS reduction, antioxidant defense, oxidative damage prevention",
+        # CORRECTED (review #15): antioxidant-supplementation RCTs show MIXED
+        # results, and high-dose exogenous antioxidants can blunt adaptive
+        # (hormetic) signaling. MitoQ corrected to 20 mg/day (Rossman 2018).
+        "target": "ROS modulation, endogenous antioxidant support (modeled)",
         "components": {
-            "mitoq":                  {"dose_mg": 5,   "role": "Mitochondrial-targeted antioxidant, 60% ROS reduction"},
-            "glutathione_precursor":  {"dose_mg": 10,  "role": "NAC + glycine, glutathione synthesis boost"},
-            "sod_mimetic":            {"dose_mg": 0.5, "role": "Superoxide dismutase mimetic, superoxide clearance"},
-            "catalase_enhancer":      {"dose_mg": 1,   "role": "Catalase activity booster, H2O2 decomposition"},
-            "nrf2_activator":         {"dose_mg": 1,   "role": "NRF2 pathway, endogenous antioxidant response"},
-            "vitamin_c_conjugate":    {"dose_mg": 2,   "role": "Ascorbate derivative, ROS scavenging + collagen support"},
+            "mitoq":                  {"dose_mg": 20,  "role": "Mitochondrial-targeted antioxidant (Rossman 2018: 20 mg/day improved vascular function; grade B)"},
+            "glutathione_precursor":  {"dose_mg": 10,  "role": "NAC + glycine, glutathione synthesis support (grade B in specific populations)"},
+            "sod_mimetic":            {"dose_mg": 0.5, "role": "Superoxide dismutase mimetic (preclinical; grade C)"},
+            "catalase_enhancer":      {"dose_mg": 1,   "role": "Catalase activity support (conceptual; grade D)"},
+            "nrf2_activator":         {"dose_mg": 1,   "role": "NRF2 pathway support (grade C)"},
+            "vitamin_c_conjugate":    {"dose_mg": 2,   "role": "Ascorbate derivative, ROS scavenging + collagen support (grade A for collagen synthesis)"},
         },
-        "ros_reduction_pct": 60.0,
-        "oxidative_damage_repair_pct": 50.0,
-        "antioxidant_capacity_increase_pct": 80.0,
-        "lipid_peroxidation_reduction_pct": 55.0,
+        "ros_reduction_pct": 30.0,
+        "oxidative_damage_repair_pct": 30.0,
+        "antioxidant_capacity_increase_pct": 40.0,
+        "lipid_peroxidation_reduction_pct": 30.0,
     },
 
     # --- HormoneBalance: Hormonal Optimization ---
     "hormonebalance": {
-        "target": "Hormonal balance -- DHEA, growth hormone, sex hormones, thyroid",
+        # CORRECTED (review #15): hormone replacement to youthful levels is
+        # real clinical practice but requires individualized endocrinology
+        # with monitored risks (rhGH: insulin resistance/edema; testosterone:
+        # erythrocytosis/CV risks; estrogen: individualized risk-benefit).
+        # "100% restoration" is not a dosed-drug effect; figures below are
+        # modeled partial restorations.
+        "target": "Hormonal support -- DHEA, GH, sex hormones, thyroid (modeled partial restoration)",
         "components": {
-            "dhea":                   {"dose_mg": 50,  "role": "DHEA restoration, steroid precursor for all hormones"},
-            "gh_releaser":            {"dose_mg": 2,   "role": "Growth hormone secretagogue, IGF-1 optimization"},
-            "testosterone_optimizer": {"dose_mg": 1,   "role": "Testosterone balance (male/female adaptive)"},
-            "estrogen_optimizer":     {"dose_mg": 1,   "role": "Estrogen balance (female/male adaptive)"},
-            "thyroid_optimizer":      {"dose_mg": 0.5, "role": "Thyroid hormone optimization, metabolic rate"},
-            "melatonin":              {"dose_mg": 3,   "role": "Circadian rhythm, antioxidant, sleep quality"},
+            "dhea":                   {"dose_mg": 50,  "role": "DHEA supplementation (50 mg/day used in trials incl. TRIIM; grade B)"},
+            "gh_releaser":            {"dose_mg": 2,   "role": "GH secretagogue (rhGH used in TRIIM; off-label risks: insulin resistance, edema; grade B in niche, C for general use)"},
+            "testosterone_optimizer": {"dose_mg": 1,   "role": "Testosterone support (real TRT is prescription-only, monitored; grade A when clinically indicated)"},
+            "estrogen_optimizer":     {"dose_mg": 1,   "role": "Estrogen support (real HRT is prescription-only, individualized; grade A when clinically indicated)"},
+            "thyroid_optimizer":      {"dose_mg": 0.5, "role": "Thyroid support (real replacement is prescription-only, TSH-monitored; grade A when clinically indicated)"},
+            "melatonin":              {"dose_mg": 3,   "role": "Circadian rhythm support, antioxidant (grade A)"},
         },
-        "dhea_restoration_pct": 100.0,
-        "gh_increase_pct": 40.0,
-        "sex_hormone_balance_pct": 100.0,
-        "thyroid_optimization_pct": 100.0,
-        "circadian_rhythm_restoration_pct": 90.0,
+        "dhea_restoration_pct": 80.0,
+        "gh_increase_pct": 15.0,
+        "sex_hormone_balance_pct": 70.0,
+        "thyroid_optimization_pct": 70.0,
+        "circadian_rhythm_restoration_pct": 70.0,
     },
 
     # --- PlasmaSync: Plasma Exchange / Systemic Rejuvenation ---
     "plasmasync": {
-        "target": "Plasma exchange, systemic blood rejuvenation, young factor infusion",
+        # CORRECTED (review #15): therapeutic plasma exchange is a real,
+        # approved procedure for specific autoimmune diseases. "Rejuvenation"
+        # claims come from mouse heterochronic-parabiosis/plasma-dilution
+        # studies (Conboy 2020) -- there is NO established human rejuvenation
+        # benefit. Monthly full-volume exchange carries real risks (line
+        # infections, hypocalcemia, hypotension).
+        "target": "Plasma exchange support (real clinical procedure; rejuvenation role is MODELED, grade C-D)",
         "components": {
-            "synthetic_young_plasma": {"dose_mL": 500, "role": "Synthetic youthful plasma with recombinant factors"},
-            "albumin_replacement":    {"dose_mL": 250, "role": "Albumin replacement, carrier protein restoration"},
-            "recombinant_timp2":      {"dose_mg": 2,   "role": "TIMP2 infusion, young blood factor"},
-            "recombinant_gdf11":      {"dose_ug": 10,  "role": "GDF11 infusion, tissue rejuvenation signaling"},
-            "anti_aging_factor_removal": {"dose_mL": 500, "role": "Removal of pro-aging factors (b2M, chemokines)"},
+            "synthetic_young_plasma": {"dose_mL": 500, "role": "Plasma replacement fluid (real exchange products exist; 'young factor' content is conceptual; grade D)"},
+            "albumin_replacement":    {"dose_mL": 250, "role": "Albumin replacement (standard exchange practice; grade A)"},
+            "recombinant_timp2":      {"dose_mg": 2,   "role": "TIMP2 infusion (mouse cognition data only; no approved product; grade C)"},
+            "recombinant_gdf11":      {"dose_ug": 10,  "role": "GDF11 infusion (contested evidence; grade C-D)"},
+            "anti_aging_factor_removal": {"dose_mL": 500, "role": "Removal of pro-aging factors (b2M data are from mice; grade C)"},
         },
         "plasma_exchange_frequency": "monthly",
-        "young_factor_restoration_pct": 85.0,
-        "pro_aging_factor_clearance_pct": 75.0,
-        "systemic_rejuvenation_pct": 30.0,
+        "young_factor_restoration_pct": 30.0,
+        "pro_aging_factor_clearance_pct": 30.0,
+        "systemic_rejuvenation_pct": 15.0,
     },
 
     # --- Manufacturing Summary ---
@@ -650,7 +1201,7 @@ CHIEF_JUICE = {
             "mRNA integrity > 90% (Bioanalyzer)",
             "Endotoxin < 0.5 EU/mL",
             "Sterility: USP <71> compliant",
-            "Potency: reprogramming assay on 3T3-L1 adipocytes > 80% conversion",
+            "Potency: RELATIVE Oct4-reporter iPSC colony assay >=75% of reference lot (an absolute >80% conversion spec is not achievable; honest QC measures relative potency)",
             "Exosome particle count: 45-55 billion/dose",
         ],
     },
@@ -658,6 +1209,12 @@ CHIEF_JUICE = {
     # --- Multi-Tissue Targeting System (addresses BBB + organ-specific delivery) ---
     "multi_tissue_targeting": {
         "target": "Organ-specific LNP formulations with distinct targeting ligands",
+        # EVIDENCE NOTE (review #15): every uptake efficiency below is a
+        # MODELED estimate (grade D). Receptor-targeted LNPs improve
+        # biodistribution in animal studies; NONE of these numbers is a
+        # published human measurement. SORT-lipid organ targeting (Cheng
+        # 2020) is real but yields relative shifts, not these absolutes.
+        "uptake_note": "All in-vivo organ uptake percentages are modeled estimates, not measured values",
         "lnp_variants": {
             "adipose_lnp": {
                 "targeting_ligand": "CKGGRAKDC peptide",
@@ -714,14 +1271,19 @@ CHIEF_JUICE = {
 
     # --- Immune Evasion & Autologous Safety ---
     "immune_evasion": {
+        # CORRECTED (review #15): PD-L1 expression is a TUMOR immune-evasion
+        # hallmark. Deliberately expressing it on reprogrammed cells would
+        # shield any abnormal clone from immune surveillance -- it is a
+        # cancer-risk strategy, not a safety feature. Retained only as a
+        # flagged design concept.
         "target": "Prevent immune rejection of reprogrammed cells + maintain tolerance",
-        "autologous_advantage": "In vivo reprogramming = cells are autologous (self), no MHC mismatch, no rejection",
+        "autologous_advantage": "In vivo reprogramming = cells are autologous (self), no MHC mismatch, no donor-cell rejection",
         "surface_marker_preservation": "Reprogrammed cells retain self-MHC, no foreign antigens presented",
-        "immune_privilege_induction": "PD-L1 transient expression on reprogrammed cells (7-day saRNA window) prevents NK/T attack during transition",
-        "tolerance_maintenance": "Treg expansion via low-dose IL-2 (1000 IU/day) during reprogramming week",
-        "anti_rejection_protocol": "No immunosuppression needed (autologous), Treg boost only during transition",
+        "immune_privilege_induction_note": "CONCEPTUAL (risk-flagged): transient PD-L1 on reprogrammed cells would also shield abnormal clones from NK/T surveillance -- a tumor-evasion hallmark; low-dose IL-2 Treg support is the safer element of this concept",
+        "tolerance_maintenance": "Treg expansion via low-dose IL-2 (1000 IU/day) during reprogramming week (Klatzmann 2012 precedent; grade B)",
+        "anti_rejection_protocol": "No immunosuppression needed for autologous cells (repeat LNP/PEG exposure immunogenicity is a separate, real risk -- see peg_immune_mitigation)",
         "monitoring": "Anti-dsDNA, ANA, anti-nuclear antibodies weekly during loading, monthly during maintenance",
-        "autoimmune_risk": "Low -- no foreign cells introduced, self-tolerance maintained",
+        "autoimmune_risk": "Autologous cells should not be rejected, but tolerance disruption from rejuvenation is unquantified -- monitored, not assumed low",
         "mhc_preservation_pct": 100.0,
         "rejection_rate_pct": 0.0,
         "autoimmune_incidence_pct": 0.5,
@@ -732,9 +1294,13 @@ CHIEF_JUICE = {
         "target": "Erase adipocyte epigenetic memory from reprogrammed cells for true pluripotency",
         "problem": "iPSCs from adipocytes retain H3K4me3/H3K27me3 marks at adipocyte gene loci (Kim et al. 2010, Nature)",
         "solution_1": "5-azacytidine pulse (0.5 uM, 48hr) during reprogramming -- demethylates residual adipocyte CpG islands",
-        "solution_2": "Vitamin C (200 umol) -- TET2 activation, active demethylation of epigenetic memory marks",
+        "solution_2": "Vitamin C (~300 umol) -- TET2 activation, active demethylation of epigenetic memory marks",
         "solution_3": "Extended passaging (3-5 passages) -- passive dilution of epigenetic memory with each division",
         "solution_4": "Naive pluripotency capture (2i/LIF conditions) -- resets to ground-state pluripotency, erases memory",
+        # EVIDENCE NOTE (review #15): 95% "erasure efficiency" is a modeled
+        # figure (grade D). The beneficial-mesoderm-bias hypothesis below is
+        # plausible and consistent with lineage-priming literature, but the
+        # precise 5% residual figure is invented.
         "memory_erasure_efficiency_pct": 95.0,
         "residual_memory_pct": 5.0,
         "functional_consequence": "5% residual memory is beneficial -- biases differentiation toward mesoderm (fat/muscle/bone), which is the target lineage",
@@ -743,17 +1309,23 @@ CHIEF_JUICE = {
 
     # --- Teratoma Prevention (enhanced safety) ---
     "teratoma_prevention": {
-        "target": "Zero teratoma risk from in vivo reprogramming",
-        "risk_level": "Near-zero (partial reprogramming, not full pluripotency)",
-        "mechanism_1": "Partial reprogramming only -- saRNA pulse (7 days) then withdrawal, cells never reach full pluripotency",
-        "mechanism_2": "iCasp9 safety switch -- inducible caspase-9, AP1903 administration kills any rogue pluripotent cells",
-        "mechanism_3": "Nutlin-3a (0.5mg) -- p53 activation, prevents teratoma formation from any residual pluripotent cells",
+        # CORRECTED (review #15): "zero teratoma risk" was claimed while the
+        # safety model in BIO carries a 0.35%/month unmitigated teratoma
+        # hazard -- in-vivo OSKM produced teratomas in mice (Abad 2013).
+        # Partial/episomal dosing REDUCES but does not eliminate the risk.
+        # Nutlin-3a cannot run DURING reprogramming (p53 activation aborts
+        # it, Hong 2009) -- rescue-window use only.
+        "target": "Minimize (not zero) teratoma risk from in vivo reprogramming",
+        "risk_level": "Low but NON-ZERO (partial reprogramming, non-integrating vectors, rescue switches)",
+        "mechanism_1": "Partial reprogramming only -- saRNA pulse (7 days) then withdrawal; reduced pluripotency depth vs continuous OSKM",
+        "mechanism_2": "iCasp9 safety switch -- inducible caspase-9; AP1903 administration kills rogue pluripotent cells (Zhou 2016 CAR-T precedent; grade B)",
+        "mechanism_3": "Nutlin-3a (0.5mg) -- p53 activation as POST-WINDOW rescue only (during the saRNA window it would abort reprogramming, Hong 2009)",
         "mechanism_4": "Differentiation priority -- growth factors (EGF, FGF, PDGF) push cells toward lineage commitment, not pluripotency",
-        "mechanism_5": "Non-integrating delivery -- saRNA replicons self-destruct in 7-10 days, no genomic insertion, no permanent OSKM expression",
-        "mechanism_6": "ctDNA + AFP monitoring -- weekly during loading, monthly during maintenance, immediate AP1903 trigger if elevated",
-        "teratoma_risk_pct": 0.01,
-        "detection_sensitivity_pct": 98.0,
-        "elimination_efficiency_pct": 99.99,
+        "mechanism_5": "Non-integrating delivery -- saRNA replicons self-clear in 7-10 days, no genomic insertion, no permanent OSKM expression",
+        "mechanism_6": "ctDNA + AFP monitoring -- weekly during loading, monthly during maintenance, immediate AP1903 trigger if elevated (ctDNA detection sensitivity is stage-dependent, ~40-70%; Cohen 2018)",
+        "teratoma_risk_pct": 0.5,
+        "detection_sensitivity_pct": 55.0,
+        "elimination_efficiency_pct": 90.0,
     },
 
     # --- Regulatory Pathway (addresses 45% score) ---
@@ -788,32 +1360,36 @@ CHIEF_JUICE = {
         ],
         "comparator": "Standard of care (no treatment) + individual component arms",
         "adaptive_design": "Bayesian adaptive design, seamless Phase I/II/III, futility bounds at 6 months",
-        "regulatory_score_pct": 100.0,
+        "regulatory_score_pct": None,  # removed (review #15): no regulatory pathway has been validated; self-scores are not evidence
     },
 
     # --- Clinical Translation Roadmap (addresses 55% score) ---
     "clinical_roadmap": {
         "target": "Realistic clinical development plan leveraging existing human data",
         "components_in_human_trials": {
-            "NMN": "Phase II completed (Sinclair 2019-2023), safe at 250-1000mg/day",
-            "Metformin": "TAME (Targeting Aging with Metformin) Phase III, 3000+ subjects",
-            "Rapamycin": "Phase I/II for age-related diseases (Mannick 2014, Sci Transl Med)",
-            "Dasatinib+Quercetin": "Phase II completed (Kirkland 2019, EBioMedicine), safe in elderly",
-            "Fisetin": "Phase II (Mayo Clinic, NCT04313634) for frailty",
-            "Urolithin A": "Phase II completed (Singh 2022, Cell Rep Med), safe",
-            "MitoQ": "Phase II completed (Rossman 2018), safe",
-            "Growth factors": "FDA-approved (EGF for wounds, FGF for burns, VEGF trials for CVD)",
-            "Exosomes": "Phase I/II ongoing (Direct Biologics, NCT04276987)",
-            "Cycloastragenol": "Phase I completed (Harley 2011), telomere lengthening in humans",
-            "DHEA": "FDA-approved, prescription supplement",
-            "Melatonin": "OTC, decades of safety data",
-            "Vitamin C": "FDA-approved, GRAS status",
-            "Spermidine": "Phase II (Eisenberg 2018), safe",
-            "mRNA LNP": "Billions of doses administered (COVID vaccines), extensive safety data",
-            "saRNA": "ARCT-154 approved (Japan, 2023), human safety established",
-            "CRISPR-Cas9": "CASGEVY approved (FDA 2023), ex vivo HSC editing proven",
-            "CAR-T": "FDA-approved (Kymriah, Yescarta), engineering proven",
-            "iCasp9": "Phase I/II in CAR-T (Zhou 2016), safety switch proven in humans",
+            # CORRECTED (review #15): the previous entries overstated trial
+            # status. Human data exist for individual components -- none exist
+            # for this combination, and several "completed Phase II" claims
+            # were false.
+            "NMN": "Small human trials (Yoshino 2021, Science: 250 mg/day, 10 weeks, postmenopausal prediabetic women -- NAD+ rose; clinical outcomes unproven)",
+            "Metformin": "TAME (Targeting Aging with Metformin): FDA-agreed aging-indication trial; ongoing, not completed",
+            "Rapamycin": "Human mTOR trials: Mannick 2014 (elderly immune function), PEARL (weekly mg-scale dosing; ongoing)",
+            "Dasatinib+Quercetin": "Small pilot trials (Xu 2018; Justice 2019 in IPF). NOTE: fatalities reported after unsupervised D+Q self-administration (2025 case reports) -- research-only, clinical supervision required",
+            "Fisetin": "Mayo Clinic fisetin trials for frailty (ongoing; dose-escalation safety 100-1500 mg)",
+            "Urolithin A": "Human trials completed at 500-1000 mg/day (Andreux 2019; later muscle-function trials) -- safe, modest mitochondrial effects",
+            "MitoQ": "Human trial (Rossman 2018, 20 mg/day): vascular function benefit in older adults",
+            "Growth factors": "becaplermin (PDGF-BB, Regranex) FDA-approved for diabetic ulcers; rhEGF (Heberprot-P) approved in ~25 countries for diabetic foot; systemic EGF/VEGF/HGF/IGF-1 cocktails are investigational",
+            "Exosomes": "Early-phase trials ongoing for specific indications; no approved exosome product exists in the US/EU",
+            "Cycloastragenol": "TA-65 open-label pilot (Harley 2013, 250-1000 mg/day): modest changes in immune-cell telomere dynamics and some clinical measures; no lifespan data; NOT 'telomere lengthening established'",
+            "DHEA": "Available; used in trials including TRIIM (Fahy 2019)",
+            "Melatonin": "OTC, decades of supplement use",
+            "Vitamin C": "GRAS status",
+            "Spermidine": "Small RCTs (1.2-6 mg/day) -- safe; Bruneck-style observational associations support but do not prove benefit",
+            "mRNA LNP": "Billions of COVID vaccine doses -- the LNP-mRNA platform is the single strongest real precedent here",
+            "saRNA": "ARCT-154 approved in Japan (2023) as a self-amplifying mRNA COVID vaccine -- real saRNA regulatory precedent",
+            "CRISPR-Cas9": "CASGEVY approved (FDA 2023) -- ex-vivo HSC editing for sickle/thal; not an in-vivo precedent",
+            "CAR-T": "FDA-approved (Kymriah, Yescarta) -- for specific CD19+ hematologic cancers; not pan-cancer",
+            "iCasp9": "Human CAR-T safety-switch data (Zhou 2016) -- the switch works; used here as a design element",
         },
         "components_preclinical_only": {
             "OSKM in vivo reprogramming": "Mouse only (Ocampo 2016, Inoue 2022), no human data yet",
@@ -830,7 +1406,7 @@ CHIEF_JUICE = {
             "post_approval": "Registry study, 10,000+ subjects, long-term safety + efficacy",
         },
         "go_no_go_criteria": "Phase 2a: must show >1 year epigenetic age reversal in >60% of subjects",
-        "clinical_score_pct": 100.0,
+        "clinical_score_pct": None,  # removed (review #15): clinical translation score was self-assigned, not evidence
     },
 
     # --- Cost Reduction Strategy (addresses 65% score) ---
@@ -859,7 +1435,7 @@ CHIEF_JUICE = {
         "target_cost_year_15": "$50/dose",
         "insurance_pathway": "CMS coverage for frailty/osteoporosis/sarcopenia (established indications), private insurance follow",
         "global_access": "Tiered pricing: high-income $150, middle-income $50, low-income $15 (patent-free generics)",
-        "cost_score_pct": 100.0,
+        "cost_score_pct": None,  # removed (review #15): cost figures are modeled estimates, not verified economics
     },
 
     # --- Enhanced Manufacturing (addresses 82% score) ---
@@ -883,7 +1459,7 @@ CHIEF_JUICE = {
             "encapsulation": "RiboGreen assay, >90% encapsulation",
             "endotoxin": "LAL assay (USP <85>), <0.5 EU/mL",
             "sterility": "USP <71>, 14-day direct inoculation",
-            "potency": "3T3-L1 adipocyte reprogramming assay, >75% conversion",
+            "potency": "RELATIVE potency: Oct4-reporter iPSC colony assay, >=75% of reference lot (no absolute conversion spec is achievable; grade-D scenario inputs cannot be a release specification)",
             "targeting_ligand_density": "SPR (Biacore), 50-200 ligands/LNP",
             "osmolality": "290-310 mOsm/kg",
             "pH": "7.0-7.4",
@@ -897,7 +1473,7 @@ CHIEF_JUICE = {
         },
         "process_analytical_technology": "Real-time DLS + NIR spectroscopy for in-line LNP monitoring",
         "continuous_manufacturing": "Continuous LNP production (vs batch), 10x throughput, 50% cost reduction",
-        "manufacturing_score_pct": 100.0,
+        "manufacturing_score_pct": None,  # removed (review #15): no product has ever been manufactured; the process is conceptual
     },
 
     # --- cMyc Oncogenic Safety (addresses off-target cMyc risk) ---
@@ -906,7 +1482,7 @@ CHIEF_JUICE = {
         "problem": "cMyc is a known oncogene. Constitutive expression causes teratomas and lymphomas.",
         "solution_1": "Replace cMyc with L-Myc (LMYC1) -- 70% of reprogramming efficiency, 10x lower oncogenic risk (Nakagawa 2010, Nat Methods)",
         "solution_2": "Replace cMyc with Lin28 -- non-oncogenic reprogramming factor, maintains efficiency with VPA (Yu 2007, Science)",
-        "solution_3": "Replace cMyc with p53 shRNA pulse -- transient p53 suppression achieves same effect without oncogene (Zhao 2008, Cell Stem Cell)",
+        "solution_3": "EXCLUDED from routine use (review #15): p53-shRNA pulses boost reprogramming efficiency at the cost of genomic integrity -- trading cancer risk for speed; acceptable only in ex-vivo settings with clonal release testing",
         "solution_4": "Chemical cMyc substitute -- CHIR99021 (GSK3 inhibitor) + forskolin (cAMP) can replace cMyc entirely (Hou 2013, Science)",
         "solution_5": "If cMyc retained: self-limiting saRNA (7-day expression), iCasp9 kill switch, Nutlin-3a p53 reactivation post-reprogramming",
         "preferred_approach": "L-Myc + Lin28 dual replacement -- zero oncogenic risk, 85% efficiency retention",
@@ -945,9 +1521,9 @@ CHIEF_JUICE = {
             "CYP2D6_poor_metabolizers": "Dose reduction 50% for CYP2D6 substrates, alternative compounds selected",
             "HLA_typing": "Not needed (autologous), but recorded for future allogeneic backup",
         },
-        "ai_dose_engine": "Bayesian adaptive dosing model, updates monthly based on 30+ biomarker trends, predicts optimal dose with 95% CI",
-        "personalization_accuracy_pct": 95.0,
-        "adverse_event_reduction_pct": 80.0,
+        "ai_dose_engine": "Bayesian adaptive dosing model, updates monthly based on 30+ biomarker trends (modeling concept; individual-dose prediction accuracy is unvalidated)",
+        "personalization_accuracy_pct": 70.0,   # MODELED (grade D): no validated accuracy figure exists
+        "adverse_event_reduction_pct": 40.0,    # MODELED (grade D)
     },
 
     # --- Microbiome Integration ---
@@ -961,7 +1537,10 @@ CHIEF_JUICE = {
         "solution_5": "Rapamycin microbiome effect: minimal, but add Saccharomyces boulardii to prevent opportunistic infections",
         "monitoring": "Quarterly 16S rRNA sequencing, metabolomics panel, short-chain fatty acid quantification",
         "probiotic_dose": "10 billion CFU/day, 5-strain precision blend",
-        "microbiome_optimization_pct": 85.0,
+        # MODELED (grade C): probiotic strains named above have real human
+        # data for specific endpoints; "85% microbiome optimization" is
+        # not a measurable or validated quantity.
+        "microbiome_optimization_pct": 40.0,
     },
 
     # --- Mitochondrial Heteroplasmy Management ---
@@ -973,8 +1552,11 @@ CHIEF_JUICE = {
         "solution_3": "Mitophagy enhancement -- urolithin A + PINK1/Parkin activation selectively removes damaged mitochondria (Singh 2016, Nat Med)",
         "solution_4": "Mitochondrial replacement backup -- if heteroplasmy >80%, ex vivo MRT (3-parent technique) for HSCs, reinfuse",
         "monitoring": "Annual mtDNA sequencing (deep coverage >10,000x), heteroplasmy tracking for common pathogenic variants",
-        "heteroplasmy_reduction_per_treatment_pct": 15.0,
-        "annual_reduction_pct": 45.0,
+        # MODELED (grade C-D): mtDNA restriction enzymes and DdCBE-class
+        # editors are real preclinical tools; measured heteroplasmy
+        # reductions in animals are partial and tissue-variable.
+        "heteroplasmy_reduction_per_treatment_pct": 8.0,
+        "annual_reduction_pct": 25.0,
         "target_heteroplasmy_pct": 5.0,
     },
 
@@ -987,10 +1569,12 @@ CHIEF_JUICE = {
         "solution_3": "Partial immune reset -- remove senescent T cells (senolytics already in protocol), preserve memory T cells (CMV-specific)",
         "solution_4": "Tolerance checkpoint -- quarterly autoimmune panel (ANA, anti-dsDNA, TPO, GAD65, anti-CCP), auto-pause if elevated",
         "solution_5": "CAR-Treg therapy -- if autoimmunity detected, infuse autologous CAR-Tregs targeting inflamed tissues (clinical trials ongoing)",
-        "solution_6": "PD-1/PD-L1 axis -- transient PD-L1 on reprogrammed cells prevents immune attack during transition (7-day window only)",
+        "solution_6": "PD-1/PD-L1 axis -- RISK-FLAGGED concept (review #15): transient PD-L1 on reprogrammed cells is a tumor-evasion strategy, not a safety feature; Treg-first design is the defensible element",
         "autoimmune_incidence_pct": 0.3,
-        "detection_rate_pct": 98.0,
-        "resolution_rate_pct": 95.0,
+        # ctDNA/autoantibody detection sensitivity is ~40-70% and
+        # stage/phase-dependent (Cohen 2018) -- not 98%.
+        "detection_rate_pct": 55.0,
+        "resolution_rate_pct": 50.0,
     },
 
     # --- Enhanced Regulatory Pathway (international + combination) ---
@@ -1023,7 +1607,7 @@ CHIEF_JUICE = {
         },
         "combination_strategy": "File 6 component INDs in parallel (US), use Japan RM Act for first conditional approval, leverage for FDA/EMA",
         "first_approval_estimate": "Japan Year 8 (conditional), US Year 12 (full), EU Year 13, Global Year 15",
-        "regulatory_score_pct": 100.0,
+        "regulatory_score_pct": None,  # removed (review #15): no regulatory pathway has been validated; self-scores are not evidence
     },
 
     # --- Enhanced Clinical Translation (bridging preclinical to human) ---
@@ -1034,20 +1618,20 @@ CHIEF_JUICE = {
                 "preclinical": "Ocampo 2016 (mouse), Inoue 2022 (mouse, partial reprogramming cycles)",
                 "human_bridge_1": "Ex vivo iPSCs from human adipocytes -- proven (Takahashi 2007, multiple labs)",
                 "human_bridge_2": "In vivo mRNA delivery to human liver (COVID vaccines) -- LNP-mRNA in humans proven",
-                "human_bridge_3": "Adipotide (CKGGRAKDC-D(KLAKLAK)2) Phase I completed in humans (Barnhart 2011) -- adipocyte-homing peptide safe in humans",
-                "gap": "Combine proven LNP-mRNA + proven adipocyte targeting + proven OSKM = first-in-human IND",
-                "gap_size": "Small -- all components individually proven in humans, only combination is novel",
+                "human_bridge_3": "Adipotide (CKGGRAKDC-D(KLAKLAK)2): the peptide-homodrug was studied in mice and NON-HUMAN PRIMATES (Barnhart 2011); human development never produced an approved product -- 'Phase I completed in humans' was false",
+                "gap": "Combine a proven delivery platform + a studied homing peptide + ex-vivo-proven OSKM. NOTE: each component having data does NOT validate the core mechanism (in-vivo adipocyte-to-stem conversion), which remains untested in humans",
+                "gap_size": "Fundamental: the core in-vivo conversion mechanism itself has no human evidence",
             },
             "adipocyte_targeted_lnp": {
                 "preclinical": "Kolonin 2004 (mouse adipocyte vasculature)",
-                "human_bridge": "Adipotide (CKGGRAKDC-based) completed Phase I in humans (2011) -- targeting peptide proven safe",
+                "human_bridge": "Adipotide (CKGGRAKDC-based) was studied in mice and non-human primates (Barnhart 2011); no approved human product exists",
                 "gap": "LNP formulation (vs peptide-drug conjugate) -- LNP safety established by COVID vaccines",
-                "gap_size": "Minimal -- formulation change, same targeting mechanism",
+                "gap_size": "Moderate -- formulation change, but the peptide itself was never approved in humans",
             },
             "multi_tissue_lnp": {
                 "preclinical": "Each targeting ligand tested separately in mice",
-                "human_bridge_1": "TfR-targeted LNPs in human trials (JCR Pharmaceuticals, J-Plasma, Phase I)",
-                "human_bridge_2": "Bisphosphonate-PEG in human trials (bone targeting, multiple Phase III)",
+                "human_bridge_1": "TfR-mediated brain delivery exists in humans: JCR Pharmaceuticals' JR-141 (pabinafusp alfa) is APPROVED in Japan (2021) for MPS II -- but it is a fusion protein, not an LNP",
+                "human_bridge_2": "Bone-targeting by bisphosphonate mineral affinity is established pharmacology; specific bisphosphonate-PEG LNP trials are early-stage",
                 "human_bridge_3": "Transferrin-targeted CNS drugs in human trials (2B3-101, Phase I/II brain tumors)",
                 "gap": "Multi-LNP cocktail (6 variants in one injection) -- novel combination",
                 "gap_size": "Moderate -- each component has human data, cocktail needs combination safety study",
@@ -1067,23 +1651,27 @@ CHIEF_JUICE = {
         },
         "first_in_human_strategy": "Start with IND_2 (senolytics, all repurposed drugs) -- fastest to clinic, generates safety data for combination",
         "adaptive_platform_trial": "Master protocol, add arms as INDs clear, Bayesian adaptive randomization",
-        "clinical_score_pct": 100.0,
+        "clinical_score_pct": None,  # removed (review #15): clinical translation score was self-assigned, not evidence
     },
 
     # --- Telomerase-Cancer Safety Link ---
     "telomerase_cancer_safety": {
-        "target": "Activate telomerase for immortality without enabling immortal cancer cells",
-        "problem": "Telomerase is reactivated in ~90% of human cancers. Activating it body-wide could pre-malignant cells immortal.",
+        "target": "Limit telomerase exposure while managing cancer risk",
+        # Grammar + honesty fix (review #15). The link is real: telomerase is
+        # reactivated in the large majority of human cancers. Body-wide
+        # pharmacological activation is a genuine, unquantified risk. The
+        # "net DECREASED" claim below is a MODELED argument, not a finding.
+        "problem": "Telomerase is reactivated in ~90% of human cancers. Activating it body-wide could make pre-malignant cells immortal.",
         "solution_1": "Transient activation only -- cycloastragenol pulse (7 days) then withdrawal, not constitutive expression",
         "solution_2": "Tissue-specific delivery -- telomerase saRNA only in adipose-targeted LNP, not systemic. Cancer cells outside adipose don't get it.",
-        "solution_3": "OncoShield parallel -- p53 activation (Nutlin-3a), CRISPRi oncogene suppression, iCasp9 kill switch all active simultaneously",
-        "solution_4": "Cancer cell vulnerability -- cancer cells already have telomerase reactivated (hTERT+), so exogenous telomerase doesn't give them additional advantage. It helps normal cells catch up.",
-        "solution_5": "Senolytic clearance -- senescent cells (pre-malignant) are cleared by D+Q+F before they can become cancerous. Removing senescent cells reduces cancer risk more than telomerase increases it.",
-        "solution_6": "Telomere length ceiling -- telomerase extends telomeres to youthful length (8000 bp) then stops (telomere length sensing via shelterin complex). No unlimited elongation.",
-        "solution_7": "Monitoring -- quarterly hTERT qPCR (blood), annual whole-body MRI, ctDNA liquid biopsy. Any cancer signal triggers immediate AP1903 (iCasp9) + senolytic boost.",
-        "net_cancer_risk_change": "DECREASED -- senolytic clearance + OncoShield reduce cancer risk more than transient telomerase increases it",
+        "solution_3": "Sequenced (not simultaneous) safeguards: Nutlin-3a p53 rescue runs AFTER the saRNA window (p53 activation DURING reprogramming aborts it, Hong 2009); CRISPRi is a ctDNA-triggered contingency arm; iCasp9 is the standing kill switch",
+        "solution_4": "Cancer cell vulnerability -- cancer cells already have telomerase reactivated (hTERT+), so exogenous telomerase doesn't give them additional advantage. It helps normal cells catch up. (Argument, not proof.)",
+        "solution_5": "Senolytic clearance -- senescent cells (pre-malignant) are cleared by D+Q+F before they can become cancerous. Removing senescent cells reduces cancer risk more than telomerase increases it. (Argument, not proof.)",
+        "solution_6": "Telomere length ceiling -- telomerase extends telomeres to youthful length (8000 bp) then stops (telomere length sensing via shelterin complex). No unlimited elongation. (Shelterin feedback is real; the clean ceiling at 8 kb is modeled.)",
+        "solution_7": "Monitoring -- quarterly hTERT qPCR (blood), annual whole-body MRI, ctDNA liquid biopsy (sensitivity ~40-70%, stage-dependent). Any cancer signal triggers immediate AP1903 (iCasp9) + senolytic boost.",
+        "net_cancer_risk_change": "MODELED as DECREASED (senescent-burden reduction + surveillance outweigh transient telomerase exposure, in the model's assumptions) -- NOT an experimentally supported conclusion",
         "telomerase_cancer_risk_pct": 0.05,
-        "counterbalance_cancer_reduction_pct": 95.0,
+        "counterbalance_cancer_reduction_pct": 30.0,
     },
 
     # --- Stem Cell Homing ---
@@ -1096,7 +1684,12 @@ CHIEF_JUICE = {
         "solution_4": "ICAM-1/VCAM-1 upregulation -- damaged tissues naturally express adhesion molecules that capture circulating stem cells",
         "solution_5": "Mobilization agent -- AMD3100 (Plerixafor, FDA-approved) mobilizes stem cells from adipose into circulation for 24hr window",
         "solution_6": "Direct organ LNP -- organ-specific LNPs deliver OSKM directly to target tissue, reprogramming happens IN SITU, no migration needed",
-        "homing_efficiency_pct": 82.0,
+        # CORRECTED (review #15): systemic MSC homing to injury is measured at
+        # low single-digit percentages in animal biodistribution studies.
+        # In-situ reprogramming (organ LNP) and local delivery are the
+        # load-bearing strategies; "82% homing" had no basis. 25% is the
+        # modeled optimistic figure (grade D).
+        "homing_efficiency_pct": 25.0,
         "dual_approach": "Both in situ reprogramming (organ LNP) AND mobilization (AMD3100) ensure stem cells reach all tissues",
     },
 
@@ -1110,7 +1703,7 @@ CHIEF_JUICE = {
         "solution_4": "CMV-specific T cells preserved -- CMV is the major driver of immunosenescence, but CMV-specific memory is maintained (important for immunocompetent elderly)",
         "solution_5": "Titer checkpoint -- quarterly IgG panel (10 pathogens), auto-boost if any titer < protective threshold",
         "memory_preservation_pct": 95.0,
-        "titer_recovery_pct": 100.0,
+        "titer_recovery_pct": 90.0,   # MODELED (grade C): memory-T-cell resistance to senolytics is documented (Lanna 2017); the 95% figure is a modeled estimate
         "booster_protocol": "Auto-booster if titer drops, post-treatment vaccination refresh for all childhood vaccines",
     },
 
@@ -1178,8 +1771,8 @@ CHIEF_JUICE = {
             "Insulin-like growth factor 1 (IGF-1) -- endocrine age",
         ],
         "wearable_monitoring": "Apple Watch (HRV, VO2max), Oura Ring (sleep, HRV, temp), CGM (glucose), Withings (BP, ECG) -- continuous digital biomarker stream",
-        "digital_twin": "AI digital twin model integrates 30+ blood biomarkers + wearable data + epigenetic clocks, predicts optimal dosing with 97% accuracy",
-        "clock_validation_pct": 100.0,
+        "digital_twin": "AI digital twin model integrates 30+ blood biomarkers + wearable data + epigenetic clocks (concept; dosing-prediction accuracy is unvalidated -- the old 97% figure was invented)",
+        "clock_validation_pct": None,  # removed (review #15): clocks are validated as CORRELATES of aging, not as endpoints proving treatment benefit
         "biomarker_coverage": 42,
     },
 
@@ -1206,7 +1799,7 @@ CHIEF_JUICE = {
         },
         "revenue_model": "Tiered pricing: high-income $150, middle-income $50, low-income $15. Patent-free generics after Year 15.",
         "insurance_pathway": "CMS covers frailty (ICD-10 R54), osteoporosis (M81.0), sarcopenia (M62.84). Private insurers follow CMS.",
-        "cost_score_pct": 100.0,
+        "cost_score_pct": None,  # removed (review #15): cost figures are modeled estimates, not verified economics
     },
 
     # --- Enhanced Microbiome ---
@@ -1225,14 +1818,14 @@ CHIEF_JUICE = {
             "spermidine": "Produced by gut bacteria -- probiotic boost increases endogenous spermidine 2x",
         },
         "monitoring": "Quarterly 16S rRNA + metabolomics + SCFA quantification + calprotectin (inflammation marker)",
-        "microbiome_score_pct": 100.0,
+        "microbiome_score_pct": None,  # removed (review #15): modeled estimate only
     },
 
     # --- Enhanced Drug Interaction Management ---
     "drug_interaction_enhanced": {
         "target": "Comprehensive PK interaction management with PBPK modeling and TDM",
-        "pbpk_model": "SimCYP/GastroPlus physiologically-based PK model simulates all 60+ compounds simultaneously, predicts Cmax/AUC with 90% accuracy",
-        "ai_prediction": "Deep learning model trained on DrugBank + FDA Adverse Event data, predicts interactions with 99% sensitivity for severe interactions",
+        "pbpk_model": "SimCYP/GastroPlus physiologically-based PK modeling is real and FDA-accepted for pairs/small sets of well-characterized drugs; simulating a 60+-compound NOVEL combination is beyond validated use -- the old '90% accuracy' claim does not transfer to this combination",
+        "ai_prediction": "Published DDI-prediction models report high sensitivity ON KNOWN DRUG PAIRS; a 99% sensitivity claim for a 60+-compound combination is unfounded (the combination has never been co-administered)",
         "therapeutic_drug_monitoring": "TDM panel: dasatinib, rapamycin, metformin, navitoclax trough levels measured monthly, doses auto-adjusted to stay in therapeutic window",
         "cyp_panel": "CYP450 phenotyping (CYP2D6, 2C9, 2C19, 3A4, 3A5) before treatment, genotype-guided dosing",
         "staggered_schedule": {
@@ -1248,7 +1841,7 @@ CHIEF_JUICE = {
             "VPA_dasatinib": "VPA is CYP2C9/2C19 (not 3A4) -- minimal interaction with dasatinib, co-administered OK",
         },
         "auto_adjust": "AI engine auto-adjusts doses based on TDM + PBPK + biomarker response, 95% accuracy",
-        "drug_interaction_score_pct": 100.0,
+        "drug_interaction_score_pct": None,  # removed (review #15): the 60+ compound combination has never been co-administered; interactions are UNTESTED
     },
 
     # --- Enhanced Regulatory (precedents) ---
@@ -1265,13 +1858,13 @@ CHIEF_JUICE = {
         "implication": "Every component of ChiefJuice has a regulatory precedent: LNP-mRNA (Comirnaty), saRNA (ARCT-154), CRISPR (CASGEVY), CAR-T (Kymriah), gene therapy (Zolgensma), orphan drug (Lonafarnib). The COMBINATION is novel but each PIECE has precedent.",
         "fastest_path": "Japan RM Act: conditional approval after Phase II (Year 8). Then use Japanese data for FDA/EMA applications.",
         "combination_product_precedent": "Genvoya (Gilead) -- 4-drug combination HIV pill, approved as single product. Sets precedent for multi-component combination.",
-        "regulatory_score_pct": 100.0,
+        "regulatory_score_pct": None,  # removed (review #15): no regulatory pathway has been validated; self-scores are not evidence
     },
 
     # --- Enhanced BBB Crossing ---
     "bbb_enhanced": {
         "target": "Multiple BBB crossing mechanisms for comprehensive brain delivery",
-        "mechanism_1": "Transferrin receptor transcytosis (TfR1 MAb) -- 2B3-101 Phase I/II in humans (brain tumors), JCR Pharma TfR-LNP Phase I",
+        "mechanism_1": "Transferrin receptor transcytosis (TfR1 MAb) -- 2B3-101 Phase I/II in humans (brain tumors); JCR JR-141 pabinafusp alfa: TfR-mediated brain delivery APPROVED in Japan (2021) for MPS II (a fusion protein, not an LNP)",
         "mechanism_2": "Focused ultrasound + microbubbles -- Insightec Exablate FDA-approved for BBB opening, opens BBB locally for 4-6hr, 3x LNP uptake boost",
         "mechanism_3": "Intranasal delivery -- olfactory nerve pathway bypasses BBB entirely, 15% CNS bioavailability (Pardridge 2012, Morrison 2013)",
         "mechanism_4": "Exosome-mediated delivery -- exosomes naturally cross BBB (Yang 2019, Mol Ther), engineered exosomes with CNS targeting peptide (RVG29) achieve 40% brain uptake",
@@ -1279,8 +1872,10 @@ CHIEF_JUICE = {
         "mechanism_6": "Adsorptive transcytosis -- cationic LNP (DOTAP-modified) exploits electrostatic interaction with anionic BBB endothelium, 8% brain uptake without targeting ligand",
         "mechanism_7": "Transient BBB disruption -- hyperosmolar mannitol (FDA-approved for BBB opening in chemotherapy), 2x uptake for 1hr window",
         "primary_route": "TfR-LNP (routine) + intranasal (daily neuro-support) + FUS (quarterly intensive brain treatment)",
+        # MODELED estimate (grade D): no published combination of BBB methods
+        # has achieved a validated 45% brain bioavailability figure.
         "net_brain_bioavailability_pct": 45.0,
-        "bbb_score_pct": 100.0,
+        "bbb_score_pct": None,  # removed (review #15): brain bioavailability figures are modeled estimates
     },
 
     # --- Enhanced PK/PD Model ---
@@ -1293,7 +1888,7 @@ CHIEF_JUICE = {
         "pd_model": "PK-PD link model: saRNA expression (5-7 days) -> OSKM protein expression (3-5 days peak) -> reprogramming (7 days) -> stem cell differentiation (14-30 days) -> tissue integration (30-90 days)",
         "drug_drug_pk": "PBPK simulates all 60+ compounds simultaneously, identifies Cmax overlaps, auto-adjusts staggered schedule",
         "adaptive_pk": "Monthly TDM (therapeutic drug monitoring) feeds back into PBPK model, updates individual PK parameters, optimizes next dose",
-        "pkpd_score_pct": 100.0,
+        "pkpd_score_pct": None,  # removed (review #15): PK model is simulated, not fitted to any human data
     },
 
     # --- Enhanced Long-Term Stability ---
@@ -1307,148 +1902,67 @@ CHIEF_JUICE = {
         "stem_cell_pool_target": "Target: maintain stem cell pool at 90% of young adult level. Once achieved, reduce reprogramming frequency.",
         "biomarker_driven": "All dosing decisions driven by 42-biomarker panel + 4 epigenetic clocks + wearable data. AI engine determines optimal dose + frequency.",
         "resistance_management": "Senolytic rotation (D+Q/Fisetin/Navitoclax) prevents resistance. PEG-lipid cycling prevents anti-PEG antibodies. Hormone cycling prevents HPG suppression.",
-        "long_term_safety": "50-year simulation shows no accumulation of adverse effects. All compounds have defined clearance pathways. No compound accumulates beyond therapeutic window.",
-        "stability_score_pct": 100.0,
+        "long_term_safety": "MODELED: the 50-year simulation shows no accumulation UNDER THE MODEL'S ASSUMPTIONS. Note this is not true pharmacology for every component (denosumab t1/2 ~25 days; biologics have long residence times) -- the combination's long-term safety is unknown",
+        "stability_score_pct": None,  # removed (review #15): no long-term human data exist
     },
 
-    # --- Final Optimization (review #14: boost all domains to 100%) ---
-    "final_optimization": {
-        "target": "Push every domain to 100% with specific validation evidence",
-
-        # Reprogramming kinetics -> 100%
-        "reprogramming_boost": {
-            "enhancer_derivation": "4.2x boost = VPA (1.8x, Huangfu 2008 Nat Biotech) + PD0325901 (1.3x, Silva 2008 PLoS ONE) + CHIR99021 (1.2x, Li 2009 Cell Stem Cell) + TGF-beta inhibitor (1.2x, Lin 2009 Cell Stem Cell) = 1.8 x 1.3 x 1.2 x 1.2 = 3.37x base, with L-Myc (0.85x) = 2.86x. saRNA sustained expression (7 days vs 6-8hr) adds 1.5x = 4.29x. Rounding: 4.2x.",
-            "base_rate_source": "18% = human adipose-derived stem cell reprogramming rate (Esteban 2010, Cell Stem Cell). Not mouse data -- human ASCs specifically.",
-            "final_efficiency": "18% x 4.2x = 75.6% -- consistent with optimized protocols (Rais 2017, Nat Commun achieved 70%+ with small molecules)",
-            "validation": "Each enhancer individually published in top journals. Combined boost is multiplicative (validated by Esteban 2010). saRNA sustained expression is mechanistically sound (more protein = more reprogramming).",
-            "score_pct": 100.0,
-        },
-
-        # PK/PD -> 100%
-        "pkpd_boost": {
-            "simcyp_validation": "SimCYP PBPK platform validated against 500+ clinical PK studies (FDA-recognized, used in 40+ NDAs). Predicts Cmax within 2-fold for 90% of compounds.",
-            "nonmem_validation": "NONMEM is FDA-standard for population PK (used in 80% of NDAs). 1000-subject simulation captures age/gender/renal/hepatic variability.",
-            "ai_pk_validation": "Deep learning PK model trained on 10,000+ clinical datasets. External validation: 92% accuracy (within 2-fold) on held-out test set. Comparable to SimCYP but faster.",
-            "multi_tissue_pk_validation": "Each organ-specific LNP PK profile validated against published biodistribution data (Adipotide CKGGRAKDC in humans, TfR-LNP in primates, bisphosphonate-PEG in humans).",
-            "adaptive_pk_validation": "Monthly TDM feedback loop is standard clinical practice (e.g., tacrolimus, vancomycin TDM). Bayesian dose adjustment is FDA-recognized (BestDose software).",
-            "score_pct": 100.0,
-        },
-
-        # Long-term stability -> 100%
-        "stability_boost": {
-            "50_year_simulation": "Monte Carlo simulation (10,000 iterations) over 50 years. Models: drug accumulation (all have defined t1/2 < 48hr, no accumulation), receptor desensitization (drug holiday resets), clonal expansion (annual single-cell sequencing), immune tolerance (Treg maintenance).",
-            "long_term_drug_data": "Metformin: 60+ years of clinical use, no long-term toxicity at 1000mg (UKPDS 30-year follow-up). Rapamycin: 20+ years transplant data, anti-aging dose is 10x lower. Dasatinib: 15+ years CML data, 3-day pulse is well-tolerated.",
-            "adaptive_frequency_rationale": "As epigenetic age approaches 25 years (DunedinPACE), less intervention needed. Model predicts Year 1-5 monthly, Year 5-10 quarterly, Year 10+ semi-annual. This is biologically sound -- younger bodies maintain homeostasis better.",
-            "no_accumulation_proof": "All 60+ compounds have t1/2 < 48hr. Monthly dosing = 15 half-lives between doses. Drug concentration at next dose < 0.001% of peak. No accumulation possible.",
-            "score_pct": 100.0,
-        },
-
-        # Regulatory -> 100%
-        "regulatory_boost": {
-            "precedent_mapping": {
-                "saRNA_LNP": "ARCT-154 (Japan 2023) -> ChiefJuice saRNA-LNP. Same platform, same regulatory pathway.",
-                "mRNA_LNP": "Comirnaty (FDA 2021) -> ChiefJuice LNP delivery. Billions of doses, full approval.",
-                "CRISPR": "CASGEVY (FDA 2023) -> ChiefJuice CRISPRi. CRISPRi is safer (no DNA cut).",
-                "CAR_T": "Kymriah (FDA 2017) -> ChiefJuice CAR-T senolytic. Same autologous cell therapy framework.",
-                "gene_therapy": "Zolgensma (FDA 2019) -> ChiefJuice saRNA gene expression. AAV precedent for in vivo gene delivery.",
-                "combination": "Genvoya (FDA 2015) -> ChiefJuice multi-component. 4-drug combination approved as single product.",
-                "orphan_drug": "Lonafarnib (FDA 2020) -> ChiefJuice progeria orphan designation. <400 patients, accelerated approval.",
-            },
-            "fda_rmact": "RMAT designation (21st Century Cures Act) -- specifically designed for regenerative medicine combinations. ChiefJuice qualifies: it IS a regenerative medicine (stem cell replenishment) that modifies disease (aging).",
-            "japan_rm_act": "Japan Regenerative Medicine Act (2014) -- conditional approval after Phase II. ARCT-154 proved this works for saRNA. ChiefJuice could follow identical path.",
-            "combination_product": "21 CFR 3.2(e) -- combination product with biological primary mode (saRNA = biologic). Lead center = CBER. CBER has approved all 6 precedent products above.",
-            "score_pct": 100.0,
-        },
-
-        # Cost at scale -> 100%
-        "cost_boost": {
-            "covid_cost_proof": "Comirnaty: $19.50/dose at 1B+ doses (Pfizer 2021 contract). mRNA + LNP manufacturing at $19.50/dose. ChiefJuice saRNA uses 10x less RNA (self-amplifying) = $2/dose for saRNA.",
-            "lipid_cost": "DLin-MC3-DMA patent expires 2027. 4 generic suppliers announced (Merck, Corden, NOF, Avanti). Post-patent: $3/dose for all 4 lipids combined (industry projections).",
-            "growth_factor_cost": "Biosimilar EGF: E. coli expression at scale = $2/dose (vs $120 current). Biosimilar FGF: $1/dose. Biosimilar PDGF: $1/dose. Biosimilar VEGF: $1/dose. Total: $5/dose.",
-            "small_molecule_cost": "Dasatinib generic (patent expired 2020): $0.50/dose. Quercetin OTC: $0.10. Fisetin: $0.30. Metformin: $0.05. Rapamycin generic: $0.50. NMN: $0.40. NR: $0.40. All others: <$0.10 each. Total small molecules: <$3/dose.",
-            "exosome_cost": "3D bioreactor scaffold (CellStack, Corning) = $5/dose at scale. ASC exosomes from waste liposuction tissue = near-zero raw material cost.",
-            "qc_cost": "Automated release testing (Roche cobas, Siemens BEP, Milteny Biotec MACSQuant) = $5/dose at scale. vs $40/dose manual.",
-            "total_at_scale": "saRNA $2 + lipids $3 + growth factors $5 + small molecules $3 + exosomes $5 + QC $5 + facility $2 = $25/dose at 100M+ scale. Within COVID precedent range.",
-            "insurance": "CMS covers frailty (ICD-10 R54), osteoporosis (M81.0), sarcopenia (M62.84). Private insurers follow CMS. Treatment is reimbursable.",
-            "score_pct": 100.0,
-        },
-
-        # Drug interactions -> 100%
-        "drug_interaction_boost": {
-            "simcyp_validation": "SimCYP predicts drug-drug interactions with 87-93% accuracy (Shebley 2022, CPT). FDA accepts SimCYP for DDI prediction in NDAs (40+ approved using SimCYP data).",
-            "ai_prediction_validation": "DeepDDI model: 99% sensitivity for severe interactions, 92% for moderate (Ryu 2018, Pharmaceutics). Trained on DrugBank 5.1 + FDA FAERS (10M+ adverse event reports).",
-            "tdm_validation": "Therapeutic drug monitoring is standard of care for dasatinib (FDA label recommends TDM), rapamycin (transplant standard), metformin (renal function monitoring). All have FDA-validated TDM assays.",
-            "staggered_dosing_validation": "Staggered dosing is standard clinical practice (e.g., HIV HAART staggered dosing, transplant immunosuppression staggering). No novel concept -- just applied to more compounds.",
-            "cyp_phenotyping": "CYP450 genotyping (CYP2D6, 2C9, 2C19, 3A4, 3A5) is FDA-recommended before prescribing (Table of Pharmacogenomic Biomarkers in Drug Labeling). Standard clinical practice.",
-            "no_severe_interactions": "PBPK simulation of all 60+ compounds: zero severe (contraindicated) interactions identified. All interactions are moderate (manageable with staggering/TDM).",
-            "score_pct": 100.0,
-        },
-
-        # BBB crossing -> 100%
-        "bbb_boost": {
-            "tfr_human_data": "2B3-101 (TfR-targeted doxorubicin LNP): Phase I/II completed in brain tumors (Kerklaan 2016, J Control Release). Safe, crosses BBB in humans. JCR Pharmaceuticals TfR-LNP: Phase I in humans.",
-            "fus_human_data": "Insightec Exablate Neuro: FDA-approved for BBB opening (2016). 500+ patients treated. Opens BBB safely for 4-6hr. Used in Alzheimer's and glioblastoma trials.",
-            "intranasal_human_data": "Intranasal insulin: Phase III in Alzheimer's (NCT01767909). Intranasal BDNF: Phase I (NCT02206598). Intranasal delivery to CNS is clinically validated.",
-            "exosome_bbb_data": "Engineered exosomes with RVG29 peptide cross BBB and deliver cargo to neurons (Alvarez-Erviti 2011, Nat Biotech). 40% brain uptake in mice. Human trials starting 2024.",
-            "multiple_redundancy": "7 independent BBB crossing mechanisms. If any one fails, others compensate. Combined brain bioavailability: 45% (vs 1% for unmodified LNP).",
-            "score_pct": 100.0,
-        },
-
-        # Personalized medicine -> 100%
-        "personalized_boost": {
-            "bayesian_dosing_validation": "Bayesian adaptive dosing is FDA-recognized (BestDose, MwPharm). Used clinically for warfarin, tacrolimus, vancomycin, aminoglycosides. 95% accuracy in published studies.",
-            "pharmacogenomics": "CYP450 genotyping is FDA-recommended. CPIC guidelines exist for 100+ drugs. ChiefJuice uses CYP450 + drug-specific PGx for all 60+ compounds.",
-            "comorbidity_adjustments": "All comorbidity dose adjustments based on FDA labels (e.g., metformin dose reduction in renal impairment is on the Glucophage label). Not novel -- standard clinical practice.",
-            "age_adjustments": "Geriatric dosing principles (Beers Criteria, AGS 2023): reduced doses for elderly, increased monitoring. ChiefJuice follows Beers Criteria explicitly.",
-            "wearable_integration": "Apple Watch ECG is FDA-cleared (2018). Oura Ring is CE-marked. CGM is FDA-approved. Wearable data is clinically validated for HRV, sleep, glucose.",
-            "digital_twin": "AI digital twin model integrates 42 blood biomarkers + 4 epigenetic clocks + wearable stream. Similar models used in ICU precision medicine (Saria 2018, NPJ Digit Med).",
-            "score_pct": 100.0,
-        },
-
-        # mtDNA -> 100%
-        "mtdna_boost": {
-            "mrt_precedent": "UK approved MRT in 2015 (HFEA license). First MRT births 2016. Clinical precedent for mtDNA manipulation in humans.",
-            "urolithin_a_human": "Urolithin A Phase II completed (Singh 2022, Cell Rep Med). Safe, improves mitochondrial function in elderly. Already in formulation.",
-            "deep sequencing": "Illumina deep mtDNA sequencing (>10,000x) is clinically available. Heteroplasmy tracking routine in mitochondrial disease clinics.",
-            "score_pct": 100.0,
-        },
-
-        # Immune paradox -> 100%
-        "immune_paradox_boost": {
-            "treg_expansion": "Low-dose IL-2 Treg expansion: Phase II completed in autoimmune disease (Klatzmann 2012, Sci Transl Med). Safe, selectively expands Tregs. FDA Fast Track for IL-2 (NCT02700765).",
-            "autoimmune_monitoring": "ANA, anti-dsDNA, TPO, GAD65, anti-CCP are standard clinical tests. Auto-pause if elevated is standard safety practice.",
-            "car_treg": "CAR-Treg therapy in Phase I/II for autoimmune (Sangamo, NCT05235142). Autologous CAR-Tregs targeting inflamed tissues.",
-            "score_pct": 100.0,
-        },
-
-        # Immune memory -> 100%
-        "immune_memory_boost": {
-            "memory_t_resistance": "Memory T cells (CD45RO+, CCR7-) are resistant to senolytics because they lack senescence markers (KLRG1-, CD57-). Only exhausted/senescent T cells are cleared (Lanna 2017, Nat Cell Biol).",
-            "b_cell_memory": "Long-lived plasma cells in bone marrow are not affected by senolytics or immune LNP. They are in a protected niche (Radbruch 2006, Nat Rev Immunol).",
-            "vaccine_titer_monitoring": "IgG panel for 10 pathogens is standard clinical testing. Auto-booster is standard pediatric/adult practice.",
-            "score_pct": 100.0,
-        },
-
-        # Hormonal cycling -> 100%
-        "hormonal_boost": {
-            "pulsatile_delivery": "Pulsatile hormone delivery is clinically validated (GnRH pump for infertility, insulin pump for diabetes). Physiological pulses prevent receptor downregulation.",
-            "hcg_co_administration": "hCG + testosterone is standard endocrinology practice to maintain Leydig cell function (Liu 2006, JAMA). FDA-approved protocol.",
-            "cycling_protocol": "3 weeks on / 1 week off is standard HRT cycling protocol (endocrinology guidelines). Prevents HPG axis suppression.",
-            "score_pct": 100.0,
-        },
-
-        # Senolytic resistance -> 100%
-        "senolytic_resistance_boost": {
-            "rotation_validation": "Drug rotation to prevent resistance is standard infectious disease practice (antibiotic rotation, antiretroviral rotation). Applied to senolytics: D+Q, Fisetin, Navitoclax, Piperlongumine.",
-            "car_t_senolytic": "CAR-T targeting uPAR on senescent cells: published proof-of-concept (Amor 2020, Nature). Works in mouse models. Clinical translation feasible.",
-            "senomorphic_backup": "Rapamycin + metformin suppress SASP (senomorphics) -- clinically validated (Blagosklonny 2009, Cell Cycle). Backup if senolytics incomplete.",
-            "score_pct": 100.0,
-        },
+    # --- Verification status (review #15) ---
+    # This REPLACES the review-#14 "final_optimization" section, which
+    # self-assigned 100% to every domain by over-reading its citations.
+    # Examples of what that section asserted vs. the truth:
+    #   "18% = human adipose-derived stem cell reprogramming rate
+    #    (Esteban 2010, Cell Stem Cell)" -- FALSE. Esteban 2010 is the
+    #    vitamin-C reprogramming paper; no human OSKM protocol has ever
+    #    reported 18% (published range: ~0.01-1%).
+    #   "75.6% consistent with optimized protocols (Rais 2017 achieved 70%+)"
+    #    -- MISLEADING. Rais 2017 converted MOUSE fibroblasts to a plastic
+    #    pre-iPSC intermediate; it is not human adipocytes becoming iPSCs.
+    #   "99% sensitivity for severe interactions (Ryu 2018)" -- over-read;
+    #    a 60+-compound novel combination has never been co-administered.
+    #   Thirteen "score_pct: 100.0" self-scores -- scores are not evidence.
+    "verification_status": {
+        "summary": "ChiefJuice is an unproven research concept. Chemistry, doses, and "
+                   "mechanisms in this file are corrected to published values where a "
+                   "published value exists; every remaining magnitude is graded in "
+                   "EVIDENCE_AUDIT (A replicated human / B preliminary human / "
+                   "C animal-in-vitro / D speculative).",
+        "what_is_actually_grounded": [
+            "The LNP-mRNA platform is real (billions of COVID vaccine doses)",
+            "saRNA is a real approved platform (ARCT-154, Japan 2023)",
+            "The individual repurposed drugs exist with published dosing "
+            "(metformin, rapamycin, dasatinib, navitoclax, senolytic trial protocols)",
+            "Ex-vivo adipose-to-iPSC reprogramming is real (at ~0.01-1% efficiency)",
+            "In-vivo partial reprogramming reverses aging markers in MICE "
+            "(Ocampo 2016); human in-vivo data do not exist",
+            "Cancer-risk management concepts (iCasp9 switches, ctDNA monitoring) "
+            "have real precedents",
+        ],
+        "what_is_not_established": [
+            "In-vivo fat-to-stem-cell conversion at ANY efficiency in humans",
+            "The modeled outcome magnitudes (rejuvenation rates, regrowth, "
+            "cancer-risk reduction, epigenetic-age reversal per dose)",
+            "Safety of the 60+ component combination in any organism",
+            "That indefinite lifespan maintenance is achievable at all -- "
+            "no intervention has demonstrated this in any species",
+        ],
+        "largest_gaps": [
+            "net conversion efficiency: modeled 75.6% vs published ~0.01-1% "
+            "(ex-vivo) -- the single biggest assumption in the model",
+            "endosomal escape: modeled 78% vs published <=15%",
+            "senolytic clearance without resistance selection",
+            "synergy stacking factors (all invented; real homeostasis damps stacking)",
+        ],
+        "audit_command": "python ChiefJuiceV1.17.py --audit",
     },
-
     # --- Complete Step-by-Step Formulation Process ---
+    # WARNING (review #15): this is a CONCEPTUAL OUTLINE for a thought
+    # experiment, NOT a manufacturing protocol. No ChiefJuice product exists
+    # or has ever been made. Compounding or administering a biologic/drug
+    # combination outside a regulated clinical trial is illegal and
+    # dangerous (see the SAFETY notice in the file header). Do not execute.
     "formulation_process": {
-        "target": "Complete manufacturing protocol: raw materials to finished injectable product",
+        "status_warning": "CONCEPTUAL OUTLINE ONLY -- not a validated GMP protocol; do not synthesize or administer",
+        "target": "Conceptual manufacturing outline: raw materials to finished product (thought experiment only)",
         "facility_requirements": {
             "classification": "BSL-2 / GMP Grade A (ISO 5) cleanroom for fill-finish, Grade B (ISO 7) for formulation",
             "equipment": [
@@ -1968,6 +2482,849 @@ CHIEF_JUICE = {
                     "WHAT IS UNSOLVED: all of the chromosome-silencing work is in vitro only -- no in vivo delivery of XIST to a supernumerary chromosome has been attempted in any animal, let alone a human. Multi-megabase locus replacement exceeds every current delivery platform's cargo capacity. Crucially, neurodevelopmental architecture established in utero is not undone by correcting dosage afterwards, so even complete dosage normalisation would not reverse the existing phenotype.",
     },
 }
+
+# ===========================================================================
+# SECTION 1C -- EVIDENCE AUDIT (review #15)
+# ===========================================================================
+# Every load-bearing parameter this model runs on, graded against published
+# science. This is the honest "verification" a simulation can actually offer:
+# it states, for each assumption, what published science does and does not
+# support. It is NOT a claim that the formulation works -- that would require
+# in-vitro data, animal studies, and human trials, none of which exist.
+#
+# Grades:
+#   A = replicated human clinical data
+#   B = preliminary human data (small, uncontrolled, or early-phase trials)
+#   C = animal or in-vitro data only
+#   D = speculative: no published measurement anywhere
+#
+# Run `python ChiefJuiceV1.17.py --audit` to print this table.
+
+EVIDENCE_AUDIT = [
+    # --- Core reprogramming premise ---
+    {"module": "reprogramming", "parameter": "net_conversion_efficiency_pct",
+     "modeled": "75.6%", "published": "~0.01-1% ex-vivo human ASC->iPSC; in-vivo unquantified",
+     "grade": "D", "source": "Takahashi & Yamanaka 2007; Esteban 2010; Sugii 2011",
+     "note": "The largest assumption in the model. Every rejuvenation result scales with it."},
+    {"module": "reprogramming", "parameter": "enhancement_factor (multiplicative stacking)",
+     "modeled": "4.2x", "published": "each enhancer individually published; multiplicative stacking assumed",
+     "grade": "D", "source": "Huangfu 2008; Lin 2009; Ying 2008", "note": None},
+    {"module": "reprogramming", "parameter": "7-day reprogramming pulse",
+     "modeled": "7 days per cycle", "published": "saRNA expression window real; full ex-vivo conversion takes 3-4 weeks",
+     "grade": "C", "source": "ARCT-154 platform; Ocampo 2016 (cyclic partial reprogramming, mice)", "note": None},
+    {"module": "reprogramming", "parameter": "L-Myc as safe M-factor",
+     "modeled": "L-Myc 80 ug", "published": "L-Myc reprograms with lower transforming risk (mouse)",
+     "grade": "C", "source": "Nakagawa et al. 2010, Nat Methods", "note": None},
+    {"module": "reprogramming", "parameter": "2i/LIF media concentrations (PD0325901 1uM, CHIR99021 3uM, VPA 1mM)",
+     "modeled": "1 uM / 3 uM / 1 mM", "published": "these are the published ex-vivo media values",
+     "grade": "A", "source": "Ying 2008; Huangfu 2008; Lin 2009", "note": "In-vitro media concentrations, not injectable doses."},
+    {"module": "lnp", "parameter": "DLin-MC3-DMA ionizable lipid + 50:10:38.5:1.5 ratio",
+     "modeled": "as in file", "published": "real, approved-platform lipid and ratio",
+     "grade": "A", "source": "Jayaraman 2012; Onpattro approval", "note": None},
+    {"module": "lnp", "parameter": "endosomal_escape_pct (base)",
+     "modeled": "15%", "published": "1-15% range for LNP endosomal escape",
+     "grade": "C", "source": "Gao et al. 2023", "note": None},
+    {"module": "lnp", "parameter": "net_endosomal_escape_pct",
+     "modeled": "78%", "published": "no published LNP achieves this; functional delivery est. low single digits",
+     "grade": "D", "source": "Gao et al. 2023", "note": "Second-largest assumption."},
+    {"module": "lnp", "parameter": "adipose targeting peptide CKGGRAKDC",
+     "modeled": "targeting ligand", "published": "homes to white-fat vasculature in mice",
+     "grade": "C", "source": "Kolonin 2004; Barnhart 2011 (primates)", "note": "Original conjugate destroyed fat-vasculature endothelium."},
+    {"module": "multi_tissue_targeting", "parameter": "organ uptake efficiencies (78/12/65/55/48/42%)",
+     "modeled": "as in file", "published": "no published human measurements",
+     "grade": "D", "source": "Cheng 2020 (SORT, relative shifts only)", "note": None},
+    {"module": "growth_factors", "parameter": "EGF/FGF2/VEGF/HGF/IGF1/PDGF/GCSF/BDNF/GDF11 cocktail",
+     "modeled": "ug-scale SC co-doses", "published": "becaplermin (PDGF-BB) approved for diabetic ulcers; G-CSF approved; systemic cocktails investigational; GDF11 contested",
+     "grade": "C", "source": "Regranex label; Sinha 2014 vs Egerman 2015", "note": None},
+    {"module": "exosomes", "parameter": "50 billion ASC exosomes/dose",
+     "modeled": "as in file", "published": "exosome products are investigational; no approved US/EU product",
+     "grade": "C", "source": "early-phase exosome trials", "note": None},
+    {"module": "immune_evasion", "parameter": "PD-L1 transient expression on reprogrammed cells",
+     "modeled": "risk-flagged concept", "published": "PD-L1 expression is a tumor immune-evasion hallmark",
+     "grade": "D", "source": "cancer immunology literature", "note": "Retained as flagged concept; Treg support is the safer element."},
+    # --- Telomeres ---
+    {"module": "telomerase", "parameter": "telomere_gain_bp_per_division",
+     "modeled": "10 bp", "published": "telomerase roughly offsets divisional loss; pharmacological net lengthening marginal",
+     "grade": "C", "source": "Harley 2013 (TA-65, open label)", "note": None},
+    {"module": "BIO", "parameter": "telomerase_telomere_gain_bp",
+     "modeled": "10 bp/division", "published": "same as above",
+     "grade": "C", "source": "Harley 2013", "note": None},
+    {"module": "telomerase", "parameter": "TA-65 dose",
+     "modeled": "250 mg", "published": "250-1000 mg/day studied",
+     "grade": "B", "source": "Harley 2013", "note": None},
+    {"module": "telomerase_cancer_safety", "parameter": "counterbalance_cancer_reduction_pct",
+     "modeled": "30%", "published": "argument, not finding",
+     "grade": "D", "source": None, "note": None},
+    # --- Senolytics ---
+    {"module": "senolytics", "parameter": "dasatinib 100mg + quercetin 500mg x3d",
+     "modeled": "monthly pulse", "published": "published pilot protocol; fatalities reported after unsupervised self-administration (2025)",
+     "grade": "B", "source": "Xu 2018; Justice 2019", "note": "Research-only; clinical supervision mandatory."},
+    {"module": "senolytics", "parameter": "fisetin 500mg",
+     "modeled": "quarterly pulse", "published": "Mayo trial range 100-1500 mg",
+     "grade": "B", "source": "Mayo AF trials", "note": None},
+    {"module": "senolytics", "parameter": "navitoclax 250mg x3d",
+     "modeled": "quarterly rotation", "published": "published senolytic trial dose; dose-limiting thrombocytopenia",
+     "grade": "B", "source": "Hickson 2019", "note": "BCL-XL-dependent platelet death."},
+    {"module": "senolytics", "parameter": "clearance_efficiency_pct per round",
+     "modeled": "50%", "published": "tissue-variable animal-study clearances",
+     "grade": "C", "source": "Xu 2018; Zhu 2017", "note": None},
+    {"module": "senolytics", "parameter": "annual 93.75% (assumes no resistance)",
+     "modeled": "arithmetic", "published": "senescent-cell heterogeneity predicts resistance selection",
+     "grade": "D", "source": None, "note": None},
+    # --- Metabolic / NAD+ ---
+    {"module": "metabolic", "parameter": "NMN 500mg / NR 300mg",
+     "modeled": "daily", "published": "small human trials raise blood NAD+ ~1.5-2x",
+     "grade": "B", "source": "Yoshino 2021; Martens 2018", "note": None},
+    {"module": "metabolic", "parameter": "metformin 500mg",
+     "modeled": "daily", "published": "approved for diabetes; TAME aging trial ongoing",
+     "grade": "A", "source": "UKPDS; Barzilai (TAME)", "note": None},
+    {"module": "metabolic", "parameter": "rapamycin 6mg weekly",
+     "modeled": "weekly", "published": "weekly mg-scale dosing in human mTOR trials",
+     "grade": "B", "source": "Mannick 2014; PEARL", "note": None},
+    {"module": "metabolic", "parameter": "urolithin A 500mg / MitoQ 20mg",
+     "modeled": "daily", "published": "human trials at these doses",
+     "grade": "B", "source": "Andreux 2019; Rossman 2018", "note": None},
+    {"module": "metabolic", "parameter": "nad_plus_fold_increase",
+     "modeled": "1.8x", "published": "1.5-2x whole-blood NAD+",
+     "grade": "B", "source": "Martens 2018", "note": None},
+    {"module": "dna_repair", "parameter": "repair_rate_boost_fold",
+     "modeled": "1.3x", "published": "NAD+ supports PARP/sirtuin repair; magnitude unquantified",
+     "grade": "C", "source": "Martens 2018", "note": None},
+    # --- Immune / epigenetic age ---
+    {"module": "immune", "parameter": "IL-7 dose",
+     "modeled": "700 ug", "published": "CYT107-class ~10 ug/kg",
+     "grade": "B", "source": "Sereti 2012", "note": None},
+    {"module": "immune", "parameter": "thymic_regen_rate_pct_per_month",
+     "modeled": "2%/month", "published": "TRIIM: thymic fat replacement over ~12 months",
+     "grade": "B", "source": "Fahy 2019 (n=9)", "note": None},
+    {"module": "immune", "parameter": "immune_age_reversal_years",
+     "modeled": "3 years", "published": "TRIIM: ~1.5-2.5 years over 12 months",
+     "grade": "B", "source": "Fahy 2019", "note": None},
+    {"module": "epigenetic", "parameter": "epigenetic_age_reversal_years_per_dose",
+     "modeled": "0.25 yr/dose (~3 yr/yr)", "published": "best human data ~1.5-2.5 yr/yr continuous; mouse cyclic OSK stronger",
+     "grade": "C", "source": "Fahy 2019; Ocampo 2016", "note": None},
+    {"module": "aging_clocks", "parameter": "DunedinPACE / GrimAge / PhenoAge as endpoints",
+     "modeled": "primary endpoints", "published": "validated CORRELATES of aging; not proven surrogate endpoints for treatment benefit",
+     "grade": "B", "source": "Belsky 2022; Lu 2019; Levine 2018", "note": None},
+    {"module": "immune", "parameter": "low-dose IL-2 Treg expansion",
+     "modeled": "1000 IU/day", "published": "selectively expands Tregs in autoimmune trials",
+     "grade": "B", "source": "Klatzmann 2012", "note": None},
+    {"module": "immune", "parameter": "PD-1 agonism for autoimmunity",
+     "modeled": "component concept", "published": "peresolimab Phase 2 positive",
+     "grade": "B", "source": "Stein 2023", "note": None},
+    {"module": "immune", "parameter": "denosumab 60mg q6mo",
+     "modeled": "as in file", "published": "approved osteoporosis dosing",
+     "grade": "A", "source": "Prolia label", "note": None},
+    # --- Cancer safety ---
+    {"module": "oncoshield", "parameter": "cancer_risk_reduction_pct",
+     "modeled": "25%", "published": "no validated chemoprevention combination",
+     "grade": "D", "source": None, "note": None},
+    {"module": "oncoshield", "parameter": "ctDNA monitoring sensitivity",
+     "modeled": "55%", "published": "~40-70%, stage-dependent",
+     "grade": "B", "source": "Cohen 2018 (CancerSEEK)", "note": None},
+    {"module": "oncocure", "parameter": "cure_efficacy_pct",
+     "modeled": "35%", "published": "no pan-cancer cure exists; CAR-T CR rates in CD19+ hematologic cancers only",
+     "grade": "D", "source": "Kymriah/Yescarta data (niche)", "note": None},
+    {"module": "teratoma_prevention", "parameter": "teratoma risk under partial/episomal protocols",
+     "modeled": "0.5%/cycle", "published": "in-vivo OSKM teratomas in mice; partial/episomal risk reduced, not zero",
+     "grade": "D", "source": "Abad 2013", "note": "Hazard direction grounded; magnitude modeled."},
+    {"module": "safety systems", "parameter": "iCasp9 suicide switch",
+     "modeled": "standing kill switch", "published": "human CAR-T switch data",
+     "grade": "B", "source": "Zhou 2016", "note": None},
+    # --- Neuro / muscle / bone / blood ---
+    {"module": "neuro", "parameter": "neurogenesis_rate_pct_per_month",
+     "modeled": "2%/month", "published": "adult human hippocampal neurogenesis is debated",
+     "grade": "D", "source": "Sorrells 2018 vs counter-evidence", "note": None},
+    {"module": "neuro", "parameter": "paralysis_recovery_pct",
+     "modeled": "40%", "published": "no human paralysis reversal from these components",
+     "grade": "D", "source": None, "note": None},
+    {"module": "neuro", "parameter": "mental_illness_cure_pct",
+     "modeled": "25%", "published": "no growth-factor cocktail cures mental illness",
+     "grade": "D", "source": None, "note": None},
+    {"module": "muscle", "parameter": "max specific force",
+     "modeled": "50 N/cm2 (+25%)", "published": "human single-fiber ~25-35 N/cm2",
+     "grade": "D", "source": None, "note": "Old value (330 N/cm2, +1000%) was physically impossible."},
+    {"module": "muscle", "parameter": "anti-myostatin strength gains",
+     "modeled": "support role", "published": "modest human mass gains, small strength effects",
+     "grade": "B", "source": "anti-myostatin trial literature", "note": None},
+    {"module": "bone", "parameter": "max compressive strength",
+     "modeled": "230 MPa (+15%)", "published": "cortical bone ~150-200 MPa",
+     "grade": "D", "source": None, "note": "Old value (4,200 MPa, +2000%) was physically impossible."},
+    {"module": "bone", "parameter": "teriparatide 20ug/d, abaloparatide 80ug/d, alendronate 70mg/wk, romosozumab 210mg/mo",
+     "modeled": "as in file", "published": "approved dosing; ~5-15% BMD/yr effects",
+     "grade": "A", "source": "Forteo/Tymlos/Fosamax/Evenity labels", "note": None},
+    {"module": "hemo", "parameter": "O2 per RBC ceiling",
+     "modeled": "1.1x baseline", "published": "hemoglobin chemistry caps per-RBC O2 at ~1.07e9",
+     "grade": "D", "source": None, "note": "Old value (7.5 billion O2/RBC) violated Hb chemistry."},
+    # --- Regeneration / homing / supply ---
+    {"module": "BIO", "parameter": "stem_cell_engraftment_pct",
+     "modeled": "2%", "published": "systemic MSC biodistribution: low single-digit engraftment",
+     "grade": "C", "source": "MSC biodistribution literature", "note": None},
+    {"module": "BIO", "parameter": "ex_vivo_expansion_fold",
+     "modeled": "150x", "published": "MSC bioreactor expansion achievable; transformation risk managed by clonal release testing",
+     "grade": "C", "source": "cell-therapy manufacturing literature", "note": None},
+    {"module": "stem_cell_homing", "parameter": "homing_efficiency_pct",
+     "modeled": "25%", "published": "systemic homing to injury: low single digits in animals",
+     "grade": "D", "source": None, "note": None},
+    {"module": "stacking", "parameter": "all synergy factors",
+     "modeled": "1.2-2.0x each", "published": "invented; real homeostatic feedback damps stacking",
+     "grade": "D", "source": None, "note": None},
+    {"module": "plasmasync/commrepair", "parameter": "plasma rejuvenation factors",
+     "modeled": "30% restorations", "published": "mouse parabiosis/dilution effects; human rejuvenation not established",
+     "grade": "C", "source": "Conboy 2020", "note": None},
+    {"module": "adipostem_pro", "parameter": "enhanced conversion 75%",
+     "modeled": "75%", "published": "same gap as core conversion parameter",
+     "grade": "D", "source": "Schlaeger 2015 (Rarg/Lrh1, real but modest)", "note": None},
+    # --- Manufacturing / regulatory / economics ---
+    {"module": "formulation_process", "parameter": "entire manufacturing outline",
+     "modeled": "conceptual SOP", "published": "no product has ever been made",
+     "grade": "D", "source": None, "note": "Conceptual outline only; do not execute."},
+    {"module": "regulatory", "parameter": "RMAT/Sakigake/PRIME pathways",
+     "modeled": "strategy prose", "published": "pathways are real; no application exists for this product",
+     "grade": "B", "source": "21 CFR 3033; Japan RM Act 2014", "note": None},
+    {"module": "cost", "parameter": "all cost figures",
+     "modeled": "$850 -> $25/dose trajectory", "published": "modeled economics only",
+     "grade": "D", "source": None, "note": None},
+
+    # ===================================================================
+    # EXPANDED AUDIT (review #16) -- modules #23-37 and missing hallmarks
+    # Every load-bearing parameter in CHIEF_JUICE now has an audit entry.
+    # ===================================================================
+
+    # --- Hallmark modules missing from the original audit ---
+
+    {"module": "proteoclear", "parameter": "autophagy_boost_fold",
+     "modeled": "2.0x", "published": "spermidine/rapamycin induce autophagy; 2x flux measured in animal cells",
+     "grade": "C", "source": "Madeo 2018; Eisenberg 2009", "note": None},
+    {"module": "proteoclear", "parameter": "aggregate_clearance_pct_per_month",
+     "modeled": "70%", "published": "no human aggregate-clearance rate published",
+     "grade": "D", "source": None, "note": None},
+    {"module": "proteoclear", "parameter": "amyloid/tau_reduction_pct",
+     "modeled": "70%", "published": "no approved therapy removes established amyloid/tau at this rate",
+     "grade": "D", "source": None, "note": "Lecanemab removes amyloid modestly (~26% reduction over 18 months; Eisai 2023)."},
+    {"module": "proteoclear", "parameter": "everolimus 0.5mg",
+     "modeled": "daily mTOR inhibitor", "published": "everolimus is approved; autophagy induction at transplant doses",
+     "grade": "B", "source": "everolimus label; Mannick 2014", "note": "0.5 mg daily is low; transplant dose is higher."},
+
+    {"module": "nutrisense", "parameter": "mtor_inhibition_pct",
+     "modeled": "40%", "published": "rapamycin inhibits mTORC1; tissue-specific magnitude varies",
+     "grade": "C", "source": "Mannick 2014; PEARL trial", "note": None},
+    {"module": "nutrisense", "parameter": "insulin_sensitivity_increase_pct",
+     "modeled": "30%", "published": "metformin improves insulin sensitivity; 30% is at the high end",
+     "grade": "B", "source": "UKPDS; metformin label", "note": None},
+    {"module": "nutrisense", "parameter": "sirtuin_activity_increase_pct",
+     "modeled": "50%", "published": "NAD+ precursors raise sirtuin activity; 50% is modeled",
+     "grade": "C", "source": "Martens 2018; Yoshino 2021", "note": None},
+    {"module": "nutrisense", "parameter": "ampk_activation_fold",
+     "modeled": "2.5x", "published": "metformin activates AMPK; fold varies by tissue",
+     "grade": "C", "source": "Zhou 2001; Hardie 2018", "note": None},
+
+    {"module": "commrepair", "parameter": "signaling_repair_pct_per_month",
+     "modeled": "5%/month", "published": "no human data on signaling repair rates",
+     "grade": "D", "source": None, "note": None},
+    {"module": "commrepair", "parameter": "young_plasma_factor_restoration_pct",
+     "modeled": "30%", "published": "mouse parabiosis data; AMBROSIA trial halted (FDA 2019)",
+     "grade": "C", "source": "Castellano 2017; Conboy 2020", "note": "Human young-plasma rejuvenation is NOT established."},
+    {"module": "commrepair", "parameter": "anti-IL-6 antibody",
+     "modeled": "component", "published": "tocilizumab/anti-IL-6 approved for RA/giant cell arteritis",
+     "grade": "A", "source": "tocilizumab label", "note": "Approved in indicated diseases; not for general aging."},
+
+    {"module": "oxidshield", "parameter": "ros_reduction_pct",
+     "modeled": "30%", "published": "antioxidant RCTs show mixed results; high-dose can blunt hormesis",
+     "grade": "C", "source": "Bjelakovic 2008 meta-analysis; Rossman 2018", "note": None},
+    {"module": "oxidshield", "parameter": "MitoQ 20mg/day",
+     "modeled": "mitochondrial antioxidant", "published": "human trial: improved vascular function in older adults",
+     "grade": "B", "source": "Rossman 2018", "note": None},
+    {"module": "oxidshield", "parameter": "glutathione precursor (NAC+glycine)",
+     "modeled": "10mg", "published": "NAC is approved for acetaminophen overdose; glycine + NAC shown in older adults",
+     "grade": "B", "source": "Sekhar 2018", "note": "10 mg is far below studied doses (NAC 600-1200 mg)."},
+
+    {"module": "hormonebalance", "parameter": "DHEA 50mg",
+     "modeled": "daily", "published": "50 mg/day used in TRIIM and DHEA trials",
+     "grade": "B", "source": "Fahy 2019; DHEA trial literature", "note": None},
+    {"module": "hormonebalance", "parameter": "rhGH/gh_releaser",
+     "modeled": "GH secretagogue", "published": "rhGH used in TRIIM; off-label risks: insulin resistance, edema",
+     "grade": "B", "source": "Fahy 2019", "note": "rhGH for anti-aging is controversial; endocrinology supervision required."},
+    {"module": "hormonebalance", "parameter": "hormone restoration percentages",
+     "modeled": "70-80% restoration", "published": "HRT restores hormones but requires individualized monitoring",
+     "grade": "B", "source": "endocrinology guidelines", "note": "Testosterone: erythrocytosis/CV risk; estrogen: individualized risk-benefit."},
+
+    {"module": "plasmasync", "parameter": "plasma exchange frequency",
+     "modeled": "monthly full-volume", "published": "TPE is approved for autoimmune diseases; monthly is standard for some",
+     "grade": "B", "source": "ASFA guidelines", "note": "Risks: line infections, hypocalcemia, hypotension."},
+    {"module": "plasmasync", "parameter": "systemic_rejuvenation_pct",
+     "modeled": "15%", "published": "mouse plasma dilution shows rejuvenation effects; human data absent",
+     "grade": "D", "source": "Conboy 2020 (mouse)", "note": None},
+
+    {"module": "ecm", "parameter": "hyaluronic_acid 50mg + collagen_peptides 1000mg",
+     "modeled": "daily oral", "published": "collagen peptide supplements show modest skin/joint benefit in RCTs",
+     "grade": "B", "source": "Proksch 2014; collagen supplement meta-analyses", "note": None},
+    {"module": "ecm", "parameter": "MMP_inhibitor / LOX_activator",
+     "modeled": "conceptual components", "published": "no approved MMP-inhibitor drug; LOX modulators are preclinical",
+     "grade": "D", "source": None, "note": "MMP inhibitors failed in cancer trials (musculoskeletal toxicity)."},
+
+    {"module": "memory", "parameter": "memory_capacity_increase_pct",
+     "modeled": "20%", "published": "no approved nootropic achieves 20% memory improvement in healthy adults",
+     "grade": "D", "source": None, "note": None},
+    {"module": "memory", "parameter": "donepezil_analog",
+     "modeled": "5mg", "published": "donepezil is approved; modest symptomatic benefit in dementia",
+     "grade": "A", "source": "donepezil label", "note": "Treats symptoms; does not reverse dementia."},
+    {"module": "memory", "parameter": "dementia_reversal_pct",
+     "modeled": "10%", "published": "no therapy reverses established dementia",
+     "grade": "D", "source": None, "note": "Lecanemab slows decline; does not reverse it."},
+
+    {"module": "lung", "parameter": "gas_exchange_efficiency_increase_pct",
+     "modeled": "20%", "published": "no approved therapy improves gas exchange 20% in fibrotic lung",
+     "grade": "D", "source": None, "note": None},
+    {"module": "lung", "parameter": "fibrosis_reversal_pct",
+     "modeled": "25%", "published": "nintedanib/pirfenidone SLOW decline (~50%); established fibrosis is largely irreversible",
+     "grade": "D", "source": "nintedanib/pirfenidone labels", "note": None},
+    {"module": "lung", "parameter": "HIF2 inhibitor (belzutifan)",
+     "modeled": "fibrosis repurposing", "published": "belzutifan approved for VHL renal tumors; fibrosis is investigational",
+     "grade": "B", "source": "belzutifan label", "note": "Platform is real; this indication is not approved."},
+
+    {"module": "immunoeternal", "parameter": "CRISPR HSC editing in vivo",
+     "modeled": "routine in-vivo dose", "published": "approved HSC editing (CASGEVY) is ex-vivo with myeloablative conditioning",
+     "grade": "D", "source": "CASGEVY label", "note": "In-vivo HSC editing at routine-dose frequency is not established."},
+    {"module": "immunoeternal", "parameter": "CAR-T/NK as broad-spectrum dosing",
+     "modeled": "mRNA dose", "published": "CAR-T approved for specific CD19+ hematologic cancers only",
+     "grade": "A", "source": "Kymriah/Yescarta labels", "note": "Platform real in niche; broad-spectrum dosing is grade D."},
+    {"module": "immunoeternal", "parameter": "autoimmune_resistance_pct",
+     "modeled": "30%", "published": "no combination achieves 30% autoimmune resistance",
+     "grade": "D", "source": None, "note": None},
+
+    {"module": "eternal_youth_pro", "parameter": "necroptosis_inhibition_pct",
+     "modeled": "40%", "published": "necroptosis inhibitors are preclinical; necroptosis is also tumor-suppressive",
+     "grade": "C", "source": "preclinical necroptosis literature", "note": "Blanket inhibition carries tumor risk."},
+    {"module": "eternal_youth_pro", "parameter": "epitalon_peptide",
+     "modeled": "0.5mg", "published": "preclinical peptide; limited-quality human data",
+     "grade": "D", "source": None, "note": None},
+    {"module": "eternal_youth_pro", "parameter": "wrinkle_reduction_pct / gray_hair_reversal_pct",
+     "modeled": "40% / 30%", "published": "no injectable achieves these cosmetic outcomes",
+     "grade": "D", "source": None, "note": None},
+
+    # --- Safety / infrastructure modules ---
+
+    {"module": "cmyc_safety", "parameter": "L-Myc replacement",
+     "modeled": "L-Myc 80ug", "published": "L-Myc reprograms with lower transforming risk (mouse)",
+     "grade": "C", "source": "Nakagawa 2010, Nat Methods", "note": None},
+    {"module": "cmyc_safety", "parameter": "cmyc_cancer_risk_pct",
+     "modeled": "0.001%", "published": "constitutive cMyc causes tumors; transient expression risk is lower but nonzero",
+     "grade": "C", "source": "cMyc oncogenesis literature", "note": None},
+
+    {"module": "safety_system", "parameter": "iCasp9 suicide switch",
+     "modeled": "standing kill switch", "published": "human CAR-T safety-switch data",
+     "grade": "B", "source": "Zhou 2016", "note": None},
+    {"module": "safety_system", "parameter": "differentiation_priority",
+     "modeled": "growth factors push differentiation", "published": "standard iPSC safety practice",
+     "grade": "C", "source": "iPSC safety literature", "note": None},
+
+    {"module": "immune_memory", "parameter": "memory_preservation_pct",
+     "modeled": "95%", "published": "memory T cells are resistant to senolytics (Lanna 2017)",
+     "grade": "C", "source": "Lanna 2017, Nat Cell Biol", "note": "95% is a modeled estimate from the resistance finding."},
+    {"module": "immune_memory", "parameter": "titer_recovery_pct",
+     "modeled": "90%", "published": "booster vaccination restores titers; no data on post-rejuvenation titer dynamics",
+     "grade": "C", "source": "vaccination literature", "note": None},
+
+    {"module": "liver_sequestration", "parameter": "liver_sequestration_reduction_pct",
+     "modeled": "70%", "published": "SC route reduces first-pass; SORT lipids shift biodistribution",
+     "grade": "C", "source": "Cheng 2020, Nat Nanotech", "note": "70% is modeled; animal data show relative shifts."},
+    {"module": "liver_sequestration", "parameter": "non_liver_bioavailability_boost",
+     "modeled": "3.5x", "published": "SORT chemistry improves non-liver delivery; 3.5x is modeled",
+     "grade": "D", "source": "Cheng 2020", "note": None},
+
+    {"module": "hormonal_cycling", "parameter": "suppression_risk_pct",
+     "modeled": "5%", "published": "exogenous hormones suppress endogenous axes; cycling reduces but does not eliminate",
+     "grade": "B", "source": "endocrinology guidelines", "note": None},
+
+    {"module": "senolytic_resistance", "parameter": "rotation_effectiveness_pct",
+     "modeled": "95%", "published": "senolytic rotation is a concept; no human trial proves 95% coverage",
+     "grade": "D", "source": None, "note": None},
+    {"module": "senolytic_resistance", "parameter": "CAR-T senolytic (uPAR)",
+     "modeled": "component", "published": "uPAR-targeted CAR-T cleared senescent cells in mice",
+     "grade": "C", "source": "Amor 2020, Nature", "note": None},
+
+    {"module": "immune_paradox", "parameter": "autoimmune_incidence_pct",
+     "modeled": "0.3%", "published": "immune rejuvenation triggering autoimmunity is unquantified",
+     "grade": "D", "source": None, "note": None},
+    {"module": "immune_paradox", "parameter": "low-dose IL-2 Treg expansion",
+     "modeled": "1000 IU/day", "published": "selectively expands Tregs in autoimmune trials",
+     "grade": "B", "source": "Klatzmann 2012, Sci Transl Med", "note": None},
+
+    {"module": "mtdna_heteroplasmy", "parameter": "heteroplasmy_reduction_per_treatment_pct",
+     "modeled": "8%", "published": "mtRE and DdCBE reduce heteroplasmy in animal models; tissue-variable",
+     "grade": "C", "source": "Bacman 2013; Lim 2022", "note": None},
+    {"module": "mtdna_heteroplasmy", "parameter": "mitochondrial replacement therapy backup",
+     "modeled": "ex-vivo MRT for HSCs", "published": "MRT is approved for preventing mtDNA disease transmission; HSC application is novel",
+     "grade": "C", "source": "MRT approval literature", "note": None},
+
+    {"module": "microbiome", "parameter": "Akkermansia muciniphila probiotic",
+     "modeled": "component", "published": "human trials show barrier/metabolic benefits; pasteurized strain approved in EU",
+     "grade": "B", "source": "Depommier 2019; Plovier 2017", "note": None},
+    {"module": "microbiome", "parameter": "microbiome_optimization_pct",
+     "modeled": "40%", "published": "no validated 'microbiome optimization' metric",
+     "grade": "D", "source": None, "note": None},
+
+    {"module": "bbb_enhanced", "parameter": "net_brain_bioavailability_pct",
+     "modeled": "45%", "published": "no published combination achieves 45% brain bioavailability",
+     "grade": "D", "source": "Pardridge 2012; FUS trial data", "note": None},
+    {"module": "bbb_enhanced", "parameter": "focused ultrasound BBB opening",
+     "modeled": "3x uptake boost", "published": "Insightec Exablate FDA-approved for BBB opening; human safety data exist",
+     "grade": "B", "source": "Insightec Exablate; Lipsman 2018", "note": None},
+    {"module": "bbb_enhanced", "parameter": "intranasal delivery",
+     "modeled": "15% CNS bioavailability", "published": "intranasal route bypasses BBB; 15% is modeled",
+     "grade": "C", "source": "Pardridge 2012; Morrison 2013", "note": None},
+
+    {"module": "pkpd_enhanced", "parameter": "PBPK model for 60+ compounds",
+     "modeled": "SimCYP simulation", "published": "PBPK is FDA-accepted for pairs; 60+ novel combination is beyond validated use",
+     "grade": "D", "source": "SimCYP literature", "note": None},
+    {"module": "pkpd_enhanced", "parameter": "AI PK prediction accuracy",
+     "modeled": "92%", "published": "DL PK models report high accuracy on known drugs; this combination is novel",
+     "grade": "D", "source": None, "note": None},
+
+    {"module": "stability_enhanced", "parameter": "50-year treatment sustainability",
+     "modeled": "adaptive protocol", "published": "no intervention has been sustained 50 years; long-term safety unknown",
+     "grade": "D", "source": None, "note": "Denosumab t1/2 ~25 days; biologic residence times are long."},
+    {"module": "stability_enhanced", "parameter": "adaptive frequency decrease",
+     "modeled": "monthly->quarterly->semi-annual", "published": "no data on whether rejuvenation reduces maintenance need",
+     "grade": "D", "source": None, "note": None},
+
+    {"module": "epigenetic_memory", "parameter": "memory_erasure_efficiency_pct",
+     "modeled": "95%", "published": "5-azacytidine + vitamin C erase some memory; 95% is modeled",
+     "grade": "C", "source": "Kim 2010; Esteban 2010", "note": None},
+    {"module": "epigenetic_memory", "parameter": "residual_memory_pct beneficial bias",
+     "modeled": "5% residual -> mesoderm bias", "published": "lineage-priming is real; 5% figure is invented",
+     "grade": "D", "source": "Kim 2010, Nature", "note": None},
+
+    {"module": "monitoring", "parameter": "42-biomarker panel",
+     "modeled": "comprehensive panel", "published": "individual biomarkers are validated; the 42-panel as a set is modeled",
+     "grade": "B", "source": "individual biomarker literature", "note": None},
+    {"module": "monitoring", "parameter": "ai_dose_optimization",
+     "modeled": "Bayesian adaptive dosing", "published": "adaptive dosing concepts exist; accuracy for this application unvalidated",
+     "grade": "D", "source": None, "note": None},
+
+    {"module": "personalized_medicine", "parameter": "personalization_accuracy_pct",
+     "modeled": "70%", "published": "no validated accuracy figure for AI-personalized dosing of this type",
+     "grade": "D", "source": None, "note": None},
+    {"module": "personalized_medicine", "parameter": "age/gender/comorbidity adjustments",
+     "modeled": "dose modifiers", "published": "geriatric dosing and comorbidity adjustments are standard pharmacology",
+     "grade": "B", "source": "clinical pharmacology guidelines", "note": None},
+    {"module": "personalized_medicine", "parameter": "genetic profiling (APOE4, BRCA, TP53, CYP2D6)",
+     "modeled": "genotype-guided dosing", "published": "pharmacogenomics is real and increasingly standard",
+     "grade": "B", "source": "CPIC guidelines", "note": None},
+
+    {"module": "drug_interaction_enhanced", "parameter": "staggered dosing schedule",
+     "modeled": "4-window monthly cycle", "published": "staggered dosing is standard pharmacology; this specific schedule is novel",
+     "grade": "C", "source": "clinical pharmacology", "note": None},
+    {"module": "drug_interaction_enhanced", "parameter": "AI interaction prediction accuracy",
+     "modeled": "95%", "published": "DDI prediction models work on known pairs; 60+ novel combination is untested",
+     "grade": "D", "source": None, "note": None},
+
+    # ===================================================================
+    # EXTENSION MODULES #23-37 (review #16)
+    # These are the disease-specific healing-gap modules. Each has at least
+    # one audit entry for its load-bearing efficacy parameter.
+    # ===================================================================
+
+    # --- #23: AutoTolerAI (tolerance) ---
+    {"module": "tolerance", "parameter": "tolerogenic pMHC nanoparticles",
+     "modeled": "PLG-pMHC platform", "published": "Cour Pharmaceuticals / Northwestern PLG-pMHC platform; TAK-101 reached Phase 2 for celiac",
+     "grade": "B", "source": "Cour Pharmaceuticals; Maldonado 2015", "note": "Platform real; combination with other tolerance modules is novel."},
+    {"module": "tolerance", "parameter": "autoreactive_clone_depletion_pct",
+     "modeled": "85%", "published": "CAAR-T depletes autoreactive B-cells in pemphigus preclinical",
+     "grade": "C", "source": "Ellebrecht 2016, Science", "note": "85% is modeled from preclinical data."},
+    {"module": "tolerance", "parameter": "treg_expansion_fold",
+     "modeled": "6.0x", "published": "low-dose IL-2 expands Tregs ~2-3x; 6x with stacked factors is modeled",
+     "grade": "C", "source": "Klatzmann 2012; Hartemann 2013", "note": None},
+    {"module": "tolerance", "parameter": "relapse_reduction_pct",
+     "modeled": "80%", "published": "no combination tolerance therapy achieves 80% relapse reduction in humans",
+     "grade": "D", "source": None, "note": None},
+    {"module": "tolerance", "parameter": "islet-specific tolerizing vaccine (T1D)",
+     "modeled": "proinsulin peptide", "published": "peptide immunotherapy trials for T1D show partial immune modulation",
+     "grade": "B", "source": "Alhadj Ali 2017, Sci Transl Med", "note": "Slows decline; does not cure established T1D alone."},
+
+    # --- #24: GeneFix (genefix) ---
+    {"module": "genefix", "parameter": "base_editor_mRNA (ABE8e/CBE)",
+     "modeled": "in-situ correction", "published": "base editors correct point mutations in vivo (liver, animal models)",
+     "grade": "C", "source": "Richter 2020; Musunuru 2021", "note": None},
+    {"module": "genefix", "parameter": "prime_editor_mRNA (PE3)",
+     "modeled": "indel/duplication correction", "published": "prime editing works in cells; in-vivo delivery is early preclinical",
+     "grade": "C", "source": "Anzalone 2019, Nature", "note": None},
+    {"module": "genefix", "parameter": "correction_efficiency_pct",
+     "modeled": "60%", "published": "in-vivo base editing achieves 20-60% in liver; other tissues lower",
+     "grade": "C", "source": "Richter 2020 (NTLA-2001)", "note": "60% is the high end for liver; most tissues are far lower."},
+    {"module": "genefix", "parameter": "exon_skipping_ASO (DMD)",
+     "modeled": "component", "published": "eteplirsen/golodirsen approved for DMD exon skipping",
+     "grade": "A", "source": "eteplirsen/golodirsen labels", "note": "Approved; restores partial dystrophin, not full cure."},
+
+    # --- #25: SpondyRegen (enthesis) ---
+    {"module": "enthesis", "parameter": "IL17A/IL23 dual blockade",
+     "modeled": "secukinumab/bimekizumab class", "published": "IL-17 inhibition is proven to slow radiographic progression in axSpA",
+     "grade": "A", "source": "secukinumab MEASURE trials; bimekizumab trials", "note": "Slows progression; does not reverse existing fusion."},
+    {"module": "enthesis", "parameter": "existing_fusion_resorption_pct",
+     "modeled": "75%", "published": "NO human precedent for resorbing an already-fused syndesmophyte bridge",
+     "grade": "D", "source": None, "note": "The single most speculative mechanism in the entire formulation."},
+    {"module": "enthesis", "parameter": "joint_mobility_restoration_pct",
+     "modeled": "80%", "published": "no therapy regrows a mobile joint in a fused spine",
+     "grade": "D", "source": None, "note": None},
+    {"module": "enthesis", "parameter": "targeted_osteoclast_resorption_factor",
+     "modeled": "localized osteoclast activation", "published": "animal models of heterotopic ossification show resorption is possible",
+     "grade": "C", "source": "heterotopic ossification literature", "note": "Localized/reversible activation only demonstrated in animals."},
+
+    # --- #26: EndoRegen (endoregen) ---
+    {"module": "endoregen", "parameter": "islet_organoid_seeding (VX-880)",
+     "modeled": "stem-cell islet replacement", "published": "VX-880/zimislecel produced insulin independence in T1D trial patients",
+     "grade": "B", "source": "Vertex VX-880 data 2023-2024", "note": "Real, early-phase; requires immunosuppression in current protocol."},
+    {"module": "endoregen", "parameter": "pituitary_organoid_seeding",
+     "modeled": "Rathke's pouch organoid", "published": "pituitary organoids generated in dish/mouse; not yet transplanted in humans",
+     "grade": "C", "source": "Suga 2011; Cox 2012", "note": None},
+    {"module": "endoregen", "parameter": "gland_function_restoration_pct",
+     "modeled": "70%", "published": "islet therapy is early-phase; pituitary/adrenal/parathyroid are preclinical",
+     "grade": "D", "source": None, "note": None},
+    {"module": "endoregen", "parameter": "hormone_independence_probability_pct",
+     "modeled": "55%", "published": "VX-880 shows insulin independence; other glands are preclinical",
+     "grade": "C", "source": "Vertex VX-880", "note": None},
+
+    # --- #27: NerveRegen (nerveregen) ---
+    {"module": "nerveregen", "parameter": "axon_regrowth_rate_mm_per_day",
+     "modeled": "2.0 mm/day", "published": "baseline human nerve regrowth ~1 mm/day; 2x is optimistic stacked",
+     "grade": "C", "source": "clinical neurophysiology; NGF/GDNF literature", "note": None},
+    {"module": "nerveregen", "parameter": "conduction_velocity_restoration_pct",
+     "modeled": "65%", "published": "clemastine enhances remyelination in MS trials (Grade B); 65% restoration is modeled",
+     "grade": "C", "source": "Green 2017 (clemastine, Nature)", "note": None},
+    {"module": "nerveregen", "parameter": "schwann_cell_reprogramming (c-Jun/Sox2)",
+     "modeled": "in-vivo fibroblast->Schwann", "published": "c-Jun reprogramming to repair Schwann cells is established in mice",
+     "grade": "C", "source": "Arthur-Farraj 2012, J Neurosci", "note": None},
+
+    # --- #28: MucosaRepair (mucosarepair) ---
+    {"module": "mucosarepair", "parameter": "gluten_specific_tolerizing_nanoparticle (TAK-101)",
+     "modeled": "component", "published": "TAK-101 reached Phase 2 human trials for celiac disease",
+     "grade": "B", "source": "TAK-101/Cour Pharmaceuticals", "note": None},
+    {"module": "mucosarepair", "parameter": "larazotide acetate",
+     "modeled": "tight junction restoration", "published": "larazotide reached Phase 3 for celiac; mixed results",
+     "grade": "B", "source": "larazotide acetate trial literature", "note": None},
+    {"module": "mucosarepair", "parameter": "villous_architecture_restoration_pct",
+     "modeled": "85%", "published": "Lgr5+ organoid biology is established; in-vivo villous regrowth is speculative",
+     "grade": "D", "source": "Sato 2011 (organoids); in-vivo delivery is novel", "note": None},
+    {"module": "mucosarepair", "parameter": "barrier_integrity_restoration_pct",
+     "modeled": "90%", "published": "larazotide + R-spondin conceptually restore barrier; 90% is modeled",
+     "grade": "D", "source": None, "note": None},
+
+    # --- #29: CircuitReset (circuitreset) ---
+    {"module": "circuitreset", "parameter": "MDMA-assisted therapy (PTSD)",
+     "modeled": "component concept", "published": "MAPS Phase 3: ~67% no longer met PTSD criteria post-treatment",
+     "grade": "B", "source": "MAPS Phase 3 2023; Mithoefer 2019", "note": "Requires concurrent psychotherapy; not a standalone injectable."},
+    {"module": "circuitreset", "parameter": "psilocybin-assisted therapy (depression)",
+     "modeled": "component concept", "published": "psilocybin trials show depression remission; still investigational",
+     "grade": "B", "source": "Davis 2021; Goodin 2021", "note": "Requires therapy; not standalone."},
+    {"module": "circuitreset", "parameter": "circuit_normalization_pct",
+     "modeled": "70%", "published": "no pharmacologic combination normalizes circuits 70% without therapy",
+     "grade": "D", "source": None, "note": "Adjunct to therapy, not a replacement."},
+    {"module": "circuitreset", "parameter": "symptom_remission_pct",
+     "modeled": "60%", "published": "MAPS Phase 3: ~67% PTSD remission; this module stacks that evidence base",
+     "grade": "C", "source": "MAPS Phase 3", "note": None},
+
+    # --- #30: SensoryRegen (sensoryregen) ---
+    {"module": "sensoryregen", "parameter": "ATOH1 cochlear hair cell regeneration",
+     "modeled": "component", "published": "Akouos AK-OTOF / Decibel gene therapy in early human trials",
+     "grade": "B", "source": "Akouos/Decibel 2024-2025 data", "note": "Early-phase; ATOH1 is real but mammalian hair cell regen at scale is unproven."},
+    {"module": "sensoryregen", "parameter": "Luxturna (RPE65 gene therapy)",
+     "modeled": "precedent", "published": "FDA-approved retinal gene therapy (2017)",
+     "grade": "A", "source": "Luxturna label", "note": "Proves targeted retinal delivery works; specific to RPE65 mutations."},
+    {"module": "sensoryregen", "parameter": "photoreceptor_regen_pct",
+     "modeled": "55%", "published": "retinal organoids generate photoreceptors; in-vivo regeneration at scale is unproven",
+     "grade": "D", "source": "retinal organoid literature", "note": None},
+    {"module": "sensoryregen", "parameter": "hair_cell_regen_pct",
+     "modeled": "50%", "published": "mammalian hair cell regeneration at scale remains unproven",
+     "grade": "D", "source": None, "note": None},
+
+    # --- #31: LimbRegen (limbregen) ---
+    {"module": "limbregen", "parameter": "blastema_induction (FGF8/SHH/WNT3A/BMP2)",
+     "modeled": "cocktail", "published": "Levin lab induced leg-like regrowth in adult Xenopus with 5-drug cocktail",
+     "grade": "C", "source": "Murugan 2022, Sci Adv (Tufts)", "note": "Xenopus, not mammal; progestin/biireactor device required."},
+    {"module": "limbregen", "parameter": "axial_growth_mm_per_day",
+     "modeled": "1.5 mm/day", "published": "pinned to peripheral nerve regrowth rate (~1-2 mm/day)",
+     "grade": "C", "source": "clinical neurophysiology", "note": "Nerve growth is the binding physical constraint."},
+    {"module": "limbregen", "parameter": "pattern_fidelity_pct",
+     "modeled": "70%", "published": "positional memory re-specification in adult human limb has NO experimental support",
+     "grade": "D", "source": None, "note": "More speculative than syndesmophyte resorption."},
+    {"module": "limbregen", "parameter": "functional_recovery_pct",
+     "modeled": "65%", "published": "no mammal regenerates a limb; human fingertip regrowth is the only precedent",
+     "grade": "D", "source": "fingertip regrowth literature (children)", "note": None},
+    {"module": "limbregen", "parameter": "ex_vivo_expansion_bioreactor",
+     "modeled": "150x expansion", "published": "clinical ASC/MSC bioreactor expansion achieves 100-1000x",
+     "grade": "B", "source": "cell therapy manufacturing literature", "note": "Real technology; transformation risk managed by clonal release testing."},
+    {"module": "limbregen", "parameter": "human fingertip regrowth precedent",
+     "modeled": "distal to nail matrix", "published": "documented in children; no human regrowth proximal to nail matrix",
+     "grade": "C", "source": "Illingworth 1974; Douglas 1972", "note": None},
+
+    # --- #32: FibroClear (fibroclear) ---
+    {"module": "fibroclear", "parameter": "FAP-targeted CAR-T (cardiac fibrosis)",
+     "modeled": "component", "published": "FAP-CAR-T reversed established cardiac fibrosis in mice",
+     "grade": "C", "source": "Aghajanian 2019, Nature", "note": "Mouse data; human translation ongoing."},
+    {"module": "fibroclear", "parameter": "pirfenidone/nintedanib",
+     "modeled": "200mg antifibrotic core", "published": "FDA-approved; SLOW pulmonary fibrosis progression (~50%)",
+     "grade": "A", "source": "pirfenidone/nintedanib labels", "note": "Slow progression; do not RESORB established fibrosis."},
+    {"module": "fibroclear", "parameter": "scar_resorption_pct",
+     "modeled": "75%", "published": "no approved therapy resorbs established human fibrosis",
+     "grade": "D", "source": None, "note": None},
+    {"module": "fibroclear", "parameter": "architecture_restoration_pct",
+     "modeled": "70%", "published": "rebuilding alveoli/hepatic lobules has no human precedent",
+     "grade": "D", "source": None, "note": None},
+    {"module": "fibroclear", "parameter": "LOXL2 inhibitor",
+     "modeled": "collagen crosslink dissolver", "published": "LOXL2 inhibition reduces crosslinking preclinically; simtuzumab failed Phase 2",
+     "grade": "C", "source": "simtuzumab trials; preclinical LOXL2 literature", "note": "Simtuzumab (anti-LOXL2 mAb) failed in NASH and pulmonary fibrosis."},
+
+    # --- #33: RepeatEdit (repeatedit) ---
+    {"module": "repeatedit", "parameter": "Cas9-nickase repeat contraction",
+     "modeled": "contraction system", "published": "Cas9-nickase-driven CAG contraction demonstrated in patient cells",
+     "grade": "C", "source": "Cinesi 2016, Nat Commun", "note": "Patient cells, not living human brain."},
+    {"module": "repeatedit", "parameter": "tofersen (SOD1-ASO precedent)",
+     "modeled": "allele-selective ASO", "published": "tofersen FDA-approved 2023 for SOD1-ALS",
+     "grade": "A", "source": "tofersen label", "note": "Proves allele-targeted ASO works; specific to SOD1."},
+    {"module": "repeatedit", "parameter": "repeat_contraction_pct",
+     "modeled": "65%", "published": "contraction shown in cells; never in living human brain",
+     "grade": "D", "source": "Cinesi 2016", "note": None},
+    {"module": "repeatedit", "parameter": "AMT-130 (Huntington's AAV-miRNA)",
+     "modeled": "precedent", "published": "AMT-130 reported encouraging Phase 1/2 data in 2025",
+     "grade": "B", "source": "uniQure AMT-130 2025", "note": "Real trial; early-phase."},
+
+    # --- #34: ReservoirPurge (reservoirpurge) ---
+    {"module": "reservoirpurge", "parameter": "CRISPR provirus excision (EBT-101)",
+     "modeled": "component", "published": "EBT-101 dosed in Phase 1 for HIV-1 CRISPR excision",
+     "grade": "B", "source": "Excision BioTherapeutics EBT-101", "note": "Phase 1; no sustained drug-free remission yet."},
+    {"module": "reservoirpurge", "parameter": "CCR5-delta32 stem cell transplant (HIV cure precedent)",
+     "modeled": "precedent", "published": "Berlin/London/Dusseldorf patients: confirmed HIV cures via CCR5-delta32 transplant",
+     "grade": "A", "source": "Hutter 2009; Gupta 2019; Jensen 2023", "note": "Existence proof; requires myeloablative transplant, not a mimetic."},
+    {"module": "reservoirpurge", "parameter": "reservoir_clearance_pct",
+     "modeled": "70%", "published": "no CRISPR reservoir therapy has produced sustained drug-free remission in humans",
+     "grade": "D", "source": None, "note": None},
+    {"module": "reservoirpurge", "parameter": "cccDNA targeting (hepatitis B)",
+     "modeled": "base editor/nuclease", "published": "cccDNA editors clear HBV episomes in animal models",
+     "grade": "C", "source": "HBV cccDNA editing literature", "note": None},
+
+    # --- #35: TissueForge (tissueforge) ---
+    {"module": "tissueforge", "parameter": "tissue-engineered intestine (scaffold)",
+     "modeled": "component", "published": "established in rodent models; not yet in humans",
+     "grade": "C", "source": "tissue engineering literature", "note": None},
+    {"module": "tissueforge", "parameter": "teduglutide (GLP-2 analog)",
+     "modeled": "component", "published": "FDA-approved for short bowel syndrome; drives intestinal adaptation",
+     "grade": "A", "source": "teduglutide (Gattex) label", "note": "Approved; improves absorption, does not regrow absent segments."},
+    {"module": "tissueforge", "parameter": "segment_regrowth_pct",
+     "modeled": "65%", "published": "no human has regrown an absent bowel segment",
+     "grade": "D", "source": None, "note": None},
+    {"module": "tissueforge", "parameter": "functional_integration_pct",
+     "modeled": "60%", "published": "peristalsis/absorption/lymph flow is a far higher bar than tissue presence",
+     "grade": "D", "source": None, "note": None},
+
+    # --- #36: DeliverMax (delivermax) ---
+    {"module": "delivermax", "parameter": "Zolgensma (AAV9 CNS delivery)",
+     "modeled": "precedent", "published": "FDA-approved; cures fatal CNS motor neuron disease by single systemic infusion",
+     "grade": "A", "source": "Zolgensma label", "note": "Infant SMA; adult brain-wide coverage is unsolved."},
+    {"module": "delivermax", "parameter": "Casgevy/Lyfgenia (ex-vivo HSC editing)",
+     "modeled": "precedent", "published": "FDA-approved 2023; curative editing fractions via ex-vivo HSC editing",
+     "grade": "A", "source": "CASGEVY/Lyfgenia labels", "note": "Ex-vivo with myeloablative conditioning."},
+    {"module": "delivermax", "parameter": "cns_coverage_pct",
+     "modeled": "35%", "published": "adult brain-wide parenchymal coverage is unsolved; no approved therapy reaches it",
+     "grade": "D", "source": None, "note": "Deliberately set low so CNS-dependent conditions stay short of HEALED."},
+    {"module": "delivermax", "parameter": "ganglionic_coverage_pct",
+     "modeled": "20%", "published": "sensory ganglia delivery is unsolved; no approved therapy reaches it",
+     "grade": "D", "source": None, "note": None},
+    {"module": "delivermax", "parameter": "hepatic_coverage_pct",
+     "modeled": "90%", "published": "Onpattro/Givlaari/Hemgenix achieve high hepatocyte delivery",
+     "grade": "A", "source": "Onpattro/Givlaari/Hemgenix labels", "note": None},
+    {"module": "delivermax", "parameter": "focused ultrasound BBB opening",
+     "modeled": "adjunct", "published": "Insightec Exablate FDA-approved; human safety data exist",
+     "grade": "B", "source": "Lipsman 2018, Nat Commun", "note": None},
+
+    # --- #37: ChromoBalance (chromobalance) ---
+    {"module": "chromobalance", "parameter": "XIST-mediated trisomy silencing",
+     "modeled": "XIST lncRNA targeting", "published": "XIST silencing of trisomy 21 demonstrated in patient-derived iPSCs",
+     "grade": "C", "source": "Jiang 2013, Nature", "note": "In vitro only; no in-vivo delivery attempted in any animal."},
+    {"module": "chromobalance", "parameter": "UBE3A-ATS antisense (Angelman)",
+     "modeled": "imprint reset ASO", "published": "reached Phase 1 for Angelman syndrome",
+     "grade": "B", "source": "Angelman syndrome ASO trials", "note": None},
+    {"module": "chromobalance", "parameter": "dosage_normalization_pct",
+     "modeled": "60%", "published": "XIST silencing is in vitro; neurodevelopmental architecture is not undone by correcting dosage afterwards",
+     "grade": "D", "source": "Jiang 2013", "note": "Even complete dosage normalization would not reverse existing phenotype."},
+    {"module": "chromobalance", "parameter": "large_cargo_locus_replacement",
+     "modeled": "integrase/prime-editing cassette", "published": "multi-megabase locus replacement exceeds every current delivery platform's cargo capacity",
+     "grade": "D", "source": None, "note": None},
+
+    # --- Additional BIO constants missing from original audit ---
+    {"module": "BIO", "parameter": "adipocytes_per_gram",
+     "modeled": "1.0e6", "published": "measured human adipocyte density ~1 million/g adipose tissue",
+     "grade": "A", "source": "adipose tissue biology literature", "note": "Corrected from 1.0e7 (was 10x inflated)."},
+    {"module": "BIO", "parameter": "total_adipocytes_70kg",
+     "modeled": "1.75e10", "published": "17.5 kg fat x 1e6/g x 1000 g/kg",
+     "grade": "A", "source": "derived from corrected adipocyte density", "note": None},
+    {"module": "BIO", "parameter": "essential_body_fat_pct",
+     "modeled": "5.0%", "published": "essential body fat is ~3-5%; below this = physiological failure",
+     "grade": "A", "source": "physiology literature", "note": "Prevents impossible fat depletion."},
+    {"module": "BIO", "parameter": "max_divisions_before_senescence (Hayflick)",
+     "modeled": "50", "published": "Hayflick limit ~40-60 divisions for somatic cells",
+     "grade": "A", "source": "Hayflick 1961; Hayflick & Moorhead 1961", "note": None},
+    {"module": "BIO", "parameter": "dna_lesions_per_cell_per_day",
+     "modeled": "10000", "published": "estimated 10,000-100,000 DNA damage events per cell per day",
+     "grade": "A", "source": "Lindahl 1993, Nature", "note": None},
+    {"module": "BIO", "parameter": "senescent_burden_at_age_60_pct",
+     "modeled": "15%", "published": "senescent cell burden ranges ~10-36% in aged tissues (varies by tissue)",
+     "grade": "B", "source": "Campisi 2013; Zhu 2017", "note": None},
+    {"module": "BIO", "parameter": "mito_function_at_60_pct",
+     "modeled": "52%", "published": "mitochondrial function declines ~0.8%/yr; ~52% at 60 is within published range",
+     "grade": "B", "source": "Short 2005; Bratic 2010", "note": None},
+    {"module": "BIO", "parameter": "stem_cell_pool_at_60_pct",
+     "modeled": "30%", "published": "stem cell pool declines ~1-1.5%/yr; ~30% at 60 is within range",
+     "grade": "B", "source": "Signer 2013; stem cell aging literature", "note": None},
+    {"module": "BIO", "parameter": "thymus_function_at_60_pct",
+     "modeled": "10%", "published": "thymus is ~90% involuted by age 60",
+     "grade": "A", "source": "thymic involution literature; Palmer 2014", "note": None},
+    {"module": "BIO", "parameter": "naive_t_cells_young",
+     "modeled": "1.0e11", "published": "naive T-cell pool is ~10^11 in young adults",
+     "grade": "B", "source": "immunology literature; Saule 2006", "note": None},
+    {"module": "BIO", "parameter": "inflammation_at_60",
+     "modeled": "2.05x young", "published": "inflammaging: CRP/IL-6 rise ~2-3x by age 60",
+     "grade": "B", "source": "Franceschi 2007; inflammaging literature", "note": None},
+    {"module": "BIO", "parameter": "organ_function_at_60",
+     "modeled": "58%", "published": "organ function declines ~0.5-1%/yr; 58% at 60 is within range",
+     "grade": "B", "source": "organ aging literature", "note": None},
+    {"module": "BIO", "parameter": "cognitive_function_at_60_pct",
+     "modeled": "70%", "published": "cognitive decline ~0.5%/yr; 70% at 60 is within range",
+     "grade": "B", "source": "Salthouse 2009; cognitive aging literature", "note": None},
+    {"module": "BIO", "parameter": "bone_strength_at_60_mpa",
+     "modeled": "140 MPa", "published": "cortical bone strength declines ~1%/yr; 140 MPa at 60 is within range",
+     "grade": "B", "source": "bone biomechanics literature", "note": None},
+    {"module": "BIO", "parameter": "baseline_cancer_risk_per_year_pct",
+     "modeled": "1.5%", "published": "age-adjusted cancer incidence ~1.5%/yr at age 60",
+     "grade": "A", "source": "SEER cancer statistics", "note": None},
+    {"module": "BIO", "parameter": "telomere_loss_per_division_bp",
+     "modeled": "50 bp", "published": "telomere shortening ~50-100 bp per division (replication-dependent)",
+     "grade": "A", "source": "Levy 1992; Harley 1990", "note": None},
+    {"module": "BIO", "parameter": "telomere_loss_per_year_bp",
+     "modeled": "25 bp/yr", "published": "age-related telomere shortening ~20-40 bp/yr in adults",
+     "grade": "B", "source": "Daniali 2013; telomere epidemiology", "note": None},
+    {"module": "BIO", "parameter": "initial_telomere_bp",
+     "modeled": "8000 bp", "published": "human telomere length at birth ~8000-10000 bp",
+     "grade": "A", "source": "telomere biology literature", "note": None},
+    {"module": "BIO", "parameter": "critical_telomere_bp",
+     "modeled": "2000 bp", "published": "senescence/crisis triggered below ~2000-4000 bp",
+     "grade": "A", "source": "Harley 1990; telomere crisis literature", "note": None},
+    {"module": "BIO", "parameter": "mutation_rate_per_division_baseline",
+     "modeled": "1.0e-7 per base", "published": "human mutation rate ~1-5 x 10^-8 to 10^-7 per base per division",
+     "grade": "A", "source": "Lynch 2010; Milholland 2017", "note": None},
+    {"module": "BIO", "parameter": "cells_per_gram_soft_tissue",
+     "modeled": "5.0e8", "published": "soft tissue cell density ~2.5e8-1e9 cells/cm3",
+     "grade": "B", "source": "cell biology literature", "note": None},
+    {"module": "BIO", "parameter": "menopause_onset_age",
+     "modeled": "51 years", "published": "median age at natural menopause ~51 years",
+     "grade": "A", "source": "menopause epidemiology", "note": None},
+    {"module": "BIO", "parameter": "total_stem_cells_young_adult",
+     "modeled": "2.0e9", "published": "estimated total stem cell pool in young adult ~10^9-10^10",
+     "grade": "B", "source": "stem cell biology literature", "note": None},
+    {"module": "BIO", "parameter": "ex_vivo_expansion_fold",
+     "modeled": "150x", "published": "clinical ASC/MSC bioreactor expansion achieves 100-1000x over 2-4 weeks",
+     "grade": "B", "source": "cell therapy manufacturing literature", "note": "Transformation risk managed by clonal release testing."},
+    {"module": "BIO", "parameter": "regen_cells_per_pct_point",
+     "modeled": "3.0e7", "published": "calibrated against monthly engrafted cell supply (~8.5e7 at 2% engraftment)",
+     "grade": "D", "source": "model calibration", "note": "No published figure; derived from model dynamics."},
+    {"module": "BIO", "parameter": "hazard rates (all 8 mechanism hazards)",
+     "modeled": "0.18-0.40%/month", "published": "grounded in known failure modes of each technology class",
+     "grade": "C", "source": "technology-specific failure mode literature", "note": "Magnitudes are modeled from class-level risk."},
+    {"module": "BIO", "parameter": "mitigation efficacies (all 10+ mitigations)",
+     "modeled": "0.55-0.90", "published": "each mitigation corresponds to a real safeguard; efficacy is modeled",
+     "grade": "C", "source": "safeguard-specific literature", "note": None},
+    {"module": "BIO", "parameter": "rebound overshoot multipliers",
+     "modeled": "1.4-1.6x baseline", "published": "rebound overshoot is a real failure mode of anti-cytokine/senolytic withdrawal",
+     "grade": "C", "source": "withdrawal rebound literature", "note": None},
+    {"module": "BIO", "parameter": "individual variation (responder_sd, nonresponder_fraction)",
+     "modeled": "sd=0.22, 14% non-responders", "published": "therapy response variation is real; specific figures are modeled",
+     "grade": "C", "source": "pharmacogenomics literature", "note": None},
+    {"module": "BIO", "parameter": "regen_nutrient_demand multipliers",
+     "modeled": "1.5-3.0x normal", "published": "regeneration increases protein/vitamin C/iron/zinc demand; magnitudes are modeled",
+     "grade": "C", "source": "wound healing nutrition literature", "note": None},
+]
+
+
+def get_evidence_summary() -> dict:
+    """Counts of audited parameters per evidence grade."""
+    counts = Counter(e["grade"] for e in EVIDENCE_AUDIT)
+    total = len(EVIDENCE_AUDIT)
+    return {
+        "total": total,
+        "A": counts.get("A", 0),
+        "B": counts.get("B", 0),
+        "C": counts.get("C", 0),
+        "D": counts.get("D", 0),
+        "speculative_fraction": counts.get("D", 0) / total if total else 0.0,
+    }
+
+
+def print_evidence_audit():
+    """Print the honest evidence audit: what is published vs. what is assumed."""
+    print("\n" + "=" * 80)
+    print("  ChiefJuiceV1.17 -- EVIDENCE AUDIT (review #15)")
+    print("  What published science does and does not support in this model")
+    print("=" * 80)
+    print("\n  GRADES: A = replicated human data | B = preliminary human data")
+    print("          C = animal/in-vitro only  | D = speculative (no data)")
+
+    for grade in ("A", "B", "C", "D"):
+        entries = [e for e in EVIDENCE_AUDIT if e["grade"] == grade]
+        print(f"\n  --- GRADE {grade}: {len(entries)} parameters ---")
+        for e in entries:
+            print(f"  [{e['module']}] {e['parameter']}")
+            print(f"      modeled:  {e['modeled']}")
+            print(f"      science:  {e['published']}")
+            if e.get("source"):
+                print(f"      source:   {e['source']}")
+            if e.get("note"):
+                print(f"      note:     {e['note']}")
+
+    s = get_evidence_summary()
+    print("\n" + "-" * 80)
+    print("  SUMMARY")
+    print(f"    Parameters audited:        {s['total']}")
+    print(f"    A (replicated human):       {s['A']}")
+    print(f"    B (preliminary human):      {s['B']}")
+    print(f"    C (animal/in-vitro only):   {s['C']}")
+    print(f"    D (speculative):            {s['D']} ({s['speculative_fraction']:.0%} of audited parameters)")
+    print("-" * 80)
+    print("\n  HONEST VERDICT")
+    print("    1. The model's MATH is consistent: the test suite verifies mass")
+    print("       balance, supply limits, rebound, safety interlocks, and that")
+    print("       the reports re-derive from the constants. Math consistency is")
+    print("       not biological proof.")
+    print("    2. The model's CHEMISTRY is corrected to published values where")
+    print("       published values exist (doses, media concentrations, drug facts).")
+    print("    3. The model's HEADLINE OUTCOME -- indefinite lifespan maintenance")
+    print(f"       -- rests on {s['D']} grade-D assumptions, led by:")
+    print("         - in-vivo conversion efficiency: 75.6% modeled vs <=1%")
+    print("           published (ex-vivo) and unquantified in vivo")
+    print("         - endosomal escape: 78% modeled vs <=15% published")
+    print("         - multiplicative synergy stacking: invented")
+    print("    4. NOTHING in this formulation has been tested in any organism.")
+    print("       Scientific verification of the goal would require: in-vitro")
+    print("       adipocyte-conversion assays -> animal safety/efficacy studies")
+    print("       -> regulated human trials. A simulation cannot substitute for")
+    print("       any of these steps.")
+    print("\n  REAL-WORLD POINTERS (evidence-based, for a human, not a model)")
+    print("    - Ankylosing spondylitis: TNF-alpha and IL-17 inhibitors are")
+    print("      proven, life-changing standard of care (grade A). See a")
+    print("      rheumatologist; untreated axial inflammation causes the")
+    print("      fused-spine damage this project models.")
+    print("    - Type 1 diabetes: teplizumab delays onset; hybrid closed-loop")
+    print("      systems improve control; islet transplantation exists for")
+    print("      severe cases (grade A/B).")
+    print("    - Celiac disease: a strict gluten-free diet remains the only")
+    print("      proven treatment (grade A).")
+    print("    - Longevity with grade-A evidence today: exercise, sleep, not")
+    print("      smoking, and controlling blood pressure / glucose / lipids.")
+    print("      These outperform every supplement in this file.")
+    print("    - DO NOT synthesize or self-administer anything from this file.")
+    print("      Dasatinib and navitoclax are oncology drugs; senolytic self-")
+    print("      administration has documented fatalities.")
+    print("=" * 80)
+
 
 # ===========================================================================
 # SECTION 1B -- DISEASE COVERAGE SURVEY
@@ -4203,7 +5560,12 @@ BIO = {
     "telomere_loss_per_division_bp": 50, # telomere shortening per cell division
     "telomere_loss_per_year_bp": 25,    # age-related telomere loss (independent of division)
     "critical_telomere_bp": 2000,       # below this = senescence/crisis
-    "telomerase_telomere_gain_bp": 100, # net gain per division with telomerase active
+    # CORRECTED (review #15): +100 bp/division assumed sustained net
+    # lengthening that has never been demonstrated in humans. Telomerase in
+    # telomerase-positive stem cells roughly OFFSETS divisional loss; TA-65
+    # trials show at most marginal net change. 10 bp/division is the modeled
+    # optimistic maintenance-plus figure. Grade C/D (see EVIDENCE_AUDIT).
+    "telomerase_telomere_gain_bp": 10,  # net gain per division with telomerase active (modeled)
 
     # --- DNA damage ---
     "dna_lesions_per_cell_per_day": 10000,  # endogenous + exogenous DNA damage events
@@ -4635,6 +5997,358 @@ BIO = {
     "plasma_young_factor_pct": 100.0,
     "plasma_pro_aging_factor_young_pct": 5.0,
     "plasma_pro_aging_increase_per_year_pct": 1.5,
+
+    # ===================================================================
+    # EXPANDED BIO CONSTANTS (review #16) -- detailed biological stats
+    # for every body system the model touches. Every value is grounded
+    # in published biology where one exists; modeled values are noted.
+    # ===================================================================
+
+    # --- Hematology / blood composition ---
+    "total_blood_volume_ml_70kg": 5000.0,        # ~70 mL/kg
+    "rbc_count_per_uL": 5.0e6,                   # 4.5-5.5 million per uL (male)
+    "total_rbc_count_70kg": 2.5e13,              # ~25 trillion RBCs in adult
+    "wbc_count_per_uL": 7.0e3,                   # 4-11 thousand per uL
+    "platelet_count_per_uL": 250.0e3,            # 150-400 thousand per uL
+    "hemoglobin_concentration_g_dL": 15.0,       # 13.5-17.5 g/dL (male)
+    "hemoglobin_per_rbc_pg": 30.0,               # MCH ~27-33 pg
+    "o2_binding_sites_per_hb": 4,                # hemoglobin binds 4 O2 molecules
+    "hb_molecules_per_rbc": 2.7e8,               # ~270 million Hb per RBC
+    "max_o2_per_rbc": 1.08e9,                     # 4 * 2.7e8 = 1.08 billion O2 per RBC
+    "rbc_lifespan_days": 120.0,                   # normal RBC lifespan
+    "rbc_production_rate_per_day": 2.0e11,        # ~200 billion RBCs produced daily
+    "reticulocyte_pct_baseline": 1.5,            # % of RBCs that are reticulocytes
+    "plasma_volume_ml_70kg": 3000.0,              # ~3 L plasma in 70 kg adult
+    "serum_albumin_g_dL": 4.2,                    # 3.5-5.0 g/dL
+    "serum_total_protein_g_dL": 7.0,              # 6.0-8.3 g/dL
+
+    # --- Body composition (detailed) ---
+    "total_body_water_pct_70kg": 60.0,           # ~60% of body weight
+    "intracellular_water_pct": 40.0,              # 2/3 of body water
+    "extracellular_water_pct": 20.0,             # 1/3 of body water
+    "lean_body_mass_kg_70kg": 52.5,              # 75% of body weight
+    "skeletal_muscle_mass_kg_70kg": 28.0,        # ~40% of body weight
+    "bone_mass_kg_70kg": 4.5,                     # ~6.5% of body weight
+    "organ_mass_kg_70kg": 7.0,                    # brain+heart+liver+kidneys+lungs
+    "skin_mass_kg_70kg": 5.0,                     # ~7% of body weight
+    "visceral_fat_pct_of_total_fat": 10.0,        # ~10% of total fat is visceral
+    "subcutaneous_fat_pct_of_total_fat": 90.0,    # ~90% is subcutaneous
+    "brown_adipose_tissue_g_adult": 100.0,        # ~100g active BAT in adults
+    "bmi_normal_range_low": 18.5,
+    "bmi_normal_range_high": 24.9,
+    "bmi_overweight_threshold": 25.0,
+    "bmi_obese_threshold": 30.0,
+
+    # --- Cell biology (detailed) ---
+    "total_cells_in_body": 3.7e13,                # ~37 trillion cells (Bianconi 2013)
+    "total_cell_divisions_per_day": 1.0e12,       # ~1 trillion divisions/day
+    "cell_volume_typical_pL": 3.0,                # ~3 pL per cell (varies by type)
+    "cell_diameter_um_typical": 15.0,             # ~15 um average
+    "dna_bases_per_cell": 6.4e9,                  # 3.2 billion bp x 2 strands
+    "dna_length_per_cell_m": 2.0,                 # ~2 meters of DNA per cell
+    "chromosomes_diploid": 46,                    # 23 pairs
+    "genes_protein_coding": 20000,                # ~20,000 protein-coding genes
+    "proteins_per_cell": 1.0e9,                   # ~1 billion proteins per cell
+    "mitochondria_per_cell": 1000.0,              # ~1000 mitochondria per cell (varies)
+    "mtdna_copies_per_cell": 1000.0,              # ~1000 mtDNA copies per cell
+    "ribosomes_per_cell": 10.0e6,                 # ~10 million ribosomes per cell
+    "mrna_molecules_per_cell": 200000.0,          # ~200K mRNA per cell
+    "protein_synthesis_rate_per_sec": 10.0,       # ~10 amino acids/sec per ribosome
+
+    # --- Telomere biology (detailed) ---
+    "telomere_length_newborn_bp": 10000.0,        # ~10,000 bp at birth
+    "telomere_length_adult_25_bp": 8000.0,        # ~8,000 bp at age 25
+    "telomere_length_adult_60_bp": 5000.0,        # ~5,000 bp at age 60
+    "telomere_length_adult_90_bp": 3000.0,        # ~3,000 bp at age 90
+    "telomerase_expression_stem_cells": True,      # telomerase active in stem cells
+    "telomerase_expression_somatic": False,        # telomerase repressed in somatic cells
+    "telomere_shortening_replication_bp": 50.0,    # ~50 bp lost per division (end replication)
+    "telomere_shortening_oxidative_bp_per_year": 15.0,  # oxidative damage contribution
+    "shelterin_complex_proteins": ["TRF1", "TRF2", "POT1", "TIN2", "TPP1", "RAP1"],
+    "telomere_senesce_threshold_bp": 2000.0,       # senescence below this
+    "telomere_crisis_threshold_bp": 1000.0,        # crisis/apoptosis below this
+
+    # --- DNA damage and repair (detailed) ---
+    "dna_damage_events_per_cell_per_hour": 400.0,  # ~10,000/day
+    "dna_damage_types": {
+        "oxidative": 55000.0,    # 8-oxoG lesions per cell per day
+        "hydrolytic": 10000.0,   # depurination/deamination per cell per day
+        "uv_indoor": 1000.0,     # UV-induced lesions per cell per day (indoor)
+        "replication_errors": 100.0,  # errors per replication cycle
+        "double_strand_breaks": 10.0,  # DSB per cell per day
+    },
+    "dna_repair_pathways": {
+        "BER": "base excision repair (oxidative/hydrolytic damage)",
+        "NER": "nucleotide excision repair (UV/bulky adducts)",
+        "MMR": "mismatch repair (replication errors)",
+        "NHEJ": "non-homologous end joining (DSB, error-prone)",
+        "HR": "homologous recombination (DSB, error-free, S/G2 only)",
+        "TLS": "translesion synthesis (damage bypass)",
+    },
+    "parp1_molecules_per_cell": 1.0e6,             # ~1 million PARP1 per cell
+    "sirtuin_family_members": ["SIRT1", "SIRT2", "SIRT3", "SIRT4", "SIRT5", "SIRT6", "SIRT7"],
+    "sirtuin_nad_dependency": True,                 # all sirtuins require NAD+
+
+    # --- Senescence (detailed) ---
+    "senescence_markers": ["p16INK4a", "p21", "SA-beta-gal", "SASP", "gamma-H2AX", "p53"],
+    "sasp_factors": ["IL-6", "IL-8", "MMP-3", "PAI-1", "TNF-alpha", "TGF-beta", "IGFBP7"],
+    "senescent_cell_types": ["fibroblasts", "endothelial", "epithelial", "immune", "adipocytes"],
+    "senescent_burden_at_25_pct": 1.0,              # ~1% at age 25
+    "senescent_burden_at_40_pct": 5.0,              # ~5% at age 40
+    "senescent_burden_at_80_pct": 25.0,             # ~25% at age 80
+    "senolytic_resistance_rate_pct_per_round": 15.0, # modeled resistance emergence
+
+    # --- Mitochondrial (detailed) ---
+    "mitochondrial_dna_circular_bp": 16569.0,      # human mtDNA is 16,569 bp circular
+    "mitochondrial_genes": 37.0,                   # 37 genes on mtDNA
+    "mitochondrial_proteins_total": 1300.0,         # ~1300 proteins in mitochondria
+    "oxphos_complexes": ["I", "II", "III", "IV", "V"],
+    "atp_production_per_mitochondrion_per_sec": 100.0,  # ~100 ATP/sec per mitochondrion
+    "total_atp_production_per_day": 50.0,           # ~50 kg ATP/day (recycled)
+    "atp_molecules_per_cell": 1.0e9,                # ~1 billion ATP per cell
+    "mitochondrial_mutation_rate_per_division": 3.0e-5,  # higher than nuclear DNA
+    "heteroplasmy_threshold_disease_pct": 60.0,     # disease above 60-90% mutant
+    "mitophagy_rate_baseline_per_day": 0.5,         # % of mitochondria turned over per day
+    "ros_production_mito_pct": 90.0,                # ~90% of cellular ROS from mitochondria
+
+    # --- Stem cell biology (detailed) ---
+    "stem_cell_types": {
+        "hematopoietic": "HSCs in bone marrow, ~20K-100K per adult",
+        "mesenchymal": "MSCs in bone marrow/adipose, ~1e6 per gram adipose (SVF)",
+        "neural": "NSCs in hippocampus/SVZ, decline with age",
+        "intestinal": "Lgr5+ crypt base columnar cells, most active in body",
+        "epidermal": "interfollicular stem cells, hair follicle bulge",
+        "muscle_satellite": "satellite cells under basal lamina, quiescent until injury",
+        "hepatic": "hepatic progenitor cells (oval cells), activated on injury",
+    },
+    "stem_cell_niche_repopulation_days": 30.0,      # niche repopulation cycle
+    "stem_cell_quiescence_fraction": 0.75,          # 75% of stem cells are quiescent
+    "stem_cell_asymmetric_division_pct": 70.0,      # 70% of divisions are asymmetric
+    "stem_cell_exhaustion_age_pct": 90.0,           # ~90% pool loss by age 90
+
+    # --- Immune system (detailed) ---
+    "total_immune_cells_70kg": 1.8e12,              # ~1.8 trillion immune cells
+    "t_cells_total": 3.0e11,                        # ~300 billion T cells
+    "b_cells_total": 5.0e10,                        # ~50 billion B cells
+    "nk_cells_total": 2.0e10,                       # ~20 billion NK cells
+    "macrophages_total": 1.0e10,                     # ~10 billion macrophages
+    "neutrophils_total": 2.0e11,                    # ~200 billion neutrophils
+    "treg_fraction_young_pct": 5.0,                 # ~5% of CD4+ T cells are Tregs
+    "treg_fraction_aged_pct": 3.0,                  # declines with age
+    "naive_t_cell_fraction_age_25_pct": 60.0,       # 60% of T cells are naive at 25
+    "naive_t_cell_fraction_age_60_pct": 20.0,       # 20% naive at 60
+    "cmv_senescent_t_cell_expansion_pct": 25.0,     # CMV drives ~25% of T-cell expansion
+    "thymus_mass_grams_young": 30.0,                # ~30g at puberty
+    "thymus_mass_grams_60": 3.0,                    # ~3g at age 60 (90% involution)
+    "thymopoiesis_rate_young_pct_per_month": 100.0, # full output at young age
+    "thymopoiesis_rate_60_pct_per_month": 10.0,     # 10% of young at 60
+
+    # --- Inflammation (detailed) ---
+    "crp_young_mg_L": 0.5,                          # <1.0 mg/L in young healthy
+    "crp_aged_mg_L": 2.0,                           # ~2-5 mg/L in elderly
+    "il6_young_pg_mL": 1.0,                         # ~1 pg/mL in young
+    "il6_aged_pg_mL": 3.0,                          # ~3-5 pg/mL in elderly
+    "tnf_alpha_young_pg_mL": 1.0,                   # ~1 pg/mL in young
+    "tnf_alpha_aged_pg_mL": 2.5,                    # ~2-3 pg/mL in elderly
+    "inflammaging_rate_per_year": 0.03,             # 3% increase per year
+    "nf_kappa_b_activation_fold_aged": 3.0,         # NF-kB 3x more active in aged
+    "nrf2_activity_decline_per_year_pct": 0.8,      # NRF2 declines with age
+
+    # --- Organ function (detailed) ---
+    "heart_rate_resting_bpm": 70.0,                 # 60-100 bpm normal
+    "cardiac_output_resting_L_min": 5.0,            # ~5 L/min at rest
+    "stroke_volume_mL": 70.0,                        # ~70 mL per beat
+    "ejection_fraction_normal_pct": 60.0,           # 50-70% normal
+    "heart_mass_grams": 300.0,                       # ~300g adult heart
+    "coronary_blood_flow_pct_cardiac_output": 4.0,  # 4% of cardiac output
+    "liver_mass_grams": 1500.0,                     # ~1.5 kg adult liver
+    "liver_blood_flow_pct_cardiac_output": 25.0,    # 25% of cardiac output (portal+hepatic)
+    "liver_regen_capacity_pct": 70.0,               # liver can regenerate from 30% remnant
+    "kidney_mass_grams_total": 300.0,                # ~300g total (both kidneys)
+    "gfr_normal_ml_min": 100.0,                     # 90-120 mL/min/1.73m2
+    "gfr_decline_per_year_ml_min": 1.0,              # ~1 mL/min/year decline
+    "gfr_at_60_ml_min": 70.0,                        # ~70 mL/min at 60
+    "nephron_count_per_kidney": 1.0e6,              # ~1 million nephrons per kidney
+    "nephron_loss_per_year": 5000.0,                # ~5000 nephrons lost per year
+    "brain_mass_grams": 1400.0,                      # ~1.4 kg adult brain
+    "brain_blood_flow_pct_cardiac_output": 15.0,    # 15% of cardiac output
+    "brain_oxygen_consumption_pct_total": 20.0,     # 20% of total O2 consumption
+    "neuron_count_adult": 8.6e10,                   # ~86 billion neurons
+    "synapse_count_adult": 1.0e14,                  # ~100 trillion synapses
+    "neuron_loss_per_year": 100000.0,               # ~100K neurons lost per year
+    "hippocampal_volume_decline_per_year_pct": 0.5,  # ~0.5% per year
+    "lung_mass_grams": 1000.0,                       # ~1 kg adult lungs
+    "total_alveoli": 4.8e8,                          # ~480 million alveoli
+    "alveolar_surface_area_m2": 70.0,               # ~70 m2 gas exchange surface
+    "lung_vital_capacity_young_L": 4.8,             # ~4.8 L young adult
+    "fev1_decline_per_year_ml": 25.0,                # ~25 mL/year FEV1 decline
+    "fev1_at_60_pct_predicted": 80.0,                # ~80% predicted at 60
+    "skin_surface_area_m2": 1.8,                     # ~1.8 m2 adult skin
+    "skin_cell_turnover_days": 28.0,                 # ~28 day epidermal turnover
+    "skin_collagen_decline_per_year_pct": 1.0,       # ~1% collagen loss per year
+    "pancreas_mass_grams": 100.0,                    # ~100g adult pancreas
+    "islet_count_adult": 1.0e6,                      # ~1 million islets
+    "beta_cell_count_adult": 1.0e9,                  # ~1 billion beta cells
+    "beta_cell_mass_grams": 1.5,                     # ~1.5g beta cell mass
+    "beta_cell_loss_per_year_t1d_pct": 5.0,          # T1D: ~5% loss per year pre-diagnosis
+    "insulin_sensitivity_young_pct": 100.0,           # reference
+    "insulin_resistance_onset_age": 40.0,            # insulin resistance begins ~40
+    "muscle_fiber_count_adult": 6.0e11,               # ~600 billion muscle fibers
+    "muscle_mass_decline_per_year_pct": 1.0,          # ~1% per year (sarcopenia)
+    "muscle_strength_decline_per_year_pct": 1.5,      # ~1.5% per year
+    "sarcopenia_threshold_pct": 60.0,                 # below 60% of young mass
+    "bone_density_peak_age": 30.0,                    # peak BMD at ~30
+    "bone_density_decline_per_year_pct_after_peak": 0.7,  # ~0.7% per year after peak
+    "osteoporosis_t_score_threshold": -2.5,           # T-score < -2.5 = osteoporosis
+    "fracture_risk_osteoporosis_mult": 3.0,           # 3x fracture risk with osteoporosis
+
+    # --- Cancer statistics ---
+    "lifetime_cancer_risk_pct": 40.0,                # ~40% lifetime risk
+    "cancer_incidence_age_50_per_year": 0.5,          # 0.5% per year at 50
+    "cancer_incidence_age_60_per_year": 1.5,          # 1.5% per year at 60
+    "cancer_incidence_age_70_per_year": 3.0,          # 3% per year at 70
+    "cancer_incidence_age_80_per_year": 5.0,          # 5% per year at 80
+    "cancer_mortality_pct": 33.0,                     # ~33% of cancers are fatal
+    "telomerase_reactivation_cancer_pct": 90.0,       # ~90% of cancers reactivate telomerase
+    "cancer_mutation_burden_average": 50.0,           # ~50 mutations per cancer (varies)
+    "cancer_immunoediting_phases": ["elimination", "equilibrium", "escape"],
+    "ctdna_detection_sensitivity_stage_1_pct": 40.0,  # ~40% at stage I
+    "ctdna_detection_sensitivity_stage_4_pct": 80.0,  # ~80% at stage IV
+
+    # --- Pharmacokinetic parameters ---
+    "lnp_circulation_half_life_hr": 18.0,             # LNP t1/2 in blood
+    "lnp_liver_uptake_pct_iv": 80.0,                 # ~80% of IV LNP goes to liver
+    "lnp_liver_uptake_pct_sc": 20.0,                  # ~20% of SC LNP goes to liver
+    "lnp_spleen_uptake_pct": 5.0,                     # ~5% to spleen
+    "lnp_adipose_uptake_pct_sc": 40.0,                # ~40% of SC LNP to adipose (modeled)
+    "sarna_expression_duration_days": 7.0,            # saRNA expression window
+    "mrna_expression_duration_days": 3.0,             # standard mRNA expression window
+    "protein_synthesis_delay_hr": 2.0,                # ~2hr from mRNA to protein
+    "lnp_endosomal_escape_time_hr": 1.0,              # ~1hr to escape endosome
+    "cytoplasmic_mrna_half_life_hr": 12.0,            # ~12hr mRNA half-life in cytoplasm
+    "protein_half_life_avg_hr": 48.0,                 # ~48hr average protein half-life
+
+    # --- Nutritional requirements ---
+    "rda_protein_g_per_kg": 0.8,                      # 0.8 g/kg/day RDA
+    "rda_vitamin_c_mg": 90.0,                         # 90 mg/day (male)
+    "rda_vitamin_d_iu": 600.0,                        # 600 IU/day
+    "rda_calcium_mg": 1000.0,                         # 1000 mg/day
+    "rda_iron_mg": 8.0,                               # 8 mg/day (male)
+    "rda_zinc_mg": 11.0,                              # 11 mg/day (male)
+    "rda_folate_ug": 400.0,                           # 400 ug/day
+    "rda_b12_ug": 2.4,                                # 2.4 ug/day
+    "rda_niacin_mg": 16.0,                            # 16 mg/day (male)
+    "rda_magnesium_mg": 400.0,                        # 400 mg/day (male)
+    "rda_selenium_ug": 55.0,                          # 55 ug/day
+    "caloric_need_kcal_per_day_70kg": 2500.0,         # ~2500 kcal/day
+    "protein_need_regen_g_per_day": 120.0,            # ~120g/day during regeneration
+    "vitamin_c_need_regen_mg": 300.0,                 # ~300mg/day during collagen synthesis
+
+    # --- Growth factor pharmacokinetics ---
+    "egf_half_life_hr": 2.0,                          # EGF plasma half-life
+    "fgf2_half_life_hr": 1.5,                         # FGF2 plasma half-life
+    "vegf_half_life_hr": 1.0,                         # VEGF plasma half-life
+    "igf1_half_life_hr": 12.0,                        # IGF-1 (bound to IGFBP)
+    "bdnf_half_life_hr": 2.0,                         # BDNF plasma half-life
+    "gcsf_half_life_hr": 3.5,                         # G-CSF plasma half-life
+
+    # --- Drug half-lives (key components) ---
+    "metformin_half_life_hr": 6.0,                    # 6 hr (immediate release)
+    "rapamycin_half_life_hr": 60.0,                   # ~60 hr
+    "dasatinib_half_life_hr": 4.0,                    # 3-5 hr
+    "navitoclax_half_life_hr": 26.0,                  # ~26 hr
+    "quercetin_half_life_hr": 12.0,                   # ~12 hr
+    "fisetin_half_life_hr": 3.0,                      # ~3 hr
+    "valproic_acid_half_life_hr": 12.0,               # ~12 hr
+    "alendronate_half_life_days": 10.0,               # ~10 years in bone (terminal)
+    "denosumab_half_life_days": 25.0,                  # ~25 days
+    "teriparatide_half_life_hr": 1.0,                 # ~1 hr (SC)
+    "romosozumab_half_life_days": 13.0,               # ~13 days
+    "nintedanib_half_life_hr": 10.0,                  # ~10 hr
+    "pirfenidone_half_life_hr": 3.0,                   # ~3 hr
+    "spermidine_half_life_hr": 2.0,                   # ~2 hr
+    "resveratrol_half_life_hr": 5.0,                  # ~5 hr (glucuronidated)
+    "ta65_half_life_hr": 2.0,                          # ~2 hr (cycloastragenol)
+    "epo_half_life_hr": 8.0,                           # ~8 hr (IV)
+    "il7_half_life_hr": 2.0,                           # ~2 hr (CYT107)
+
+    # --- Exosome biology ---
+    "exosome_diameter_nm_range": [30, 150],           # 30-150 nm
+    "exosome_density_g_cm3": 1.13,                    # buoyant density on sucrose gradient
+    "exosome_cargo_types": ["miRNA", "mRNA", "protein", "lncRNA", "DNA fragments"],
+    "exosome_biogenesis_pathway": "MVB (multivesicular body) -> exocytosis",
+    "exosome_uptake_mechanisms": ["endocytosis", "macropinocytosis", "fusion", "receptor-mediated"],
+    "exosome_circulation_half_life_hr": 1.0,          # ~1 hr in blood (rapid clearance)
+    "exosome_biodistribution_liver_pct": 50.0,        # ~50% to liver
+    "exosome_biodistribution_spleen_pct": 10.0,        # ~10% to spleen
+    "exosome_biodistribution_lung_pct": 5.0,          # ~5% to lung
+    "exosome_biodistribution_brain_pct": 2.0,         # ~2% cross BBB (without targeting)
+
+    # --- LNP biophysics ---
+    "lnp_diameter_range_nm": [70, 120],               # optimal size range
+    "lnp_zeta_potential_range_mv": [-5, 5],           # near-neutral stealth
+    "lnp_pdi_target": 0.2,                             # PDI < 0.2 for uniformity
+    "lnp_encapsulation_efficiency_target_pct": 90.0,  # >90% RNA encapsulated
+    "lnp_np_ratio_optimal": 12.0,                      # N/P 12:1 for MC3-DMA
+    "lnp_pka_optimal": 6.44,                           # DLin-MC3-DMA pKa
+    "lnp_endosomal_escape_range_pct": [1, 15],        # published escape range
+    "lnp_peg_shedding_time_hr": 24.0,                  # PEG-lipid shedding half-time
+
+    # --- Aging rate statistics ---
+    "aging_rate_baseline_per_year": 1.0,                # 1 biological year per chronological year
+    "aging_rate_acceleration_after_40": 1.5,           # ~1.5x after 40
+    "aging_rate_acceleration_after_60": 2.0,           # ~2x after 60
+    "aging_rate_acceleration_after_80": 3.0,           # ~3x after 80
+    "mortality_doubling_age_gompertz": 8.0,            # mortality doubles every ~8 years (Gompertz)
+    "gompertz_beta_baseline": 0.08,                    # Gompertz mortality parameter
+    "maximum_documented_lifespan_years": 122.0,        # Jeanne Calment (122.4 years)
+    "median_lifespan_global_years": 73.0,             # global median lifespan
+    "life_expectancy_at_birth_us": 79.0,               # US life expectancy at birth
+    "healthspan_vs_lifespan_gap_years": 10.0,          # ~10 year healthspan-lifespan gap
+
+    # --- Regenerative capacity by tissue ---
+    "epidermis_turnover_days": 28.0,                   # 28-day epidermal turnover
+    "intestinal_epithelium_turnover_days": 5.0,        # 5-day intestinal epithelium turnover
+    "gastric_mucosa_turnover_days": 7.0,               # 7-day gastric mucosa turnover
+    "liver_regen_time_70pct_resection_days": 30.0,     # liver regrows in ~30 days from 30% remnant
+    "kidney_regen_capacity": "limited (nephrons do not regenerate)",
+    "heart_regen_capacity": "very limited (cardiomyocyte turnover ~1%/yr at age 20, 0.45% at 75)",
+    "brain_regen_capacity": "limited (hippocampal neurogenesis debated; ~700 new neurons/day in young adults)",
+    "spinal_cord_regen_capacity": "very limited (CNS axons do not regenerate without intervention)",
+    "peripheral_nerve_regen_rate_mm_per_day": 1.0,    # ~1 mm/day peripheral nerve regrowth
+    "bone_fracture_healing_weeks": 8.0,                # ~8 weeks for typical fracture
+    "muscle_regen_after_injury_weeks": 4.0,            # ~4 weeks for muscle strain
+
+    # --- Hallmarks of aging (complete list) ---
+    "aging_hallmarks": [
+        "genomic instability",
+        "telomere attrition",
+        "epigenetic alterations",
+        "loss of proteostasis",
+        "deregulated nutrient sensing",
+        "mitochondrial dysfunction",
+        "cellular senescence",
+        "stem cell exhaustion",
+        "altered intercellular communication",
+        "chronic inflammation (inflammaging)",
+        "dysbiosis (microbiome changes)",
+        "disabled macroautophagy",
+    ],
+    "aging_hallmark_count": 12,                        # 9 original + 3 added 2023
+
+    # --- Epigenetic clocks (detailed) ---
+    "epigenetic_clocks": {
+        "horvath_2013": "pan-tissue clock, 353 CpG sites, most validated",
+        "grimage": "predicts mortality/morbidity, combines methylation + clinical biomarkers",
+        "phenoage": "phenotypic age, combines methylation + blood biomarkers",
+        "dunedinpace": "rate-of-aging clock, most responsive to intervention, validated 4 cohorts",
+        "dunedinpoam38": "38-CpG pace-of-aging measure",
+        "omicm_age": "multi-omic clock (proteomic + metabolomic + transcriptomic)",
+    },
+    "epigenetic_clock_cpg_sites_horvath": 353,          # 353 CpG sites
+    "epigenetic_clock_cpg_sites_grimage": 1030,         # ~1030 CpG sites
+    "epigenetic_clock_cpg_sites_phenoage": 513,        # 513 CpG sites
+    "epigenetic_clock_cpg_sites_dunedinpace": 173,     # 173 CpG sites
 }
 
 # ===========================================================================
@@ -8434,6 +10148,9 @@ def print_formulation_report():
     print(f"  \"{cj['tagline']}\"")
     print("=" * 80)
 
+    print(f"\n  STATUS: conceptual research model -- NOT a tested or approved product.")
+    print("  Doses/mechanisms are evidence-graded; run --audit for the honest audit.")
+
     print(f"\n  Delivery:        {cj['delivery']}")
     print(f"  Dose:            {cj['dose_ml']} mL per injection")
     print(f"  Frequency:       Every {cj['dose_frequency_days']} days (maintenance)")
@@ -8447,7 +10164,7 @@ def print_formulation_report():
     print("-" * 80)
     rp = cj["reprogramming"]
     print(f"  Target:          {rp['target']}")
-    print(f"  Conversion:      {rp['conversion_efficiency_pct']}% base -> {rp['net_conversion_efficiency_pct']}% net (x{rp['enhancement_factor']} enhancer boost)")
+    print(f"  Conversion:      {rp['conversion_efficiency_pct']}% base -> {rp['net_conversion_efficiency_pct']}% net (x{rp['enhancement_factor']} enhancer boost)  [MODELED scenario, grade D: published ex-vivo range ~0.01-1%]")
     print(f"  Time:            {rp['reprogramming_time_days']} days for full conversion")
     print(f"  mRNA type:       {rp['saRNA_upgrade']}")
     print(f"  Safety:          {rp['safety']}")
@@ -8479,7 +10196,7 @@ def print_formulation_report():
         print(f"    {name:6s}  {info['dose_ug']:3d} ug  {info['role']}")
 
     print("\n" + "-" * 80)
-    print("  IMMORTALITY MECHANISMS (16 Pillars)")
+    print("  MODELED REJUVENATION MECHANISMS (16 pillars -- magnitudes are model assumptions; see --audit)")
     print("-" * 80)
     mechanisms = [
         ("1. Telomerase Activation", cj["telomerase"], "telomere_gain_bp_per_division"),
@@ -8686,8 +10403,9 @@ def print_simulation_report(result: SimulationResult, label: str = "ChiefJuice")
     print(f"  Status:                   {'ALIVE' if state.alive else f'DEAD ({state.cause_of_death})'}")
 
     if result.immortal:
-        print(f"  *** IMMORTALITY ACHIEVED ***")
-        print(f"  Biological age stabilized/reversed -- indefinite lifespan maintained.")
+        print(f"  *** MODELED INDEFINITE LIFESPAN (scenario outcome, not a biological claim) ***")
+        print(f"      Biological age stabilized/reversed IN THE MODEL -- this holds only")
+        print(f"      if the grade-D assumptions in EVIDENCE_AUDIT are true. Run --audit.")
     else:
         print(f"  Years survived:           {result.years_gained:.1f}")
 
@@ -8833,8 +10551,9 @@ def print_feasibility_report():
          "established science. mRNA delivery avoids genomic integration (safe)."),
         ("LNP delivery", "Same technology as COVID-19 mRNA vaccines (Pfizer/Moderna). "
          "Proven safe in billions of doses worldwide."),
-        ("Telomerase activators (TA-65, cycloastragenol)", "Clinical trials show telomere "
-         "lengthening in humans. FDA-approved as supplements."),
+        ("Telomerase activators (TA-65, cycloastragenol)", "Open-label human study at 250-1000 "
+         "mg/day showed modest immune-cell telomere dynamics. Not FDA-approved; FDA has "
+         "warned about telomere-length supplement claims."),
         ("Senolytics (D+Q, fisetin)", "Mayo Clinic clinical trials showing senescent cell "
          "clearance in humans. Published in Nature Medicine."),
         ("NAD+ precursors (NMN, NR)", "Clinical trials in humans showing NAD+ elevation "
@@ -8842,23 +10561,27 @@ def print_feasibility_report():
         ("Exosome therapy", "FDA fast-track designation for some exosome products. "
          "Active clinical trials for wound healing, cardiac repair."),
         ("Partial reprogramming", "Salk Institute (2016-2024) showed OSKM cycling "
-         "reverses epigenetic age in mice without teratoma risk."),
-        ("GDF11", "Harvard/Wagers lab showed young blood factor GDF11 rejuvenates "
-         "old mouse hearts, muscle, brain."),
+         "reverses epigenetic age in mice with REDUCED (not zero) teratoma risk."),
+        ("GDF11", "Harvard/Wagers lab showed young-blood factor GDF11 rejuvenates "
+         "old mouse hearts, muscle, brain. CONTESTED: Egerman 2015 reanalyses "
+         "questioned the original findings and assay specificity."),
         ("mTOR inhibition (rapamycin)", "Most robust life-extension drug in mice (25%+). "
          "Human clinical trials for aging (NIH TAME study)."),
-        ("PTEN activation / CRISPRi oncogene suppression", "PTEN is a known tumor suppressor. "
-         "CRISPRi (interference) is proven for gene silencing without DNA cutting."),
+        ("PTEN pathway support / CRISPRi oncogene suppression", "PTEN is a known tumor "
+         "suppressor, but NO small-molecule PTEN activator exists (concept only). "
+         "CRISPRi (interference) is real for gene silencing without DNA cutting."),
         ("Teriparatide / romosozumab (bone formation)", "FDA-approved osteoporosis drugs. "
          "Teriparatide builds bone; romosozumab (sclerostin inhibitor) is approved."),
         ("Anti-myostatin antibodies", "Active clinical trials (Bimagrumab, Trevogrumab) "
          "show muscle mass increase in humans. FDA fast-track for sarcopenia."),
-        ("HDAC inhibitors (CI-994)", "FDA-approved for cancer. Clinical trials show "
-         "memory enhancement and cognitive benefits in animal models."),
+        ("HDAC inhibitors (CI-994)", "HDAC inhibitors are FDA-approved for cancer "
+         "(vorinostat class); CI-994 itself is not an approved drug. Memory "
+         "enhancement data are from ANIMAL models."),
         ("Methylene blue", "Clinical trials for cognitive enhancement. FDA-approved "
          "for methemoglobinemia. Mitochondrial electron donor."),
-        ("CAR-T cell therapy", "FDA-approved for blood cancers. Living drugs that "
-         "target and kill specific cells. Proven in millions of patients."),
+        ("CAR-T cell therapy", "FDA-approved for specific blood cancers. Living drugs that "
+         "target and kill specific cells. Proven in tens of thousands of patients, "
+         "not pan-cancer and not millions."),
         ("CRISPR-Cas9 gene editing", "Nobel Prize 2020. FDA-approved Casgevy for "
          "sickle cell disease. HSC editing is clinically proven."),
         ("HIF-2 inhibitors (belzutifan)", "FDA-approved for kidney cancer. "
@@ -8871,33 +10594,35 @@ def print_feasibility_report():
     print("\n\n  --- THEORETICAL / SPECULATIVE COMPONENTS ---")
     print("  These push beyond current clinical practice:")
     speculative = [
-        ("In vivo reprogramming at 85% efficiency",
-         "Current in vitro reprogramming: 0.1-1%. In vivo: <0.01%. "
-         "85% is a 100-1000x improvement over state of art."),
+        ("In vivo reprogramming at 75.6% efficiency (modeled)",
+         "Current in vitro human reprogramming: 0.01-1%. In vivo: unquantified. "
+         "75.6% is the model's scenario assumption, ~100x beyond state of art."),
         ("Monthly maintenance dosing for indefinite lifespan",
          "No human has been maintained indefinitely on any regenerative regimen. "
          "Longest mouse lifespan extension: ~60% (rapamycin + Yamanaka cycling)."),
         ("Complete organ repair to youthful function",
          "Stem cell therapies show partial repair. Complete restoration to 100% "
          "has not been demonstrated in any human organ."),
-        ("Epigenetic age reversal of 0.5 years/dose",
-         "Current best: ~0.5 years reversal in mice over weeks. "
-         "Human epigenetic age reversal is in early clinical trials."),
+        ("Epigenetic age reversal of 0.25 years/dose (monthly)",
+         "Best human data: ~1.5-2.5 years over 12 months of daily intervention "
+         "(TRIIM). The model's 3 yr/yr at monthly dosing is still 1.5-2x optimistic."),
         ("Teratoma risk elimination",
          "iPSCs carry inherent teratoma risk. Safety switches (iCasp9) help but "
          "have not been tested at this scale in humans."),
-        ("1000% muscle fiber strength increase",
-         "Current anti-myostatin trials show ~5-30% muscle mass increase. "
-         "1000% specific force gain is 30-200x beyond current results."),
-        ("2000% bone strength increase",
-         "Current osteoporosis drugs achieve ~10-20% BMD improvement. "
-         "2000% gain is 100x beyond state of art."),
+        ("+25% muscle specific force (MyoForce, corrected)",
+         "CORRECTED (review #15): the old +1000% target was physically impossible. "
+         "Anti-myostatin trials show ~5-30% muscle MASS increase and small strength "
+         "effects; +25% specific force remains an optimistic model input."),
+        ("+15% bone strength (OsteoMax, corrected)",
+         "CORRECTED (review #15): the old +2000% target was physically impossible. "
+         "Approved agents achieve ~5-15% BMD/yr; the model now sits at the top of reality."),
         ("100% cancer cure efficacy (OncoCure)",
          "Current CAR-T: 40-80% for blood cancers, <20% for solid tumors. "
          "100% across all cancer types is unprecedented."),
-        ("650% oxygen capacity increase (HemoMax)",
-         "Current EPO doping gives ~10-15% RBC increase. "
-         "650% O2 capacity requires synthetic carriers + hemoglobin engineering."),
+        ("+10% O2 capacity via RBC mass (HemoMax, corrected)",
+         "CORRECTED (review #15): the old +650% per-RBC claim violated hemoglobin "
+         "chemistry (4 O2 per Hb is a hard cap). EPO raises RBC COUNT ~10-15% with "
+         "thrombosis/hypertension risks."),
         ("Cumulative stacking synergy multipliers",
          "Cross-mechanism synergy is theoretically sound but unquantified. "
          "Multiplicative stacking may have diminishing returns or unexpected interactions."),
@@ -8944,16 +10669,24 @@ def print_feasibility_report():
     for phase in path:
         print(f"  {phase}")
 
-    print("\n  VERDICT: ChiefJuiceV1.17 is a plausible 20-30 year roadmap, not a "
-          "current therapy. Every individual mechanism has real scientific backing. "
-          "The combination and efficacy levels are aspirational but grounded.")
+    print("\n  VERDICT: ChiefJuiceV1.17 is an aspirational multi-decade research "
+          "roadmap, not a therapy of any kind today. Individual mechanisms have "
+          "real scientific anchors; the COMBINATION and its efficacy levels are "
+          "untested in any organism. See --audit for the evidence grading.")
     print("\n" + "=" * 80)
 
 
 def print_math_proof():
-    """Prove that the simulation math is self-consistent and biologically grounded."""
+    """Print the model's arithmetic-consistency check.
+
+    This proves the MATH is self-consistent: every figure re-derives from
+    the stated constants. It does NOT prove the biology. The constants are
+    graded in EVIDENCE_AUDIT, and the load-bearing ones are speculative
+    (grade D). Arithmetic consistency is the only mathematical claim this
+    file can honestly make.
+    """
     print("\n" + "=" * 80)
-    print("  ChiefJuiceV1.17 -- MATHEMATICAL PROOF: THE MATH HOLDS")
+    print("  ChiefJuiceV1.17 -- MATH CONSISTENCY CHECK (arithmetic, not biology)")
     print("=" * 80)
 
     print("\n  1. TELOMERE DYNAMICS")
@@ -8963,8 +10696,10 @@ def print_math_proof():
     print(f"     Critical: {BIO['critical_telomere_bp']} bp")
     max_years = (BIO['initial_telomere_bp'] - BIO['critical_telomere_bp']) / BIO['telomere_loss_per_year_bp']
     print(f"     Max lifespan (no telomerase): {max_years:.0f} years")
-    print(f"     With telomerase: gain {BIO['telomerase_telomere_gain_bp']} bp/division > loss {BIO['telomere_loss_per_division_bp']} bp/division")
-    print(f"     => Net positive: telomeres GROW, not shrink. Immortality mechanism PROVEN.")
+    print(f"     With telomerase active: +{BIO['telomerase_telomere_gain_bp']} bp/division, and the model applies")
+    print(f"     only a 70%-slowed age loss ({BIO['telomere_loss_per_year_bp'] * 0.3:.1f} bp/yr) in that branch -- net positive IN THE MODEL")
+    print(f"     => MODELED net positive. Assumption, not proof (see --audit): sustained")
+    print(f"        pharmacological net lengthening is unproven in humans.")
 
     print("\n  2. SENESCENCE BALANCE")
     print(f"     Accumulation: {BIO['senescent_cell_accumulation_pct_per_year']}%/year")
@@ -8972,7 +10707,7 @@ def print_math_proof():
     max_years_sen = BIO['senescent_burden_lethal_pct'] / BIO['senescent_cell_accumulation_pct_per_year']
     print(f"     Max lifespan (no clearance): {max_years_sen:.0f} years")
     print(f"     With senolytics: 50%/round x4 rounds/yr = 93.75%/yr > {BIO['senescent_cell_accumulation_pct_per_year']}%/yr accumulation")
-    print(f"     => Senescent burden DECREASES. Immortality mechanism PROVEN.")
+    print(f"     => Senescent burden DECREASES. Immortality mechanism modeled net-positive (assumption, not proof)")
 
     print("\n  3. STEM CELL POOL")
     print(f"     Decline: {BIO['stem_cell_decline_per_year_pct']}%/year")
@@ -9008,21 +10743,21 @@ def print_math_proof():
     annual_gain = BIO['mito_biogenesis_rate_per_month'] * 12
     annual_decline = BIO['mito_decline_per_year_pct'] * 0.2  # 80% reduction
     print(f"     Annual gain: {annual_gain:.1f}% > Annual decline: {annual_decline:.1f}%")
-    print(f"     => Mitochondria REJUVENATED. Immortality mechanism PROVEN.")
+    print(f"     => Mitochondria REJUVENATED. Immortality mechanism modeled net-positive (assumption, not proof)")
 
     print("\n  5. INFLAMMATION CONTROL")
     print(f"     Increase: {BIO['inflammation_increase_per_year']}/year")
     print(f"     With ChiefJuice: 5% reduction/month toward baseline")
     annual_reduction = 0.05 * 12 * (2.0 - BIO['inflammation_baseline_young'])
     print(f"     Annual reduction: ~{annual_reduction:.2f} > Annual increase: {BIO['inflammation_increase_per_year']:.2f}")
-    print(f"     => Inflammation CONTROLLED. Immortality mechanism PROVEN.")
+    print(f"     => Inflammation CONTROLLED. Immortality mechanism modeled net-positive (assumption, not proof)")
 
     print("\n  6. EPIGENETIC AGE REVERSAL")
     print(f"     Normal: +1.0 year/year (aging)")
     print(f"     With ChiefJuice: -{CHIEF_JUICE['epigenetic']['epigenetic_age_reversal_years_per_dose']} year/dose - 0.1 year/month partial reprog")
     monthly_reversal = CHIEF_JUICE['epigenetic']['epigenetic_age_reversal_years_per_dose'] + 0.1
     print(f"     Monthly reversal: {monthly_reversal:.2f} years > Monthly aging: {1/12:.4f} years")
-    print(f"     => Epigenetic age REVERSES. Immortality mechanism PROVEN.")
+    print(f"     => Epigenetic age REVERSES. Immortality mechanism modeled net-positive (assumption, not proof)")
 
     print("\n  7. FAT SUSTAINABILITY")
     print(f"     Body fat: {BIO['avg_body_fat_kg_70kg']} kg")
@@ -9046,32 +10781,33 @@ def print_math_proof():
     print(f"     Baseline risk at 60: {BIO['cancer_risk_at_60_pct_per_year']}%/year")
     print(f"     OncoShield reduction: {CHIEF_JUICE['oncoshield']['cancer_risk_reduction_pct']}%")
     print(f"     OncoCure efficacy: {CHIEF_JUICE['oncocure']['cure_efficacy_pct']}%")
-    print(f"     Net monthly risk change with treatment: negative (risk DECREASES)")
-    print(f"     => Cancer risk driven toward zero. Immortality mechanism PROVEN.")
+    print(f"     Net monthly risk change with treatment: negative IN THE MODEL")
+    print(f"     => Cancer risk growth moderated in the model (25% modeled reduction;")
+    print(f"        no validated chemoprevention stack exists). Modeled, not proven.")
 
     print("\n  9. NEURAL REGENERATION")
     print(f"     Cognitive decline: {BIO['cognitive_decline_per_year_pct']}%/year")
     print(f"     Neurogenesis rate (treated): {CHIEF_JUICE['neuro']['neurogenesis_rate_pct_per_month']}%/month")
     annual_neuro_gain = CHIEF_JUICE['neuro']['neurogenesis_rate_pct_per_month'] * 12 * CHIEF_JUICE['stacking']['neuro_stem_cell_synergy']
     print(f"     Annual gain (with synergy): {annual_neuro_gain:.1f}% > Annual decline: {BIO['cognitive_decline_per_year_pct']}%")
-    print(f"     => Brain function REJUVENATED. Immortality mechanism PROVEN.")
+    print(f"     => Brain function REJUVENATED. Immortality mechanism modeled net-positive (assumption, not proof)")
 
     print("\n  10. MUSCLE FIBER STRENGTH")
     print(f"     Baseline: {BIO['baseline_specific_force_n_per_cm2']} N/cm2, Max target: {CHIEF_JUICE['muscle']['max_specific_force_n_per_cm2']} N/cm2")
     print(f"     Gain target: {CHIEF_JUICE['muscle']['strength_increase_pct']}% over {CHIEF_JUICE['muscle']['regeneration_months']} months")
-    print(f"     => Muscle strength INCREASES 10x. Enhancement mechanism PROVEN.")
+    print(f"     => Muscle specific force target +25% in the model (inside known biology).")
 
     print("\n  11. BONE STRENGTH")
     print(f"     Baseline: {BIO['baseline_bone_strength_mpa']} MPa, Max target: {CHIEF_JUICE['bone']['max_compressive_strength_mpa']} MPa")
     print(f"     Gain target: {CHIEF_JUICE['bone']['strength_increase_pct']}% over {CHIEF_JUICE['bone']['regeneration_months']} months")
-    print(f"     => Bone strength INCREASES 20x. Enhancement mechanism PROVEN.")
+    print(f"     => Bone strength target +15% in the model (inside known biology).")
 
     print("\n  12. CUMULATIVE STACKING")
     s = CHIEF_JUICE['stacking']
     print(f"     Global multiplier: {s['global_synergy_multiplier']}x")
     print(f"     Synergy factors: {len([k for k in s if k.endswith('_synergy')])} cross-mechanism interactions")
     print(f"     Formula: total_effect = base * product(synergy) * global")
-    print(f"     => Exponential rejuvenation from synergistic stacking. PROVEN.")
+    print(f"     => Exponential rejuvenation from synergistic stacking. MODELED, not proven.")
 
     print("\n  13. PROTEOSTASIS RESTORATION")
     print(f"     Aggregate accumulation: {BIO['protein_aggregate_accumulation_per_year_pct']}%/year")
@@ -9079,31 +10815,35 @@ def print_math_proof():
     print(f"     Max lifespan (no clearance): {BIO['protein_aggregate_lethal_pct'] / BIO['protein_aggregate_accumulation_per_year_pct']:.0f} years")
     pc = CHIEF_JUICE['proteoclear']
     print(f"     With ProteoClear: {pc['aggregate_clearance_pct_per_month']}% clearance/month > accumulation")
-    print(f"     => Protein aggregates DECREASE. Proteostasis maintained. PROVEN.")
+    print(f"     => Protein aggregates DECREASE. Proteostasis maintained. MODELED, not proven.")
 
     print("\n  14. OXIDATIVE STRESS DEFENSE")
     os_sh = CHIEF_JUICE['oxidshield']
     print(f"     ROS increase: {BIO['ros_increase_per_year_pct']}%/year")
     print(f"     With OxidShield: {os_sh['ros_reduction_pct']}% ROS reduction + {os_sh['antioxidant_capacity_increase_pct']}% antioxidant boost")
-    print(f"     => ROS DECREASES, antioxidants RESTORED. PROVEN.")
+    print(f"     => ROS DECREASES, antioxidants RESTORED. MODELED, not proven.")
 
     print("\n  15. HORMONAL OPTIMIZATION")
     hb = CHIEF_JUICE['hormonebalance']
     print(f"     DHEA decline: {BIO['dhea_decline_per_year_pct']}%/year")
     print(f"     With HormoneBalance: {hb['dhea_restoration_pct']}% restoration + {hb['gh_increase_pct']}% GH boost")
-    print(f"     => Hormones RESTORED to youthful levels. PROVEN.")
+    print(f"     => Hormones RESTORED to youthful levels. MODELED, not proven.")
 
     print("\n  16. PLASMA EXCHANGE / SYSTEMIC REJUVENATION")
     ps = CHIEF_JUICE['plasmasync']
     print(f"     Pro-aging factor accumulation: {BIO['plasma_pro_aging_increase_per_year_pct']}%/year")
     print(f"     With PlasmaSync: {ps['pro_aging_factor_clearance_pct']}% clearance + {ps['young_factor_restoration_pct']}% young factor restoration")
-    print(f"     => Blood composition RESET to youthful profile. PROVEN.")
+    print(f"     => Blood composition RESET to youthful profile. MODELED, not proven.")
 
-    print("\n  CONCLUSION: All 22 immortality mechanisms show net-positive biological")
-    print("  dynamics under ChiefJuice treatment. The math holds: aging is reversed,")
-    print("  not merely slowed. The body's own fat provides the raw material.")
-    print("  Cumulative stacking amplifies all mechanisms multiplicatively.")
-    print("  Indefinite lifespan is mathematically supported by this model.")
+    print("  CONCLUSION (honest): the arithmetic above is internally consistent --")
+    print("  every modeled mechanism is net-positive GIVEN ITS STATED ASSUMPTIONS.")
+    print("  The assumptions, not the arithmetic, carry the risk: the load-bearing")
+    print("  parameters are grade D (speculative) in EVIDENCE_AUDIT -- chiefly")
+    print("  in-vivo conversion efficiency (75.6% modeled vs <=1% published ex-vivo),")
+    print("  endosomal escape (78% modeled vs <=15% published), and multiplicative")
+    print("  synergy stacking (invented). Consistent math does NOT mean the outcome")
+    print("  would occur in an organism. Run --audit for the evidence grading of")
+    print("  every assumption in this model.")
     print("\n" + "=" * 80)
 
 
@@ -9145,7 +10885,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
 
     W, H = 1400, 880
     pygame.init()
-    pygame.display.set_caption("ChiefJuiceV1.17 -- Immortality Formulation Blueprint")
+    pygame.display.set_caption("ChiefJuiceV1.17 -- Rejuvenation Research Model (conceptual; NOT a therapy)")
     screen = pygame.display.set_mode((W, H), pygame.RESIZABLE)
     clock = pygame.time.Clock()
     font = pygame.font.SysFont(MONO, 15)
@@ -9698,7 +11438,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
         signaling = sim_result.signaling_efficiency[idx] if idx < len(sim_result.signaling_efficiency) else 0
 
         rows = [
-            ("Status", f"{'IMMORTAL' if sim_result.immortal else ('ALIVE' if state.alive else 'DEAD')}",
+            ("Status", f"{'HELD (model)' if sim_result.immortal else ('ALIVE' if state.alive else 'DEAD')}",
              C_GOOD if sim_result.immortal else (C_ACCENT if state.alive else C_BAD), 1.0),
             ("Chronological Age", f"{sim_result.chronological_age[idx]:.1f} yr", C_TEXT, 0.5),
             ("Biological Age", f"{bio_age:.1f} yr", C_GOOD if bio_age < 60 else C_WARN, max(0, 1 - bio_age / 120)),
@@ -9890,7 +11630,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             (0.50, "Month 3", "Maintenance +\nAI dose adjust", C_GOOD),
             (0.65, "Month 6", "Full panel\nBiomarker review", C_ACCENT3),
             (0.80, "Year 1", "Maintenance\ncontinues", C_TEXT),
-            (0.95, "Year 2+", "Immortality\nachieved", C_GOOD),
+            (0.95, "Year 2+", "Modeled age-hold\n(scenario; see --audit)", C_GOOD),
         ]
         for frac, label, desc, col in events:
             ex = tl_x + int(tl_w * frac)
@@ -10122,7 +11862,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             pygame.draw.circle(screen, color, (ex, ey), 3)
         screen.blit(font_sm.render("stem", True, C_TEXT_DIM), (sx - 10, cy + 22))
         # Labels
-        screen.blit(font_sm.render(f"{CHIEF_JUICE['reprogramming']['net_conversion_efficiency_pct']:.0f}% conversion (18% base x4.2x)", True, color),
+        screen.blit(font_sm.render(f"{CHIEF_JUICE['reprogramming']['net_conversion_efficiency_pct']:.0f}% conversion (modeled scenario; published ex-vivo <=1%)", True, color),
                     (x + 10, y + 28))
         screen.blit(font_sm.render(f"{CHIEF_JUICE['reprogramming']['reprogramming_time_days']:.0f} days  |  saRNA delivery", True, C_TEXT_DIM),
                     (x + 10, y + 44))
@@ -11069,7 +12809,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
         stages = [
             ("1. INJECTION", "SubQ LNP suspension\n10 mL, monthly", (255, 180, 40), "syringe"),
             ("2. CIRCULATION", "18hr half-life\nAdipose homing peptide\nCKGGRAKDC", (100, 200, 255), "blood"),
-            ("3. ADIPOCYTE TARGETING", "LNP binds adipocyte\nreceptor, internalized\n78% endosomal escape", (0, 220, 100), "cell"),
+            ("3. ADIPOCYTE TARGETING", "LNP binds adipocyte\nreceptor, internalized\n(modeled escape; published <=15%)", (0, 220, 100), "cell"),
             ("4. REPROGRAMMING", "OSKM mRNA released\n85% conversion\n7 days", (180, 100, 255), "transform"),
             ("5. STEM CELL POOL", "New stem cells\nTelomerase activated\nUnlimited divisions", (255, 120, 200), "stem"),
             ("6. TISSUE REPAIR", "37 mechanisms\nSystemic rejuvenation\nExosome signaling", (255, 80, 80), "repair"),
@@ -11402,7 +13142,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
         labels = [
             ("PEG-PEG2k (stealth + targeting)", (120, 160, 200)),
             ("Ionizable lipid (DLin-MC3-DMA)", (255, 180, 40)),
-            ("mRNA cargo (Oct4/Sox2/Klf4/cMyc)", (100, 200, 255)),
+            ("mRNA cargo (Oct4/Sox2/Klf4/L-Myc)", (100, 200, 255)),
             ("Helper lipid (DSPC)", (200, 140, 30)),
             ("Cholesterol (38.5%)", (255, 200, 100)),
             ("Targeting peptide (CKGGRAKDC)", (0, 220, 100)),
@@ -11419,7 +13159,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             [f"Diameter: {lnp['diameter_nm']:.0f} nm",
              "PEG stealth layer + CKGGRAKDC targeting",
              "Ionizable lipid shell (DLin-MC3-DMA)",
-             "mRNA cargo: Oct4, Sox2, Klf4, cMyc",
+             "mRNA cargo: Oct4, Sox2, Klf4, L-Myc",
              f"Encapsulation: {lnp['payload_encapsulation_pct']:.0f}%",
              f"Endosomal escape: {lnp['net_endosomal_escape_pct']:.0f}%"]))
 
@@ -12597,7 +14337,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             screen.blit(font_sm.render(name, True, C_TEXT), (margin + 24, y))
             screen.blit(font_sm.render(desc, True, C_TEXT_DIM), (margin + 130, y))
             hover_regions.append((margin, y, left_w, 16, name,
-                [desc, "Safety mechanism in multi-layer shield", "Validated through adversarial review"]))
+                [desc, "Modeled safety concept (not validated)", "Graded in EVIDENCE_AUDIT (--audit)"]))
 
         # Middle: OncoShield components (30%)
         mid_x = margin + left_w + 6
@@ -13360,7 +15100,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             ("5. NUCLEAR ENTRY", "OSKM proteins translocate to nucleus\nvia NLS signals", (180, 100, 255),
              ["NLS: bipartite signal", "Importin alpha/beta pathway", "Nuclear pore: 25 nm", "Entry time: ~30 min"]),
             ("6. EPIGENETIC RESET", "OSKM bind target promoters\nreset epigenetic marks", (160, 255, 160),
-             ["Oct4: pluripotency genes", "Sox2: transcription factor", "Klf4: anti-differentiation", "cMyc: proliferation boost"]),
+             ["Oct4: pluripotency genes", "Sox2: transcription factor", "Klf4: anti-differentiation", "L-Myc: proliferation (safer than cMyc)"]),
             ("7. FATE COMMITMENT", "Partial reprogramming, then\ndifferentiation to stem cell", (0, 255, 150),
              ["Duration: 7 days", "Conversion: 85%", "Safety: iCasp9 switch", "Outcome: ASC-like stem cell"]),
         ]
@@ -13464,7 +15204,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             ("Oct4 mRNA", f"{rp['yamanaka_factors']['Oct4']['dose_ug']} ug", (100, 200, 255)),
             ("Sox2 mRNA", f"{rp['yamanaka_factors']['Sox2']['dose_ug']} ug", (100, 200, 255)),
             ("Klf4 mRNA", f"{rp['yamanaka_factors']['Klf4']['dose_ug']} ug", (100, 200, 255)),
-            ("cMyc mRNA", f"{rp['yamanaka_factors']['cMyc']['dose_ug']} ug", (100, 200, 255)),
+            ("L-Myc mRNA", f"{rp['yamanaka_factors']['L_Myc']['dose_ug']} ug", (100, 200, 255)),
             ("Valproic acid", f"{rp['enhancers']['valproic_acid']['dose_umol']} umol", (255, 140, 60)),
             ("LNP particles", "~1.2 billion", (255, 180, 40)),
             ("HGF", f"{CHIEF_JUICE['growth_factors']['HGF']['dose_ug']} ug", (0, 220, 100)),
@@ -14149,35 +15889,35 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
 
         # Left: Mechanism validation table
         _panel(screen, margin, mid_y, col_w, mid_h, alpha=220)
-        screen.blit(font_sm.render("MECHANISM VALIDATION (22 mechanisms)", True, C_ACCENT),
+        screen.blit(font_sm.render("PLATFORM & MECHANISM EVIDENCE (graded -- not product validation)", True, C_ACCENT),
                     (margin + 10, mid_y + 8))
 
         mechanisms_sci = [
-            ("LNP mRNA delivery", "PROVEN", "COVID-19 vaccines (Pfizer/Moderna)", C_GOOD),
-            ("saRNA self-amplifying", "PROVEN", "ARCT-154 saRNA COVID vaccine approved", C_GOOD),
-            ("OSKM reprogramming", "PROVEN", "Takahashi & Yamanaka 2006, Cell", C_GOOD),
-            ("Partial reprogramming", "PROVEN", "Ocampo et al. 2016, Nature", C_GOOD),
-            ("Adipocyte targeting", "PROVEN", "Kolonin et al. 2004, Science", C_GOOD),
-            ("Endosomal escape boost", "FIXED r10", "15% base -> 78% (4x boost)", C_GOOD),
-            ("Reprogramming 18%->75%", "FIXED r10", "18% base x4.2x enhancer boost", C_GOOD),
+            ("LNP mRNA delivery", "REAL PLATFORM", "COVID-19 vaccines (Pfizer/Moderna)", C_GOOD),
+            ("saRNA self-amplifying", "REAL PLATFORM", "ARCT-154 saRNA COVID vaccine approved", C_GOOD),
+            ("OSKM reprogramming", "REAL PLATFORM", "Takahashi & Yamanaka 2006, Cell", C_GOOD),
+            ("Partial reprogramming", "REAL PLATFORM", "Ocampo et al. 2016, Nature", C_GOOD),
+            ("Adipocyte targeting", "PRECLINICAL", "Kolonin 2004 mouse fat vasculature; primates later", (255, 200, 80)),
+            ("Endosomal escape", "GRADE D", "modeled 78%; published <=15% (r15)", C_BAD),
+            ("Reprogramming 75.6%", "GRADE D", "modeled scenario; published ex-vivo <=1%", C_BAD),
             ("Telomerase activation", "LIKELY", "Harley et al. 2011, Rejuvenation Res", (255, 200, 80)),
-            ("Senolytics (D+Q)", "PROVEN", "Zhu et al. 2015, Aging Cell", C_GOOD),
-            ("Senolytic 50%/round", "FIXED r10", "93.75%/yr cumulative (4 rounds)", C_GOOD),
-            ("NAD+ repletion", "PROVEN", "Mills et al. 2016, Cell Metab", C_GOOD),
-            ("mTOR inhibition", "PROVEN", "Harrison et al. 2009, Nature", C_GOOD),
-            ("Mitophagy (Urolithin A)", "PROVEN", "Singh et al. 2016, Nature Med", C_GOOD),
+            ("Senolytics (D+Q)", "REAL PLATFORM", "Zhu et al. 2015, Aging Cell", C_GOOD),
+            ("Senolytic 50%/round", "MODELED", "93.75%/yr arithmetic; resistance assumed away", (255, 200, 80)),
+            ("NAD+ repletion", "REAL PLATFORM", "Mills et al. 2016, Cell Metab", C_GOOD),
+            ("mTOR inhibition", "REAL PLATFORM", "Harrison et al. 2009, Nature", C_GOOD),
+            ("Mitophagy (Urolithin A)", "REAL PLATFORM", "Singh et al. 2016, Nature Med", C_GOOD),
             ("DNA repair enhancement", "LIKELY", "NAD+/PARP well-established", (255, 200, 80)),
             ("Exosome therapy", "EMERGING", "Bari et al. 2019, Cells", (100, 200, 255)),
             ("Immune rejuvenation", "LIKELY", "IL-7 thymic regrowth, Perales 2018", (255, 200, 80)),
-            ("Epigenetic reversal", "PROVEN", "Horvath 2013, Genome Biology", C_GOOD),
+            ("Epigenetic reversal", "REAL PLATFORM", "Horvath 2013, Genome Biology", C_GOOD),
             ("ECM remodeling", "LIKELY", "Hyaluronic acid well-studied", (255, 200, 80)),
-            ("Hormone restoration", "PROVEN", "DHEA/GH replacement therapy", C_GOOD),
+            ("Hormone restoration", "REAL PLATFORM", "DHEA/GH replacement therapy", C_GOOD),
             ("Plasma exchange", "EMERGING", "Conboy et al. 2005, Nature", (100, 200, 255)),
             ("Proteostasis", "LIKELY", "Autophagy/proteasome established", (255, 200, 80)),
-            ("Nutrient sensing", "PROVEN", "AMPK/mTOR/Sirtuin pathways", C_GOOD),
+            ("Nutrient sensing", "REAL PLATFORM", "AMPK/mTOR/Sirtuin pathways", C_GOOD),
             ("Intercellular comm.", "EMERGING", "GDF11/TIMP2 contested", (100, 200, 255)),
-            ("ROS shielding", "PROVEN", "MitoQ clinical trials", C_GOOD),
-            ("Cancer safeguards", "PROVEN", "iCasp9 in CAR-T, Brentjens 2013", C_GOOD),
+            ("ROS shielding", "REAL PLATFORM", "MitoQ clinical trials", C_GOOD),
+            ("Cancer safeguards", "REAL PLATFORM", "iCasp9 in CAR-T, Brentjens 2013", C_GOOD),
             ("Neural repair", "LIKELY", "BDNF/GDF11 preclinical", (255, 200, 80)),
             ("PEG immune mitigation", "FIXED r10", "PEG-lipid cycling every 6mo", C_GOOD),
             ("Drug interaction screen", "FIXED r10", "CYP450 + staggered dosing", C_GOOD),
@@ -14185,7 +15925,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             ("Multi-tissue targeting", "FIXED r11", "6 organ-specific LNP variants", C_GOOD),
             ("Immune evasion", "FIXED r11", "Autologous + PD-L1 + Treg boost", C_GOOD),
             ("Epigenetic memory", "FIXED r11", "5-aza + VitC + 2i/LIF erasure", C_GOOD),
-            ("Teratoma prevention", "FIXED r11", "6 mechanisms, 0.01% risk", C_GOOD),
+            ("Teratoma prevention", "MODELED r15", "0.5%/cycle modeled; non-zero (Abad 2013)", (255, 200, 80)),
             ("Regulatory (RMAT)", "FIXED r11", "RMAT + orphan + breakthrough", C_GOOD),
             ("Clinical roadmap", "FIXED r11", "19 components in human trials", C_GOOD),
             ("Cost reduction", "FIXED r11", "$850 -> $50/dose at scale", C_GOOD),
@@ -14195,7 +15935,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             ("mtDNA heteroplasmy", "FIXED r12", "mtRE + DdCBE + mitophagy (Bacman 2013)", C_GOOD),
             ("Immune paradox", "FIXED r12", "Treg expansion + tolerance checkpoint", C_GOOD),
             ("Global regulatory", "FIXED r12", "FDA+EMA+PMDA+NMPA+MHRA, Japan RM Act Y8", C_GOOD),
-            ("Clinical bridging", "FIXED r12", "Adipotide Ph1 + Intellia Ph1 + 2B3-101 Ph1", C_GOOD),
+            ("Clinical bridging", "CORRECTED r15", "Adipotide = mice/primates, not human Ph1; NTLA-2001 real", (255, 200, 80)),
             ("Telomerase-cancer safety", "FIXED r13", "Transient + tissue-specific + OncoShield", C_GOOD),
             ("Stem cell homing", "FIXED r13", "SDF-1/CXCR4 + AMD3100 + in situ LNP", C_GOOD),
             ("Immune memory", "FIXED r13", "Memory T cells resist senolytics (Lanna 2017)", C_GOOD),
@@ -14206,7 +15946,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             ("Regulatory precedents", "FIXED r13", "6 'impossible' approvals: CAR-T/mRNA/CRISPR", C_GOOD),
             ("PBPK + TDM", "FIXED r13", "SimCYP + NONMEM + AI PK + monthly TDM", C_GOOD),
             ("PEG-free pSar LNP", "CLOSED r14", "Polysarcosine primary, PEG backup", C_GOOD),
-            ("All doses verified", "CLOSED r14", "20/20 within published clinical ranges", C_GOOD),
+            ("Dose corrections", "DONE r15", "urolithin A 500, MitoQ 20, rapa 6mg/wk, folate 1mg", C_GOOD),
             ("Epi-memory = feature", "CLOSED r14", "5% mesoderm bias = 5% repair boost", C_GOOD),
         ]
         for i, (name, status, evidence, col) in enumerate(mechanisms_sci):
@@ -14218,46 +15958,24 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             screen.blit(font_sm.render(status, True, col), (margin + 14, y + 2))
             screen.blit(font_sm.render(name, True, C_TEXT), (margin + 72, y + 2))
             hover_regions.append((margin, y, col_w, 16, name,
-                [f"Status: {status}", f"Evidence: {evidence}", "Validated through adversarial review"]))
+                [f"Status: {status}", f"Evidence: {evidence}", "Graded vs published science (see --audit)"]))
 
-        # Middle: Feasibility scores (radar + bars)
+        # Middle: Evidence audit (self-scores removed in review #15)
         mid_x = margin + col_w + margin
         _panel(screen, mid_x, mid_y, col_w, mid_h, alpha=220)
-        screen.blit(font_sm.render("FEASIBILITY SCORES BY DOMAIN", True, C_ACCENT),
+        screen.blit(font_sm.render("EVIDENCE AUDIT BY GRADE (review #15)", True, C_ACCENT),
                     (mid_x + 10, mid_y + 8))
 
+        _s = get_evidence_summary()
+        _t = _s["total"]
         domains = [
-            ("Chemistry accuracy", 100, C_GOOD),
-            ("LNP delivery system", 100, C_GOOD),
-            ("Reprogramming kinetics", 100, C_GOOD),
-            ("Dose realism", 100, C_GOOD),
-            ("Biomarker model", 100, C_GOOD),
-            ("Safety systems", 100, C_GOOD),
-            ("Manufacturing", 100, C_GOOD),
-            ("PK/PD model", 100, C_GOOD),
-            ("Long-term stability", 100, C_GOOD),
-            ("Regulatory pathway", 100, C_GOOD),
-            ("Cost at scale", 100, C_GOOD),
-            ("Clinical translation", 100, C_GOOD),
-            ("PEG immune mitigation", 100, C_GOOD),
-            ("Drug interaction mgmt", 100, C_GOOD),
-            ("saRNA stability", 100, C_GOOD),
-            ("BBB crossing", 100, C_GOOD),
-            ("Immune evasion", 100, C_GOOD),
-            ("Epigenetic memory", 100, C_GOOD),
-            ("Teratoma prevention", 100, C_GOOD),
-            ("cMyc oncogenic safety", 100, C_GOOD),
-            ("Personalized medicine", 100, C_GOOD),
-            ("Microbiome integration", 100, C_GOOD),
-            ("mtDNA heteroplasmy", 100, C_GOOD),
-            ("Immune paradox", 100, C_GOOD),
-            ("Telomerase-cancer safety", 100, C_GOOD),
-            ("Stem cell homing", 100, C_GOOD),
-            ("Immune memory", 100, C_GOOD),
-            ("Liver sequestration", 100, C_GOOD),
-            ("Hormonal cycling", 100, C_GOOD),
-            ("Senolytic resistance", 100, C_GOOD),
-            ("Aging clocks", 100, C_GOOD),
+            (f"Grade A: replicated human ({_s['A']}/{_t})", int(100 * _s['A'] / _t), C_GOOD),
+            (f"Grade B: preliminary human ({_s['B']}/{_t})", int(100 * _s['B'] / _t), C_GOOD),
+            (f"Grade C: animal/in-vitro ({_s['C']}/{_t})", int(100 * _s['C'] / _t), (255, 200, 80)),
+            (f"Grade D: speculative ({_s['D']}/{_t})", int(100 * _s['D'] / _t), C_BAD),
+            ("Model math consistency (47 test checks)", 100, C_GOOD),
+            ("Tested in any organism", 0, C_BAD),
+            ("Regulatory approval / human trials", 0, C_BAD),
         ]
         bar_w = col_w - 130
         for i, (name, score, col) in enumerate(domains):
@@ -14273,9 +15991,10 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             pygame.draw.rect(screen, col, (bx, y + 3, int(bar_w * score / 100), 10), border_radius=2)
             screen.blit(font_sm.render(f"{score}%", True, col), (bx + bar_w + 4, y))
             hover_regions.append((mid_x, y, col_w, 18, name,
-                [f"Score: {score}/100", "Domain validated through adversarial review", "See mechanism validation column"]))
+                [f"Share of audited parameters: {score}%", "Evidence-graded in EVIDENCE_AUDIT (run --audit)",
+                 "The old '100% domain scores' were removed in review #15"]))
 
-        # Overall score gauge
+        # Overall gauge: honest status instead of a fake 100%
         gauge_y = mid_y + mid_h - 50
         gauge_cx = mid_x + col_w // 2
         gauge_cy = gauge_y
@@ -14291,16 +16010,16 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             rad = math.radians(a - 90)
             px = gauge_cx + int(gauge_r * math.cos(rad))
             py = gauge_cy + int(gauge_r * math.sin(rad))
-            pygame.draw.circle(screen, C_GOOD, (px, py), 2)
-        score_img = font.render("100%", True, C_GOOD)
+            pygame.draw.circle(screen, C_BAD, (px, py), 2)
+        score_img = font.render("UNTESTED", True, C_BAD)
         screen.blit(score_img, (gauge_cx - score_img.get_width() // 2, gauge_cy - 8))
-        screen.blit(font_sm.render("OVERALL", True, C_TEXT_DIM), (gauge_cx - 18, gauge_cy + 14))
+        screen.blit(font_sm.render("PRODUCT STATUS", True, C_TEXT_DIM), (gauge_cx - 42, gauge_cy + 14))
 
         # Right: Chemistry verification + key literature
         right_x = mid_x + col_w + margin
         right_w = rect.w - right_x - margin
         _panel(screen, right_x, mid_y, right_w, mid_h, alpha=220)
-        screen.blit(font_sm.render("CHEMISTRY VERIFICATION & KEY LITERATURE", True, C_ACCENT),
+        screen.blit(font_sm.render("CHEMISTRY FACT-CHECK & KEY LITERATURE (formulas real; scenario inputs graded)", True, C_ACCENT),
                     (right_x + 10, mid_y + 8))
 
         # Chemistry checklist
@@ -14329,8 +16048,8 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             ("Spermidine dose from dict", "FIXED r9", C_GOOD),
             ("pH trigger 6.5 endosome", "VERIFIED", C_GOOD),
             ("CKGGRAKDC -> prohibitin-1", "VERIFIED", C_GOOD),
-            ("Endosomal escape 15%->78%", "FIXED r10", C_GOOD),
-            ("Reprogramming 18%->75.6%", "FIXED r10", C_GOOD),
+            ("Endosomal escape (modeled 78%)", "GRADE D", C_BAD),
+            ("Reprogramming 75.6% (scenario)", "GRADE D", C_BAD),
             ("saRNA 5-7 day expression", "FIXED r10", C_GOOD),
             ("PEG immune cycling 6mo", "FIXED r10", C_GOOD),
             ("Drug interaction screening", "FIXED r10", C_GOOD),
@@ -14338,9 +16057,9 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             ("Staggered dosing protocol", "FIXED r10", C_GOOD),
             ("BBB: TfR transcytosis + FUS", "FIXED r11", C_GOOD),
             ("Multi-tissue LNP (6 variants)", "FIXED r11", C_GOOD),
-            ("Immune evasion (autologous)", "FIXED r11", C_GOOD),
+            ("Immune evasion (autologous)", "CONCEPT", (255, 200, 80)),
             ("Epigenetic memory erasure", "FIXED r11", C_GOOD),
-            ("Teratoma prevention (6 mech)", "FIXED r11", C_GOOD),
+            ("Teratoma prevention (0.5%/cy modeled)", "MODELED r15", (255, 200, 80)),
             ("RMAT regulatory pathway", "FIXED r11", C_GOOD),
             ("19 components in human trials", "FIXED r11", C_GOOD),
             ("cMyc -> L-Myc/Lin28", "FIXED r12", C_GOOD),
@@ -14371,7 +16090,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             screen.blit(font_sm.render(item, True, C_TEXT), (right_x + 26, y))
             screen.blit(font_sm.render(status, True, col), (right_x + right_w - 70, y))
             hover_regions.append((right_x, y, right_w, 15, item,
-                [f"Status: {status}", "Verified through adversarial review", "Chemistry verification check"]))
+                [f"Status: {status}", "Formula/fact checked (r15); scenario inputs graded separately in --audit"]))
 
     def draw_about(rect):
         nonlocal scroll_offset
@@ -14893,32 +16612,23 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
         add(f"  Controls: TAB cycle | SPACE play/pause | ,/. speed | [/] anim | H help | ESC quit", C_TEXT_DIM, 0)
         add(f"  Animation: ANIM_SPEED=3x slowdown for readability", C_TEXT_DIM, 0)
 
-        # === SCORE BREAKDOWN ===
-        add_section("SCORE BREAKDOWN (31 DOMAINS)")
-        scores = [
-            ("Chemistry accuracy", 100), ("LNP delivery system", 100),
-            ("Reprogramming kinetics", 100), ("Dose realism", 100),
-            ("Biomarker model", 100), ("Safety systems", 100),
-            ("Manufacturing", 100), ("PK/PD model", 100),
-            ("Long-term stability", 100), ("Regulatory pathway", 100),
-            ("Cost at scale", 100), ("Clinical translation", 100),
-            ("PEG immune mitigation", 100), ("Drug interaction mgmt", 100),
-            ("saRNA stability", 100), ("BBB crossing", 100),
-            ("Immune evasion", 100), ("Epigenetic memory", 100),
-            ("Teratoma prevention", 100), ("cMyc oncogenic safety", 100),
-            ("Personalized medicine", 100), ("Microbiome integration", 100),
-            ("mtDNA heteroplasmy", 100), ("Immune paradox", 100),
-            ("Telomerase-cancer safety", 100), ("Stem cell homing", 100),
-            ("Immune memory", 100), ("Liver sequestration", 100),
-            ("Hormonal cycling", 100), ("Senolytic resistance", 100),
-            ("Aging clocks", 100),
+        # === EVIDENCE STATUS (the fake "31 domains at 100%" scores were removed in review #15) ===
+        add_section("EVIDENCE AUDIT SUMMARY (review #15)")
+        _es = get_evidence_summary()
+        _et = _es["total"]
+        _grades = [
+            ("A: replicated human data", _es["A"], C_GOOD),
+            ("B: preliminary human data", _es["B"], C_GOOD),
+            ("C: animal/in-vitro only", _es["C"], C_WARN),
+            ("D: speculative (no data)", _es["D"], C_BAD),
         ]
-        for name, score in scores:
-            col = C_GOOD if score >= 97 else (C_WARN if score >= 80 else C_BAD)
-            bar = "#" * (score // 5)
-            add(f"  {name:30s} {score}% {bar}", col, 0)
-        avg = sum(s for _, s in scores) / len(scores)
-        add(f"  {'AVERAGE':30s} {avg:.1f}%  OVERALL: 100%", C_ACCENT, 0)
+        for _gname, _gn, _gcol in _grades:
+            _gpct = 100 * _gn / _et
+            _gbar = "#" * int(_gpct // 4)
+            add(f"  {_gname:30s} {_gn}/{_et} ({_gpct:3.0f}%) {_gbar}", _gcol, 0)
+        add(f"  {'PRODUCT STATUS':30s} UNTESTED in any organism", C_BAD, 0)
+        add(f"  {'MATH STATUS':30s} 47/47 internal-consistency checks pass", C_GOOD, 0)
+        add(f"  Run --audit for the full parameter-by-parameter evidence table", C_ACCENT, 0)
 
         # === ADVERSARIAL FIX LOG ===
         add_section("ADVERSARIAL FIX LOG (25 ISSUES + 10 GAP CLOSURES)")
@@ -14948,16 +16658,20 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             ("r13", "Hormonal suppression -> pulsatile + cycling + hCG"),
             ("r13", "Senolytic resistance -> 4-drug rotation + CAR-T backup"),
             ("r13", "Aging clock selection -> 4 validated clocks + 42 biomarkers"),
-            ("r14", "Clinical 93->100% (parallel IND, RWE, Japan fast path)"),
-            ("r14", "PEG 93->100% (polysarcosine primary, PEG backup)"),
-            ("r14", "saRNA 93->100% (ARCT-154 2yr data, 10M+ doses)"),
-            ("r14", "mtDNA 93->100% (MRT UK-approved, LHON trials)"),
-            ("r14", "Manufacturing 94->100% (Comirnaty 1B+, modular)"),
-            ("r14", "Dose realism 95->100% (20/20 verified in range)"),
-            ("r14", "Epi-memory 94->100% (5% residual = beneficial bias)"),
-            ("r14", "Homing 95->100% (in situ LNP + exosome boost 91%)"),
-            ("r14", "Liver 95->100% (route-specific, liver = immune target)"),
-            ("r14", "Microbiome 95->100% (direct supplementation, FMT)"),
+            ("r14", "RETRACTED r15: 'boost all domains to 100%' self-scores (fake)"),
+            ("r15", "cMyc -> L-Myc in the dosed factors (recipe contradiction)"),
+            ("r15", "2i media concentrations fixed (PD0325901 1uM, CHIR 3uM, VPA 1mM)"),
+            ("r15", "Hb chemistry: 7.5e9 O2/RBC -> 1.1x (4 O2/Hb is the hard cap)"),
+            ("r15", "Bone 4200 MPa -> 230 MPa; muscle 330 -> 50 N/cm2 (physics)"),
+            ("r15", "Nutlin-3a moved to post-window rescue (p53 blocks reprogramming)"),
+            ("r15", "Fake 'drugs' labelled CONCEPTUAL (PTEN activator etc.)"),
+            ("r15", "CHK1 inhibitor removed (genotoxic, not protective)"),
+            ("r15", "Doses: urolithin A 500, MitoQ 20, rapa 6mg/wk, folate 1mg, IL-7 700ug"),
+            ("r15", "Navitoclax 25->250mg (Hickson 2019) + thrombocytopenia warning"),
+            ("r15", "Telomerase +100bp/div -> +10bp (sustained lengthening unproven)"),
+            ("r15", "TH5487 role corrected (OGG1 inhibitor, not fat-identity switch)"),
+            ("r15", "GDF11 marked contested; resveratrol SIRT1-activation refuted"),
+            ("r15", "31x100% self-scores removed everywhere; --audit evidence table added"),
         ]
         for rev, desc in fixes:
             add(f"  [{rev}] {desc}", C_GOOD, 0)
@@ -15249,7 +16963,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
         profile_str = ('Profile: ' + ','.join(patient_conditions)) if patient_conditions else 'Profile: healthy (base only)'
         info = [
             profile_str[:38],
-            f"Status: {'IMMORTAL' if sim_result.immortal else ('ALIVE' if state.alive else 'DEAD')}",
+            f"Status: {'HELD (model)' if sim_result.immortal else ('ALIVE' if state.alive else 'DEAD')}",
             f"Chronological: {state.age_years:.1f} yr",
             f"Biological: {state.biological_age_estimate:.1f} yr",
             f"Epigenetic: {state.epigenetic_age_years:.1f} yr",
@@ -15512,7 +17226,10 @@ def main():
     parser = argparse.ArgumentParser(description="ChiefJuiceV1.17 -- Injectable Fat-to-Stem-Cell Immortality Engine")
     parser.add_argument("--report", action="store_true", help="Print formulation report")
     parser.add_argument("--feasibility", action="store_true", help="Print feasibility analysis")
-    parser.add_argument("--proof", action="store_true", help="Print mathematical proof")
+    parser.add_argument("--proof", action="store_true", help="Print math-consistency check (arithmetic, not biology)")
+    parser.add_argument("--audit", action="store_true",
+                        help="Print the EVIDENCE AUDIT: every load-bearing parameter graded "
+                             "A-D against published science, with citations and the honest verdict")
     parser.add_argument("--optimize", action="store_true",
                         help="Recommended operating point, re-derived by robust protocol "
                              "search (optimizes 5th-percentile utility, not the median)")
@@ -15602,6 +17319,10 @@ def main():
 
     if args.proof:
         print_math_proof()
+        return
+
+    if args.audit:
+        print_evidence_audit()
         return
 
     if args.roadmap:
