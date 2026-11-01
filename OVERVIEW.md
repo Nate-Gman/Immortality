@@ -2,10 +2,14 @@
 
 ## System Summary
 
-ChiefJuiceV1.17 is a single-file Python application (17,453 lines) modelling an
+ChiefJuiceV1.17 is a single-file Python application (17,804 lines) modelling an
 injectable fat-to-stem-cell conversion therapy, paired with `test_chiefjuice.py`
-(490 lines, 64 checks in 12 suites) and `FatStemCells.py` (library interface,
-147 lines).
+(~650 lines, 85 checks in 13 suites) and `FatStemCells.py` (library interface,
+147 lines). Supporting files: `requirements.txt` (numpy; pygame optional),
+`TESTING.md` (reproducibility + calibration targets), `GOVERNANCE.md`
+(research ethics; supersedes the former `RULES` file),
+`.github/workflows/test.yml` (CI: full suite on push, Linux+Windows ×
+Py3.11/3.13).
 
 It combines a monthly time-step simulation engine (37 mechanism functions), a
 22-mode pygame visualization (~6,400 lines), a 304-condition disease survey
@@ -31,18 +35,18 @@ The same IDs appear in `DISEASE_COVERAGE` `mechanisms` lists and
 | Section | Line range | Size | Contents |
 |---|---|---|---|
 | 1 | 164–2485 | ~2,320 | `CHIEF_JUICE` formulation dict — 89 top-level modules, 2,100+ nested keys |
-| 1C | 2486–3328 | ~840 | `EVIDENCE_AUDIT` (219 entries) + `get_evidence_summary()` + `print_evidence_audit()` |
-| 1B | 3329–4317 | ~990 | `DISEASE_COVERAGE` survey + `get_healing_progress()` + `HEALING_TARGET` |
-| — | 4317–5146 | ~830 | `PERSONALIZED_TREATMENTS` (29 modules) + condition lookup + tier upgrades |
-| — | 5146–5528 | ~380 | Derived-tier resolver (`_derive_tier`, `_derive_coverage`, `_derive_tractability`), integrity locks, `get_prescribed_mechanisms`, `EXTENSION_FIELD_PROFILE`, `apply_patient_profile` |
-| 2 | 5528–6354 | ~830 | `BIO` dict — 472 biological constants |
-| 3 | 6354–6862 | ~510 | `BodyState` dataclass + `SimulationResult` dataclass |
-| 4 | 6863–8399 | ~1,540 | 37 mechanism functions + failure/variability models |
-| 5 | 8400–9466 | ~1,070 | `simulate_chief_juice()` monthly engine + setpoint governor + `MONTE_CARLO_PRIORS`/`RECOMMENDED_PROTOCOL` + `run_monte_carlo`/`optimize_protocol` |
-| 6 | 9467–9627 | ~160 | `run_comparative_simulation()` |
-| 7 | 9628–10850 | ~1,220 | Report functions (formulation, feasibility, math-proof, prescription, roadmap, uncertainty, audit, JSON export) |
-| 8 | 10851–17220 | ~6,370 | `run_visualization()` — 22-mode pygame GUI |
-| 9 | 17221–17453 | ~230 | `main()` argparse CLI |
+| 1C | 2486–3329 | ~840 | `EVIDENCE_AUDIT` (219 entries) + `get_evidence_summary()` + `print_evidence_audit()` |
+| 1B | 3330–4323 | ~990 | `DISEASE_COVERAGE` survey + `get_healing_progress()` + `HEALING_TARGET` |
+| — | 4324–5361 | ~1,040 | `PERSONALIZED_TREATMENTS` (29 modules) + condition lookup + tier upgrades |
+| — | 5362–5528 | ~170 | Derived-tier resolver (`_derive_tier`, `_derive_coverage`, `_derive_tractability`), integrity locks, `get_prescribed_mechanisms`, `EXTENSION_FIELD_PROFILE`, `apply_patient_profile` |
+| 2 | 5529–6417 | ~890 | `BIO` dict — 480+ biological constants |
+| 3 | 6418–6993 | ~580 | `BodyState` dataclass + `SimulationResult` dataclass |
+| 4 | 6994–8575 | ~1,580 | 37 mechanism functions + failure/variability models + competing-risk mortality (`disease_mortality_step`) |
+| 5 | 8576–9705 | ~1,130 | `simulate_chief_juice()` monthly engine + setpoint governor + `MONTE_CARLO_PRIORS`/`RECOMMENDED_PROTOCOL` + `run_monte_carlo`/`optimize_protocol` |
+| 6 | 9706–9871 | ~165 | `run_comparative_simulation()` |
+| 7 | 9872–11102 | ~1,230 | Report functions (formulation, feasibility, math-proof, prescription, roadmap, uncertainty, audit, JSON export) |
+| 8 | 11103–17472 | ~6,370 | `run_visualization()` — 22-mode pygame GUI |
+| 9 | 17473–17804 | ~250 | `main()` argparse CLI |
 
 ## Section 1: Formulation Constants (`CHIEF_JUICE` dict, lines 164–2485)
 
@@ -144,7 +148,7 @@ Safety, quality, platform & commercial modules:
 | `clinical_enhanced` / `clinical_roadmap` | Bridging data, first-in-human strategy, adaptive platform trial, go/no-go criteria |
 | `verification_status` | Honest summary: what is grounded vs not established vs largest gaps |
 
-### Section 1C: Evidence Audit (`EVIDENCE_AUDIT`, lines 2486–3328)
+### Section 1C: Evidence Audit (`EVIDENCE_AUDIT`, lines 2486–3329)
 
 Every load-bearing parameter graded against published science — 219 entries
 across 72 distinct modules, each with: `module`, `parameter`, `modeled` value,
@@ -161,7 +165,7 @@ across 72 distinct modules, each with: `module`, `parameter`, `modeled` value,
 `print_evidence_audit()` / `--audit` prints all 219 entries grouped by grade
 with modeled vs published values, citations, and an honest verdict.
 
-## Section 1B: Disease Coverage Survey (lines 3329–4317)
+## Section 1B: Disease Coverage Survey (lines 3330–4323)
 
 Per-condition cross-reference of all 37 mechanisms against 304 real
 diseases/conditions in 10 categories (`DISEASE_COVERAGE_CATEGORY_ORDER`):
@@ -194,7 +198,7 @@ Tier semantics:
 - `GAP` — no credible mechanism even in this model plausibly reverses the root
   cause
 
-### The derivation resolver (lines 5146–5436)
+### The derivation resolver (lines 5362–5528)
 
 `_derive_tier(note, mechanisms, precedent)` scans each note against four phrase
 lists in precedence order:
@@ -263,7 +267,7 @@ generic aging biology plus extension modules. Two patients with different
 diagnoses produce nearly identical trajectories; a tier is a reasoned
 literature claim, not a simulation output.
 
-## Section — Personalized Treatments (lines 4317–5146)
+## Section — Personalized Treatments (lines 4324–5361)
 
 `PERSONALIZED_TREATMENTS`: 29 condition-specific targeted formulation modules
 added ON TOP of the base regimen. Each contains:
@@ -281,7 +285,7 @@ added ON TOP of the base regimen. Each contains:
 `get_personalized_treatments(patient_conditions)` maps condition names →
 treatment keys via a reverse lookup built at import.
 
-## Section — Prescription logic (lines 5454–5528)
+## Section — Prescription logic (lines 5474–5528)
 
 `get_prescribed_mechanisms(patient_conditions)` — mechanisms #0–21 are the
 universal base (every patient); #22–36 are prescribed only when a matching
@@ -319,9 +323,9 @@ Healing proofs exist for the 29 `PERSONALIZED_TREATMENTS` modules only (they
 cite specific trials/FDA approvals with proof levels FDA-approved / Phase 1–3 /
 Preclinical), not for survey entries.
 
-## Section 2: Biological Constants (`BIO` dict, lines 5528–6354)
+## Section 2: Biological Constants (`BIO` dict, lines 5529–6417)
 
-472 published biological parameters used by the simulation models, organized by
+482 published biological parameters used by the simulation models, organized by
 body system:
 
 - **Adipose tissue**: adipocyte density (1e6/g), total adipocytes, SVF stem
@@ -393,7 +397,7 @@ body system:
 - **Monte Carlo / protocol**: see `MONTE_CARLO_PRIORS` and
   `RECOMMENDED_PROTOCOL` in Section 5
 
-## Section 3: Data Structures (lines 6354–6862)
+## Section 3: Data Structures (lines 6418–6993)
 
 ### `BodyState` (~143 dataclass fields)
 
@@ -461,12 +465,18 @@ Complete simulated-body state at a point in time. Grouped:
 - **Discontinuation**: `discontinued_at_month`, `months_since_discontinuation`
 - **Individual variation**: `response_multiplier`, `clearance_multiplier`,
   `immune_reactivity_multiplier`, `regen_capacity_multiplier`,
-  `adverse_risk_multiplier`, `responder_class`, `active_interactions`
+  `adverse_risk_multiplier`, `responder_class`, `active_interactions`,
+  `delivery_hazard_factor`, `immune_hazard_factor` (shared-hazard
+  correlators — see `safety_model`)
 - **Safety**: `risk_teratoma_pct`, `risk_ectopic_tissue_pct`,
   `risk_transformation_pct`, `risk_cytokine_storm_pct`,
   `risk_off_target_edit_pct`, `risk_structural_failure_pct`,
   `risk_hypoglycemia_pct`, `risk_immune_reaction_pct`, `safety_halted`,
   `safety_halt_months`, `adverse_events`
+- **Mortality (competing risk)**: `mortality_hazard_integral`,
+  `mortality_hazard_threshold` (actuarial survival draw),
+  `disease_hazard_integral`, `disease_hazard_threshold`,
+  `disease_hazard_integrals` (per-pathology contributions)
 - **Flags**: `alive`, `cause_of_death`
 
 Computed properties:
@@ -481,8 +491,24 @@ Computed properties:
 | `biological_age_estimate` | `max(biological_age_raw, min_biological_age_floor)` — floored at 18, non-linear; do not interpolate against it |
 | `biological_age_raw` | Unfloored mean of **15 component ages**: telomere, senescence, mito, stem-cell, inflammation, organ, cognitive, memory, lung, muscle, bone, proteostasis, ROS, DHEA, signaling — each linear in one biomarker |
 
-`check_alive()`: death on senescent overload (≥30%), systemic inflammation
-(≥5.0), telomere crisis (<2000 bp), organ failure, stem-cell critical.
+`check_alive()` + `disease_mortality_step()`: mortality is now a proper
+**competing-risk** system. The dominant channel is an actuarial all-cause
+Gompertz draw calibrated to SSA period life tables (60y median ~82
+male/unspecified, ~85 female via `mortality_female_hazard_scale` = 0.75,
+per-`patient_seed` quantile draw) plus a `mortality_nonaging_hazard_per_year`
+= 0.001 floor for accidents/infection a perfect rejuvenation would not
+touch. The 10 pathology channels (senescence ≥30%, inflammation ≥5,
+telomere <2000 bp, organ ≤20, stem pool ≤5%, gas exchange ≤20%, bone ≤50
+MPa, aggregates ≥80%, ROS ≥350, cancer risk >50 uncured) accrue
+`rate × severity²` per month past their danger levels into
+`disease_hazard_integrals` (monotone: resolving a pathology stops accrual
+but does not erase hazard already incurred). Death fires when the combined
+integral crosses a second survival draw; the largest contributor names the
+cause — risks compete instead of being checked in a fixed order. Only
+severity ≥2 (3× danger) remains an instant catastrophic death via
+`check_alive()`. Net cohort effect: untreated 60y median ~82.7, ~80%
+actuarial + ~20% terminal cancer — matching the real ~20-25% cancer share
+of late-life deaths.
 
 ### `SimulationResult`
 
@@ -500,9 +526,12 @@ plasma_young/pro_aging) plus: `final_state`, `total_doses`,
 (monthly {appendage: pct}), `regen_completed_month`, `stem_cell_reserve`,
 `total_cells_consumed_by_regen`, `regen_stalled_months`,
 `cumulative_severe_risk_pct`, `safety_halt_months`, `adverse_events`,
-`risk_breakdown` (per-hazard-class totals for the RISK view).
+`risk_breakdown` (per-hazard-class totals for the RISK view),
+`risk_trajectory` (monthly cumulative-incidence series — monotone
+non-decreasing by construction; exported so reviewers can verify the curve
+directly rather than trusting the final figure).
 
-## Section 4: Biological Models (lines 6863–8399)
+## Section 4: Biological Models (lines 6994–8575)
 
 Each mechanism is an independent function that modifies `BodyState`. Effect
 magnitudes are **modeled values** (post-correction), not measured outcomes;
@@ -518,7 +547,7 @@ evidence grades are in `EVIDENCE_AUDIT`.
 | 5 | `compute_stacking_multiplier` | Multiplicative synergy across mechanisms (invented; grade D) |
 | 6 | `dna_damage_model` | 1.3× repair rate, 15% mutation reduction (NAD+/PARP) |
 | 7 | `immune_rejuvenation_model` | Thymic regrowth 2%/mo, +3 yr immune age reversal (TRIIM-anchored) |
-| 8 | `cancer_risk_model` | Multi-layer safeguards, 25% risk reduction (modeled; not 95%) |
+| 8 | `cancer_risk_model` | Multi-layer safeguards, 25% risk reduction (modeled; not 95%). Detection now returned on the OncoCure-active path (the old `False` return made `cancer_cured` unreachable); malignancy-named `patient_conditions` enrol with detectable cancer so the cure transition is exercisable |
 | 9 | `neural_model` | BDNF/NGF/GDNF, +2%/mo neurogenesis (debated in adults) |
 | 10 | `muscle_strength_model` | Myostatin inhibition, +25% specific force (50 N/cm², within human range) |
 | 11 | `bone_strength_model` | Osteo-anabolic restoration within physical limits |
@@ -555,7 +584,7 @@ pro-aging clearance; mouse parabiosis), `inflammation_model`,
 `assess_benefit_risk`, `nutrient_dynamics_model`,
 `regeneration_supply_factor`.
 
-## Section 5: Simulation Engine (lines 8400–9466)
+## Section 5: Simulation Engine (lines 8576–9705)
 
 `simulate_chief_juice()` runs a monthly time-step simulation:
 
@@ -613,6 +642,14 @@ target-age ideal (`_biomarker_value_at_age` closed-form inverses), because the
 testing, bone/muscle were driven to ≈ −21 years subsidising inflamed organs.
 `biomarkers_capped_this_month` counts caps for diagnostics.
 
+**Ungoverned mode** (`simulate_chief_juice(governor_active=False)` /
+`--no-governor`) skips both `rebalance_biomarkers` and the alpha
+interpolation, exposing the raw mechanism outputs: biological age plunges to
+the floor within ~5 months. This is deliberately available as a transparency
+tool — it demonstrates precisely how load-bearing the governor is, i.e.,
+that the multi-year "rejuvenation trajectory" is governor arithmetic, not
+biology. The regression suite pins both behaviours.
+
 ### Supply-limited structural regeneration (LimbRegen, mechanism #30)
 
 `structural_regeneration_model()` regrows missing appendages and is the only
@@ -654,10 +691,21 @@ for stem-cell production equals fat removed from the body to 0.0000 kg.
 
 - **`safety_model()`** — 8 hazard classes compounded monthly, mitigated by
   safeguards `CHIEF_JUICE` already claimed (17 `mitig_*` efficacies);
-  `safeguards_active=False` shows the unmitigated formulation. Safety
-  interlock halts dosing at `safety_halt_threshold_pct` = 5% cumulative with
-  hysteresis, mirroring a DSMB stopping rule. Residual risk never zero by
-  construction; `risk_breakdown` tracks per-class totals for the RISK view.
+  `safeguards_active=False` shows the unmitigated formulation. The `risk_*`
+  fields are **cumulative incidence** — P(event has occurred) — monotone
+  non-decreasing by construction: a paused treatment adds no hazard and a
+  prospective hazard may fall, but accumulated incidence cannot decay (an
+  earlier version decayed it during pauses and resumed dosing; now the
+  `safety_halted` interlock at `safety_halt_threshold_pct` = 5% is a
+  **permanent** DSMB-style stop). Residual risk never zero by construction;
+  `risk_breakdown` tracks per-class totals for the RISK view. Hazard classes
+  are **correlated within a patient**: `delivery_hazard_factor` (lognormal,
+  sd 0.35) scales teratoma/off-target/ectopic/structural/immune hazards
+  jointly — a bad delivery lot fails them together — and
+  `immune_hazard_factor` (sd 0.30) scales cytokine-storm and
+  immune-reaction jointly. Both are drawn per `patient_seed` in
+  `assign_individual_variation`; independent-per-class hazards would
+  understate the joint tail.
 - **`discontinuation_rebound_model()`** — withdrawal dynamics.
   Suppression-dependent markers overshoot untreated baseline (senescence
   ×1.6, inflammation ×1.4); gains decay per per-mechanism persistence
@@ -676,10 +724,14 @@ for stem-cell production equals fat removed from the body to 0.0000 kg.
 - **`nutrient_dynamics_model()` + `regeneration_supply_factor()`** — draws
   down the 6 nutrient fields under regenerative load; `nutrient_adequacy_pct`
   (Liebig minimum) caps throughput; supplementation repletes between cycles.
-- **`run_monte_carlo()` / `MONTE_CARLO_PRIORS`** — samples 16 uncertain
-  parameters (fold-ranges 0.3–4.0 around BIO) plus the patient population,
+- **`run_monte_carlo()` / `MONTE_CARLO_PRIORS`** — samples 17 uncertain
+  parameters (fold-ranges 0.013–4.0 around BIO) plus the patient population,
   returns percentiles; restores `BIO` in a `finally`. Interval WIDTH is the
-  output that matters. Priors: `adipocytes_per_gram` 0.5–2.0,
+  output that matters. The prior set includes
+  `net_conversion_efficiency_pct` (0.013–1.4) — spanning ~1% (the published
+  ex-vivo ceiling) through the modeled 75.6% scenario — so the uncertainty
+  bands price in the possibility that the central premise barely works at
+  all. Priors: `adipocytes_per_gram` 0.5–2.0,
   `stem_cell_engraftment_pct` 0.3–3.0, `ex_vivo_expansion_fold` 0.3–3.0,
   `blastema_seed_fraction` 0.4–2.5,
   `blastema_maintenance_fraction_per_month` 0.5–2.0,
@@ -694,18 +746,20 @@ for stem-cell production equals fat removed from the body to 0.0000 kg.
   `biomass_conversion_efficiency` 0.6–1.6.
 - **`optimize_protocol()` / `RECOMMENDED_PROTOCOL`** — robust protocol search
   ranking by 5th-percentile utility rather than median, since the two select
-  measurably different protocols. Stored result: 22% body fat, 2-on/1-off
-  dosing, supplemented, non-accelerated; verified 1,000 runs (quality p5
-  71.4/median 84.5/p95 89.4; risk p5 0.238%/median 0.654%/p95 1.83%; 3.9% of
-  runs exceed 2% risk). `accelerate_if`: risk weight < 7.9.
+  measurably different protocols. Stored result: 25% body fat, 2-on/1-off
+  dosing, supplemented, non-accelerated; re-verified 300 runs under the
+  premise-inclusive priors (quality p5 61.8/median 90.4/p95 91.1; risk p5
+  0.235%/median 2.792%/p95 5.016%; 59.3% of runs exceed 2% — the wider risk
+  band is the honest cost of sampling the conversion premise and shared
+  hazard factors). `accelerate_if`: risk weight < 7.9.
 
-## Section 6: Comparative Analysis (lines 9467–9627)
+## Section 6: Comparative Analysis (lines 9706–9871)
 
 `run_comparative_simulation()` runs two simulations in parallel — control
 (natural aging, no ChiefJuice) vs treated — for the COMPARISON visualization
 mode and `--compare` CLI.
 
-## Section 7: Reporting (lines 9628–10850)
+## Section 7: Reporting (lines 9872–11102)
 
 | Function | Output |
 |---|---|
@@ -719,7 +773,7 @@ mode and `--compare` CLI.
 | `print_uncertainty_report()` | Monte Carlo percentile table (`--uncertainty`) |
 | `export_results_json()` | Full simulation results to JSON (`--export`) |
 
-## Section 8: Pygame Visualization (lines 10851–17220, ~6,400 lines)
+## Section 8: Pygame Visualization (lines 11103–17472, ~6,400 lines)
 
 `run_visualization()` launches a 1400×880 interactive window with 22 view
 modes (`MODES` list). It pre-runs simulation + control before launch, and
@@ -774,7 +828,7 @@ samples the Monte Carlo once at startup for the RISK view (never per frame).
 `CHIEF_JUICE` safety dicts (claims); RISK renders computed simulation output.
 The gap between the two panels is the point.
 
-## Section 9: Main / CLI (lines 17221–17453)
+## Section 9: Main / CLI (lines 17473–17804)
 
 `main()` with `argparse`. Default (no flags) → `run_visualization()`.
 Dispatch order: `--report` → `--feasibility` → `--proof` → `--audit` →
@@ -783,7 +837,10 @@ Dispatch order: `--report` → `--feasibility` → `--proof` → `--audit` →
 `--conditions` feeds `--prescribe`; `--regrow` feeds LimbRegen;
 `--no-safeguards` / `--accelerated` / `--no-supplements` / `--no-nutrition`
 toggle protocol; `--age`/`--years`/`--target-age`/`--sex` parameterize;
-`--runs`/`--risk-weight` tune Monte Carlo / optimizer.
+`--runs`/`--risk-weight` tune Monte Carlo / optimizer;
+`--conversion-efficiency-pct` overrides `BIO["net_conversion_efficiency_pct"]`
+— `0` exercises total premise failure, `1` the published ex-vivo ceiling;
+`--no-governor` runs the mechanism-only (ungoverned) trajectory.
 
 ## Data Flow
 
@@ -823,7 +880,7 @@ SimulationResult (time-series arrays + final_state + risk_breakdown)
 
 ## Verification
 
-`test_chiefjuice.py` — 64 checks across 12 suite functions; each suite loads a
+`test_chiefjuice.py` — 85 checks across 13 suite functions; each suite loads a
 fresh module instance so `BIO` mutations cannot leak between suites.
 
 | Suite | Checks |
@@ -840,6 +897,7 @@ fresh module instance so `BIO` mutations cannot leak between suites.
 | `test_doc_consistency` | Doc-quoted numbers match code outputs |
 | `test_uncertainty` | Monte Carlo priors restored; percentile sanity |
 | `test_evidence_audit_and_honesty` | Audit counts/grades; speculative fraction; honesty locks |
+| `test_critique_regressions` | External-review pins: cumulative risk cannot decay during pauses (unit calls + live `risk_trajectory`); DSMB halt permanent; cancer cure reachable (malignancy enrollees start detected, treated → cured, untreated → not); untreated 60y median ~82 actuarial with p90−median >4y (no kill wall) and female > male by the ~SSA gap; 0% conversion → 0 cells; 1% (published ceiling) → ~76× weaker; `--no-governor` exposes the raw overshoot (~5 months to floor); shared hazard factors correlate failure classes |
 
 ```
 python test_chiefjuice.py           # all suites
@@ -908,7 +966,7 @@ figure that can be asserted.
   and masked real chemistry errors
 - REVIEW #16 EXPANSION: `EVIDENCE_AUDIT` grew 58 → **219 graded parameters
   across 72 modules** (A=30, B=61, C=59, D=69 — run `--audit`), and `BIO`
-  grew 213 → **472 constants** covering every body system
+  grew 213 → **482 constants** covering every body system
 - What is actually verified: **64/64 internal-consistency checks pass**
   (mass balance, setpoint control, safety interlocks, survey integrity,
   honesty locks, Monte Carlo). Consistent math is not biological proof.

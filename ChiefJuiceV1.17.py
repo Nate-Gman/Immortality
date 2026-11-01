@@ -62,7 +62,7 @@ REVIEW STATUS (review #15 -- honesty pass; replaces the fabricated
   not verification: a simulation cannot verify a formulation. Review #15
   corrected the record and fixed the outright errors it found (below).
 
-  WHAT THE TEST SUITE ACTUALLY VERIFIES (47/47 checks, test_chiefjuice.py):
+  WHAT THE TEST SUITE ACTUALLY VERIFIES (test_chiefjuice.py, ~85 checks):
     - Internal consistency: fat->cell mass balance closes, conversion is
       supply-limited, discontinuation rebounds, safety interlocks halt dosing,
       patients vary, survey tiers cannot be inflated.
@@ -5728,10 +5728,12 @@ BIO = {
     "mitig_spatial_confinement": 0.75,
 
     # Safety interlock: cumulative severe-event probability at which a real DSMB
-    # would halt dosing. The model pauses treatment rather than continuing to
-    # accrue risk, exactly as a stopping rule would.
+    # would halt dosing. The halt is PERMANENT for the same reason a real
+    # stopping rule is: cumulative incidence of a severe event cannot decay --
+    # once a patient has had a teratoma they have had it. The old
+    # "safety_recovery" pause-resume logic conflated accumulated event
+    # probability with a recoverable hazard state.
     "safety_halt_threshold_pct": 5.0,
-    "safety_recovery_per_month_pct": 0.8,   # risk decays while dosing is paused
 
     # --- DISCONTINUATION & REBOUND ------------------------------------------
     # Nothing modelled what happens when treatment stops, which for a therapy
@@ -5768,6 +5770,13 @@ BIO = {
     "pgx_clearance_sd": 0.30,
     "pgx_immune_reactivity_sd": 0.35,
     "pgx_regen_capacity_sd": 0.25,
+    # Shared-hazard-factor spreads (lognormal sigma). These couple hazard
+    # classes INSIDE a patient so failures arrive correlated, not
+    # independent -- the review's "correlated hazards" point. A bad delivery
+    # lot raises teratoma/off-target/ectopic/immune-reaction jointly; a
+    # reactive immune axis raises immune-reaction/cytokine-storm jointly.
+    "delivery_hazard_sd": 0.35,
+    "immune_hazard_sd": 0.30,
 
     # --- DRUG INTERACTIONS WITHIN THE FORMULATION ---------------------------
     # Fraction of the paired capability lost to each internal conflict. All three
@@ -5894,7 +5903,7 @@ BIO = {
 
     # --- Cancer risk ---
     "baseline_cancer_risk_per_year_pct": 1.5,       # age-adjusted cancer incidence
-    "cancer_risk_at_60_pct_per_year": 5.0,          # at age 60
+    "cancer_risk_at_60_pct_per_year": 2.0,          # annual incidence ~1.5-2%/yr at 60, not 5%/yr
     "cancer_risk_lethal_pct": 100.0,                # untreated cancer = eventual death
     "telomerase_cancer_promotion_factor": 0.3,      # telomerase slightly increases cancer risk without safeguards
 
@@ -5954,7 +5963,10 @@ BIO = {
     "proteasome_decline_per_year_pct": 0.6,
     "protein_aggregates_young_pct": 0.0,
     "protein_aggregate_accumulation_per_year_pct": 0.8,
-    "protein_aggregate_lethal_pct": 50.0,
+    # Lethal aggregate burden. The old 50% bound at ~87.5 for every untreated
+    # survivor -- another deterministic wall (see telomere/ROS/senescent).
+    # 80 keeps it a tail-mode cause; ordinary death is actuarial.
+    "protein_aggregate_lethal_pct": 80.0,
 
     # --- Nutrient sensing ---
     "insulin_sensitivity_young_pct": 100.0,
@@ -5977,7 +5989,11 @@ BIO = {
     "ros_increase_per_year_pct": 1.5,
     "antioxidant_capacity_young_pct": 100.0,
     "antioxidant_decline_per_year_pct": 0.8,
-    "oxidative_damage_lethal_pct": 100.0,
+    # Lethal ROS is (100 + this) = 250% of youthful baseline. At the old 100
+    # every untreated survivor hit the wall at the identical age (~83.1) --
+    # the same deterministic-kill bug as the telomere wall this file once had.
+    # 250 keeps it a tail-mode cause; ordinary death is the actuarial channel.
+    "oxidative_damage_lethal_pct": 150.0,
     "lipid_peroxidation_young_pct": 5.0,
     "lipid_peroxidation_increase_per_year_pct": 1.0,
 
@@ -6301,6 +6317,53 @@ BIO = {
     "aging_rate_acceleration_after_80": 3.0,           # ~3x after 80
     "mortality_doubling_age_gompertz": 8.0,            # mortality doubles every ~8 years (Gompertz)
     "gompertz_beta_baseline": 0.08,                    # Gompertz mortality parameter
+
+    # --- Actuarial (all-cause) mortality ------------------------------------
+    # The lethal thresholds above are catastrophic-failure modes; most real
+    # deaths cross none of them. This channel adds the ordinary one: a
+    # Gompertz hazard on epigenetic age, h = a * e^(b * age) per year, drawn
+    # against a per-patient survival quantile. `a` is calibrated so an
+    # untreated 60-year-old's MEDIAN remaining life is ~22 years (SSA 2023
+    # period life table: 21.8 M / 24.7 F) -- before this existed, the default
+    # control died at 64.3 of "telomere crisis" (see replicative_doublings),
+    # which made every treated-vs-control comparison ~5x too flattering.
+    "mortality_gompertz_a": 7.0e-5,
+    "mortality_gompertz_b": 0.084,                     # ~8.2-yr doubling (consistent with above)
+    # Sex scaling of the Gompertz hazard. SSA 2023: remaining life at 60 is
+    # ~24.7y female vs ~21.8y male. A female hazard ~0.75x of the baseline
+    # reproduces the ~2.9-yr longer median. "unspecified" uses the blended
+    # baseline -- the channel is still period-life-table calibration, not an
+    # individual risk model.
+    "mortality_female_hazard_scale": 0.75,
+    # Non-ageing mortality: accidents, infections, trauma -- causes a perfect
+    # age-reversal would not touch. Without a floor, a treated patient with
+    # epigenetic age 18 faces ~zero modeled hazard, which is a stronger claim
+    # than the model can support. 0.1%/yr caps modeled mean survival even in
+    # the best case.
+    "mortality_nonaging_hazard_per_year": 0.001,
+    # Competing-risk disease channel: monthly hazard at severity=1.0 (i.e.
+    # 2x a channel's danger level) and the severity exponent. Quadratic means
+    # small excursions are survivable, large ones are quickly fatal -- the
+    # stochastic version of the old deterministic kill walls.
+    "disease_hazard_rate_per_month": 0.05,
+    "disease_hazard_exponent": 2.0,
+
+    # Replicative turnover of the compartment telomere length is measured in.
+    # Human telomere attrition is ~30-70 bp/yr; at ~50 bp lost per population
+    # doubling that is ~0.6-1.4 doublings/yr -- NOT 2 doublings/month, which
+    # burned ~1,200 bp/yr and is why the untreated control died at 64.
+    "replicative_doublings_per_month": 0.06,
+    # Telomerase-mediated net extension under treatment. MODELED -- no
+    # published human in-vivo rate exists (grade D in EVIDENCE_AUDIT).
+    "telomerase_net_gain_bp_per_month": 20.0,
+
+    # Fat->stem-cell conversion efficiency. The same scenario value also
+    # stored in CHIEF_JUICE["reprogramming"]["net_conversion_efficiency_pct"];
+    # it lives here (not only there) so the MONTE CARLO priors and the
+    # --conversion-efficiency-pct flag can sweep the model's CENTRAL PREMISE
+    # down to published ex-vivo values (<=1%) -- i.e. the scenario where the
+    # whole mechanism simply does not work. Previously every run assumed it.
+    "net_conversion_efficiency_pct": 75.6,
     "maximum_documented_lifespan_years": 122.0,        # Jeanne Calment (122.4 years)
     "median_lifespan_global_years": 73.0,             # global median lifespan
     "life_expectancy_at_birth_us": 79.0,               # US life expectancy at birth
@@ -6613,6 +6676,14 @@ class BodyState:
     immune_reactivity_multiplier: float = 1.0
     regen_capacity_multiplier: float = 1.0
     adverse_risk_multiplier: float = 1.0
+    # Shared exposure factors -- within-patient hazard CORRELATION. A patient
+    # whose delivery lot is poor tends to fail teratoma, off-target, ectopic
+    # and immune-reaction classes TOGETHER; a patient with a reactive immune
+    # axis tends to fail immune-reaction and cytokine-storm together. Drawn
+    # per patient in assign_individual_variation (lognormal). Independent
+    # per-class hazards understate joint tail risk.
+    delivery_hazard_factor: float = 1.0
+    immune_hazard_factor: float = 1.0
     responder_class: str = "typical"       # typical / non-responder / hyper-responder
     # Internal formulation conflicts currently in effect (see drug_interaction_model).
     active_interactions: list = field(default_factory=list)
@@ -6633,6 +6704,27 @@ class BodyState:
     safety_halted: bool = False
     safety_halt_months: int = 0
     adverse_events: list = field(default_factory=list)
+
+    # --- Actuarial (all-cause) mortality ------------------------------------
+    # Accumulated Gompertz hazard and this patient's survival-quantile draw.
+    # Death when the integral reaches the threshold; the threshold is -ln(u)
+    # for u ~ U(0,1) drawn in assign_individual_variation (default u=0.5 ->
+    # the median patient). Calibrated so an untreated 60-year-old median
+    # remaining life is ~22 years, matching SSA period tables.
+    mortality_hazard_integral: float = 0.0
+    mortality_hazard_threshold: float = 0.6931471805599453  # -ln(0.5)
+
+    # --- Competing-risk disease mortality ------------------------------------
+    # Per-pathology cumulative hazards and this patient's second survival
+    # draw. Each biomarker that crosses its danger level accrues monthly
+    # hazard ~ severity^2 instead of killing deterministically -- the old
+    # instant-death thresholds were the last deterministic walls. When the
+    # combined integral reaches the draw, the largest contributing channel
+    # names the cause of death. Integrals are monotone: accrual stops when a
+    # pathology resolves, but hazard already incurred does not decay.
+    disease_hazard_integral: float = 0.0
+    disease_hazard_threshold: float = 0.6931471805599453
+    disease_hazard_integrals: dict = field(default_factory=dict)
 
     @property
     def cumulative_severe_risk_pct(self) -> float:
@@ -6733,48 +6825,82 @@ class BodyState:
         return float(bio_age)
 
     def check_alive(self) -> bool:
-        """Check if the body is still viable."""
-        if self.senescent_burden_pct >= BIO["senescent_burden_lethal_pct"]:
-            self.alive = False
-            self.cause_of_death = "Senescent cell overload"
-            return False
-        if self.inflammation_level >= BIO["inflammation_lethal"]:
-            self.alive = False
-            self.cause_of_death = "Systemic inflammation (inflammaging)"
-            return False
-        if self.stem_cell_pool_pct <= BIO["stem_cell_pool_critical_pct"]:
-            self.alive = False
-            self.cause_of_death = "Stem cell exhaustion"
-            return False
-        if self.organ_average <= BIO["organ_failure_threshold"]:
-            self.alive = False
-            self.cause_of_death = "Multiple organ failure"
-            return False
-        if self.telomere_length_bp <= BIO["critical_telomere_bp"]:
-            self.alive = False
-            self.cause_of_death = "Telomere crisis"
-            return False
-        if self.gas_exchange_efficiency_pct <= BIO["respiratory_failure_threshold_pct"]:
-            self.alive = False
-            self.cause_of_death = "Respiratory failure"
-            return False
-        if self.bone_strength_mpa <= BIO["fracture_threshold_mpa"]:
-            self.alive = False
-            self.cause_of_death = "Catastrophic bone fracture"
-            return False
-        if self.cancer_risk_pct >= 100.0 and not self.cancer_cured:
-            self.alive = False
-            self.cause_of_death = "Terminal cancer"
-            return False
-        if self.protein_aggregates_pct >= BIO["protein_aggregate_lethal_pct"]:
-            self.alive = False
-            self.cause_of_death = "Proteostasis collapse (protein aggregation)"
-            return False
-        if self.ros_level_pct >= 100.0 + BIO["oxidative_damage_lethal_pct"]:
-            self.alive = False
-            self.cause_of_death = "Oxidative stress catastrophe"
-            return False
+        """Catastrophic-viability backstop: severity >= 2.0 (3x a channel's
+        danger level) is instant death -- at that point stochastic hazard is
+        no longer the honest model (a 90%-senescent body or a 3x-fracture-
+        threshold skeleton is not 'at risk', it is gone). Ordinary deaths in
+        the danger zone are handled by the competing-hazard channel in
+        disease_mortality_step()."""
+        for label, severity in _disease_hazard_channels(self):
+            if severity >= 2.0:
+                self.alive = False
+                self.cause_of_death = label
+                return False
         return True
+
+
+# (field, +1 if high-is-bad else -1, danger level, cause label) for the
+# competing-risk mortality channels. Danger levels are where the OLD
+# instant-death thresholds sat -- now they are where hazard starts accruing.
+# Cancer is handled separately (danger = the 50% detection threshold; a
+# detected malignancy carries mortality hazard, cured patients carry none).
+def _disease_hazard_channels(state: "BodyState") -> list:
+    out = []
+    for field, direction, danger, label in (
+        ("senescent_burden_pct", 1, BIO["senescent_burden_lethal_pct"],
+         "Senescent cell overload"),
+        ("inflammation_level", 1, BIO["inflammation_lethal"],
+         "Systemic inflammation (inflammaging)"),
+        ("stem_cell_pool_pct", -1, BIO["stem_cell_pool_critical_pct"],
+         "Stem cell exhaustion"),
+        ("organ_average", -1, BIO["organ_failure_threshold"],
+         "Multiple organ failure"),
+        ("telomere_length_bp", -1, BIO["critical_telomere_bp"],
+         "Telomere crisis"),
+        ("gas_exchange_efficiency_pct", -1, BIO["respiratory_failure_threshold_pct"],
+         "Respiratory failure"),
+        ("bone_strength_mpa", -1, BIO["fracture_threshold_mpa"],
+         "Catastrophic bone fracture"),
+        ("protein_aggregates_pct", 1, BIO["protein_aggregate_lethal_pct"],
+         "Proteostasis collapse (protein aggregation)"),
+        ("ros_level_pct", 1, 100.0 + BIO["oxidative_damage_lethal_pct"],
+         "Oxidative stress catastrophe"),
+    ):
+        level = getattr(state, field)
+        sev = (level - danger) / danger if direction > 0 else (danger - level) / danger
+        if sev > 0.0:
+            out.append((label, sev))
+    if not state.cancer_cured and state.cancer_risk_pct > 50.0:
+        # cancer_risk_pct is a modeled risk index, not a tumour staging
+        # measurement; a 0.6 channel weight keeps its mortality share near
+        # the real ~20-25% of late-life deaths rather than dominating.
+        out.append(("Terminal cancer",
+                    (state.cancer_risk_pct - 50.0) / 50.0 * 0.6))
+    return out
+
+
+def disease_mortality_step(state: "BodyState") -> bool:
+    """Accrue this month's competing disease hazards and resolve the draw.
+
+    Every channel over its danger level contributes rate * severity^exponent
+    to BOTH its own integral and the shared one. Death fires when the shared
+    integral reaches this patient's survival draw (an exponential survival
+    model: -ln u). The named cause is the largest accumulated contributor,
+    not whichever channel happened to be checked first -- that is what makes
+    the risks 'competing' rather than ordered. Returns False on death."""
+    rate = BIO["disease_hazard_rate_per_month"]
+    k = BIO["disease_hazard_exponent"]
+    for label, sev in _disease_hazard_channels(state):
+        h = rate * sev ** k
+        state.disease_hazard_integrals[label] = \
+            state.disease_hazard_integrals.get(label, 0.0) + h
+        state.disease_hazard_integral += h
+    if state.alive and state.disease_hazard_integral >= state.disease_hazard_threshold:
+        state.alive = False
+        state.cause_of_death = max(state.disease_hazard_integrals,
+                                   key=state.disease_hazard_integrals.get)
+        return False
+    return True
 
 
 @dataclass
@@ -6859,6 +6985,10 @@ class SimulationResult:
     safety_halt_months: int = 0
     adverse_events: List[tuple] = field(default_factory=list)
     risk_breakdown: dict = field(default_factory=dict)
+    # Monthly cumulative-incidence series -- monotone non-decreasing by
+    # construction; exported so a reviewer can verify that directly instead
+    # of trusting a final figure.
+    risk_trajectory: List[float] = field(default_factory=list)
 
 # ===========================================================================
 # SECTION 4 -- BIOLOGICAL MODELS
@@ -6874,11 +7004,15 @@ def telomere_dynamics(current_bp: float, age_years: float, divisions: int,
     Returns (new_telomere_bp, new_divisions)."""
     age_loss = BIO["telomere_loss_per_year_bp"] / 12.0  # monthly loss
     if telomerase_active:
-        # Telomerase more than compensates: net gain
-        division_gain = divisions * BIO["telomerase_telomere_gain_bp"]
-        new_bp = current_bp - age_loss * 0.3 + division_gain  # age loss slowed by 70%
+        # Telomerase more than compensates: net gain. This is a MODELED rate
+        # (telomerase_net_gain_bp_per_month, grade D) -- no published human
+        # in-vivo extension rate exists to calibrate against.
+        new_bp = current_bp - age_loss * 0.3 + BIO["telomerase_net_gain_bp_per_month"]
         new_bp = min(new_bp, BIO["initial_telomere_bp"] * 1.1)  # cap at 110% of birth length
     else:
+        # `divisions` is replicative_doublings_per_month: ~0.06/mo (HSC-class
+        # compartments divide ~0.5-1.5x/YEAR), not 2/mo -- the old value lost
+        # ~1,200 bp/yr, ~25x the published ~30-70 bp/yr attrition.
         division_loss = divisions * BIO["telomere_loss_per_division_bp"]
         new_bp = current_bp - age_loss - division_loss
     return max(new_bp, 0.0), divisions
@@ -6895,7 +7029,7 @@ def dna_damage_model(current_lesions: float, repair_boosted: bool) -> float:
 
 
 def senescence_model(current_pct: float, telomere_bp: float, inflammation: float,
-                     senolytic_dose: bool) -> float:
+                     senolytic_dose: bool, immune_function: float = 35.0) -> float:
     """Model senescent cell dynamics over one month.
     Returns new senescent burden percentage."""
     # New senescent cells from aging + inflammation
@@ -6914,7 +7048,12 @@ def senescence_model(current_pct: float, telomere_bp: float, inflammation: float
         # Clear 95% of senescent cells above a threshold
         clearance = current_pct * 0.45  # 45% clearance per dose
     else:
-        clearance = current_pct * 0.02  # natural clearance (immune surveillance, 2%/month)
+        # Natural clearance is immune surveillance, and immunosenescence is
+        # precisely why burden ACCUMULATES with age: a fixed 2%/month
+        # fractional clearance equilibrates near ~4% and made burden DECLINE
+        # with age -- backwards. Clearance now scales with immune function,
+        # so it collapses as immunity does.
+        clearance = current_pct * 0.02 * (immune_function / 35.0)
 
     new_pct = current_pct + monthly_new - clearance
     return clamp(new_pct, 0.0, 100.0)
@@ -6948,7 +7087,11 @@ def stem_cell_pool_model(current_pct: float, chief_juice_active: bool,
     Only fat above `essential_fat_kg` is available; below that, conversion stops
     instead of drawing on a reserve that does not exist.
     """
-    monthly_decline = BIO["stem_cell_decline_per_year_pct"] / 12.0
+    # Decline is RELATIVE (fraction of current pool), not linear points:
+    # -1.5 pts/mo flat drove every survivor's pool through the 5% critical
+    # floor at ~80 -- another deterministic wall. Multiplicative 1.5%/yr is
+    # the standard pool-depletion model.
+    monthly_decline = BIO["stem_cell_decline_per_year_pct"] / 12.0 / 100.0
     stem_cells_generated = 0.0
     fat_consumed_kg = 0.0
 
@@ -6958,7 +7101,10 @@ def stem_cell_pool_model(current_pct: float, chief_juice_active: bool,
         # Fat-to-stem-cell conversion, limited by what is actually mobilizable.
         fat_consumed_kg = min(usable_fat_kg * BIO["fat_releasable_pct_per_dose"] / 100.0, 0.5)
         adipocytes_used = fat_consumed_kg * BIO["adipocytes_per_gram"] * 1000  # kg -> g
-        conversion_rate = CHIEF_JUICE["reprogramming"]["net_conversion_efficiency_pct"] / 100.0
+        # Read from BIO (not the recipe dict) so Monte Carlo priors and
+        # --conversion-efficiency-pct can sweep the premise to published
+        # ex-vivo values (<=1%) or zero -- the mechanism-failure scenario.
+        conversion_rate = BIO["net_conversion_efficiency_pct"] / 100.0
         new_stem_cells = adipocytes_used * conversion_rate
         # Expansion before delivery. The 20x figure assumed in-vivo doubling
         # only; ex_vivo_expansion_fold reflects closed-bioreactor expansion of
@@ -6972,9 +7118,9 @@ def stem_cell_pool_model(current_pct: float, chief_juice_active: bool,
         engrafted = expanded_cells * BIO["stem_cell_engraftment_pct"] / 100.0
 
         pool_gain = (engrafted / BIO["total_stem_cells_young_adult"]) * 100.0
-        new_pct = current_pct - monthly_decline * 0.1 + pool_gain
+        new_pct = current_pct - current_pct * monthly_decline * 0.1 + pool_gain
     else:
-        new_pct = current_pct - monthly_decline
+        new_pct = current_pct - current_pct * monthly_decline
 
     return clamp(new_pct, 0.0, 150.0), stem_cells_generated, fat_consumed_kg
 
@@ -7051,7 +7197,11 @@ def immune_rejuvenation_model(immune_pct: float, thymus_pct: float,
     else:
         new_thymus = max(thymus_pct - 0.3, 0.0)
         new_t_cells = naive_t_cells * (1.0 - monthly_decline / 100.0)
-        new_immune = immune_pct - 0.8
+        # ~0.8%/yr decline, not 0.8/month: the old -0.8/mo ran the composite
+        # immune score to zero in ~3.6 years, which then collapsed senescent
+        # clearance to zero and drove every survivor into "senescent cell
+        # overload" at 79.5. Real decline is ~0.5-1%/yr.
+        new_immune = immune_pct - 0.07
 
     return clamp(new_immune, 0.0, 105.0), new_thymus, new_t_cells
 
@@ -7156,7 +7306,11 @@ def cancer_risk_model(current_risk: float, telomerase_active: bool,
         monthly_decrease = current_risk * cure_rate * 0.15 * stacking_mult
         new_risk = current_risk + monthly_increase * sasp_factor * stem_factor * 0.1 - monthly_decrease
         ctDNA = max(current_risk * 0.5 - 2.0, 0.0)  # ctDNA drops with cure
-        cancer_detected = False  # cancer is being cured
+        # Detection is a property of the disease state, not the treatment:
+        # returning False here made the engine's cancer_cured transition
+        # unreachable on the active-treatment path. Same screening threshold
+        # as the oncoshield branch (intensive monitoring under treatment).
+        cancer_detected = new_risk > 50.0
     elif oncoshield_active:
         # OncoShield prevents cancer: PTEN + CRISPRi + CHK1 + p53 + biosensors
         reduction = CHIEF_JUICE["oncoshield"]["cancer_risk_reduction_pct"] / 100.0
@@ -7871,6 +8025,21 @@ def assign_individual_variation(state: "BodyState", patient_seed: Optional[int])
     state.adverse_risk_multiplier *= clamp(1.0 / state.clearance_multiplier, 0.5, 2.0)
     state.adverse_risk_multiplier *= clamp(state.immune_reactivity_multiplier, 0.4, 2.5)
 
+    # Shared hazard factors: correlate failure modes that share a physical
+    # cause (delivery quality, immune axis) inside the same patient.
+    state.delivery_hazard_factor = clamp(lognorm(BIO["delivery_hazard_sd"]), 0.3, 3.0)
+    state.immune_hazard_factor = clamp(lognorm(BIO["immune_hazard_sd"]), 0.3, 3.0)
+
+    # Survival-quantile draw for the actuarial channel: u ~ U(0,1) ->
+    # H = -ln(u). Median patient (u=0.5) keeps the default threshold; cohorts
+    # spread across the actuarial curve like real populations.
+    u = clamp(rng.random(), 0.01, 0.99)
+    state.mortality_hazard_threshold = -math.log(u)
+    # Independent draw for the competing disease-risk channel: the same two
+    # people at the same biomarker excursion should not die on the same month.
+    u2 = clamp(rng.random(), 0.01, 0.99)
+    state.disease_hazard_threshold = -math.log(u2)
+
 
 def discontinuation_rebound_model(state: "BodyState") -> None:
     """Apply withdrawal dynamics after treatment stops.
@@ -7952,18 +8121,18 @@ def safety_model(state: "BodyState", month: int, chief_juice: bool,
     the formulation would do without them.
 
     Mutates `state`. Also trips the safety interlock: past
-    BIO["safety_halt_threshold_pct"] cumulative risk, dosing pauses the way a real
-    data safety monitoring board stopping rule would, and risk decays while held.
+    BIO["safety_halt_threshold_pct"] cumulative risk, dosing halts the way a
+    real data safety monitoring board stopping rule would.
+
+    The risk_* fields are CUMULATIVE INCIDENCE -- the probability that a severe
+    event has occurred at least once. They are monotone non-decreasing by
+    construction. An earlier version decayed them during dosing pauses and let
+    the interlock resume once cumulative risk fell back below the threshold;
+    that conflated accumulated event probability with a recoverable hazard
+    state. A prospective monthly hazard can fall when exposure stops, but
+    P(event has occurred) cannot. The halt is therefore permanent.
     """
     if not chief_juice or state.safety_halted:
-        # Risk decays during a treatment pause -- transformed clones are cleared,
-        # inflammation resolves, exposure stops.
-        decay = BIO["safety_recovery_per_month_pct"] / 100.0
-        for f in ("risk_teratoma_pct", "risk_ectopic_tissue_pct",
-                  "risk_transformation_pct", "risk_cytokine_storm_pct",
-                  "risk_off_target_edit_pct", "risk_structural_failure_pct",
-                  "risk_hypoglycemia_pct", "risk_immune_reaction_pct"):
-            setattr(state, f, max(0.0, getattr(state, f) * (1.0 - decay)))
         return
 
     def net(hazard_key: str, *mitigation_keys: str) -> float:
@@ -7990,12 +8159,18 @@ def safety_model(state: "BodyState", month: int, chief_juice: bool,
         cur = getattr(state, field) / 100.0
         setattr(state, field, (1.0 - (1.0 - cur) * (1.0 - monthly_pct / 100.0)) * 100.0)
 
+    # Shared exposure factors correlate failure classes that share a physical
+    # cause -- a poor delivery lot fails teratoma/off-target/ectopic/immune
+    # together, a reactive immune axis fails immune/cytokine together.
+    _deliv = state.delivery_hazard_factor
+    _imm = state.immune_hazard_factor
+
     # Reprogramming is always active -- it is the core of the formulation.
     accrue("risk_teratoma_pct", net("hazard_teratoma_per_month_pct",
                                     "mitig_p53_tumor_suppressor",
                                     "mitig_forced_differentiation",
                                     "mitig_icasp9_suicide_switch",
-                                    "mitig_episomal_nonintegrating"))
+                                    "mitig_episomal_nonintegrating") * _deliv)
     # Ex vivo expansion multiplies doublings, and doublings are where transforming
     # mutations come from. Scales with how aggressive the expansion is.
     if state.accelerated_regen:
@@ -8009,31 +8184,32 @@ def safety_model(state: "BodyState", month: int, chief_juice: bool,
         accrue("risk_ectopic_tissue_pct",
                net("hazard_ectopic_tissue_per_month_pct", "mitig_forced_differentiation",
                    "mitig_icasp9_suicide_switch", "mitig_tissue_targeted_delivery",
-                   "mitig_spatial_confinement"))
+                   "mitig_spatial_confinement") * _deliv)
     # Latency reversal.
     if 33 in prescribed:
         accrue("risk_cytokine_storm_pct",
                net("hazard_cytokine_storm_per_month_pct", "mitig_staged_latency_reversal",
-                   "mitig_transient_immunosuppression"))
+                   "mitig_transient_immunosuppression") * _imm)
     # Nuclease-based editing: GeneFix, RepeatEdit, ChromoBalance.
     if {23, 32, 36} & prescribed:
         accrue("risk_off_target_edit_pct",
                net("hazard_off_target_edit_per_month_pct", "mitig_high_fidelity_nuclease",
-                   "mitig_episomal_nonintegrating"))
+                   "mitig_episomal_nonintegrating") * _deliv)
     # Systemic collagen dissolution.
     if 31 in prescribed:
         accrue("risk_structural_failure_pct",
                net("hazard_structural_failure_pct", "mitig_tissue_targeted_delivery",
-                   "mitig_fibrosis_activated_protease", "mitig_vascular_surveillance"))
+                   "mitig_fibrosis_activated_protease", "mitig_vascular_surveillance") * _deliv)
     # Islet overgrowth.
     if 25 in prescribed:
         accrue("risk_hypoglycemia_pct",
                net("hazard_hypoglycemia_per_month_pct", "mitig_closed_loop_glucose",
                    "mitig_glucose_responsive_graft", "mitig_islet_mass_titration"))
-    # Repeat capsid/LNP exposure, worse once redosing is enabled.
+    # Repeat capsid/LNP exposure, worse once redosing is enabled. Coupled to
+    # BOTH shared factors: it is a delivery quality and an immune-axis event.
     accrue("risk_immune_reaction_pct",
            net("hazard_immune_reaction_per_month_pct", "mitig_transient_immunosuppression",
-               "mitig_episomal_nonintegrating", "mitig_capsid_rotation"))
+               "mitig_episomal_nonintegrating", "mitig_capsid_rotation") * _deliv * _imm)
 
     # --- Interlock: stop dosing before risk becomes unacceptable ---
     if state.cumulative_severe_risk_pct >= BIO["safety_halt_threshold_pct"]:
@@ -8579,6 +8755,20 @@ def initialize_body(age: float = 60.0, weight: float = 70.0, fat_pct: float = 25
     # Cancer risk increases with age
     state.cancer_risk_pct = clamp(BIO["baseline_cancer_risk_per_year_pct"] + years_aged * 0.08, 0.0, 50.0)
 
+    # A patient can enrol WITH active cancer. Previously impossible: initial
+    # risk clamps at 50 and detection requires >50, so the OncoCure "cure"
+    # transition could never fire -- the reviewer was right that it was
+    # unreachable. A diagnosed malignancy starts above the detection
+    # threshold so the cure path is exercisable. ("Leukodystrophy" etc. are
+    # deliberately NOT matched -- they are not malignancies.)
+    if any(re.search(r"cancer|carcinoma|lymphoma|leuka?emia|melanoma|sarcoma|"
+                     r"tumou?r|myeloma|blastoma|mesothelioma|neoplasm|malignan",
+                     c, re.IGNORECASE)
+           for c in (patient_conditions or [])):
+        state.cancer_risk_pct = 60.0
+        state.cancer_detected = True
+        state.ctDNA_level = 80.0
+
     # Neural function declines with age
     state.cognitive_function_pct = max(100.0 - years_aged * BIO["cognitive_decline_per_year_pct"], 30.0)
     state.neurogenesis_rate_pct = BIO["neurogenesis_baseline_per_month_pct"]
@@ -8730,6 +8920,7 @@ def simulate_chief_juice(
     safeguards_active: bool = True,
     discontinue_at_month: Optional[int] = None,
     patient_seed: Optional[int] = None,
+    governor_active: bool = True,
 ) -> SimulationResult:
     """Run the full ChiefJuice simulation.
 
@@ -8761,6 +8952,13 @@ def simulate_chief_juice(
             Only active when `regrow` is non-empty. Set False to see what a
             patient's existing adipose reserve alone can build -- for anything
             larger than a hand, the honest answer is "not the whole thing".
+        governor_active: When False, the setpoint governor and biomarker
+            rebalancing are disabled entirely: every mechanism applies its raw
+            modeled effect with no titration. This is the honest "what do the
+            mechanisms alone predict" view -- and the answer is an implausible
+            plunge to the physiological floor within months, which is exactly
+            why the governor exists. Use it to show the governor's role, not
+            as a prediction.
 
     Returns:
         SimulationResult with full time series
@@ -8833,11 +9031,42 @@ def simulate_chief_juice(
     result.circadian_rhythm.append(state.circadian_rhythm_pct)
     result.plasma_young_factors.append(state.plasma_young_factors_pct)
     result.plasma_pro_aging.append(state.plasma_pro_aging_pct)
+    result.risk_trajectory.append(state.cumulative_severe_risk_pct)
     result.peak_biological_age = max(result.peak_biological_age, bio_age_0)
     result.lowest_biological_age = min(result.lowest_biological_age, bio_age_0)
 
     for month in range(total_months):
-        # Check if alive
+        # --- Actuarial (all-cause) mortality ---------------------------------
+        # Gompertz hazard on epigenetic age -- the ordinary cause of death the
+        # model previously lacked: every death used to have to cross a
+        # catastrophic biomarker threshold, which is why the control died
+        # absurdly early of "telomere crisis". Calibrated to SSA actuarial
+        # survival (~22-yr median remaining life at 60); keyed on EPIGENETIC
+        # age so rejuvenation lowers the hazard the only honest way it can.
+        _a = BIO["mortality_gompertz_a"]
+        _b = BIO["mortality_gompertz_b"]
+        if state.sex == "female":
+            _a *= BIO["mortality_female_hazard_scale"]
+        state.mortality_hazard_integral += (_a / 12.0) * math.exp(
+            _b * min(state.epigenetic_age_years, 120.0))
+        # Non-ageing mortality (accidents/infection) applies to everyone,
+        # including a perfectly rejuvenated patient.
+        state.mortality_hazard_integral += BIO["mortality_nonaging_hazard_per_year"] / 12.0
+        if state.alive and state.mortality_hazard_integral >= state.mortality_hazard_threshold:
+            state.alive = False
+            state.cause_of_death = "All-cause mortality (actuarial)"
+            if verbose:
+                print(f"  [DEATH] Month {month}: {state.cause_of_death} at age {state.age_years:.1f}")
+            break
+
+        # Competing-risk disease mortality: biomarkers past their danger
+        # levels accrue stochastic hazard; the largest contributor names the
+        # cause. Then the catastrophic backstop (severity >= 2) for states no
+        # probability model should leave alive.
+        if not disease_mortality_step(state):
+            if verbose:
+                print(f"  [DEATH] Month {month}: {state.cause_of_death} at age {state.age_years:.1f}")
+            break
         if not state.check_alive():
             if verbose:
                 print(f"  [DEATH] Month {month}: {state.cause_of_death} at age {state.age_years:.1f}")
@@ -8884,19 +9113,14 @@ def simulate_chief_juice(
 
         # --- Safety interlock ------------------------------------------------
         # Evaluated BEFORE dosing so a halt takes effect this month rather than
-        # after one more exposure. While halted, risk decays and dosing is
-        # withheld until cumulative risk falls back under half the threshold --
-        # hysteresis, so treatment does not chatter on and off at the boundary.
+        # after one more exposure. The halt is a PERMANENT DSMB-style stop:
+        # cumulative incidence cannot decay, so there is nothing to "fall back
+        # under" a resumption threshold.
         safety_model(state, month, chief_juice_active_now and _in_dose_window
                      and not state.safety_halted, prescribed_mechanisms,
                      safeguards_active, _ix["surveillance"])
         if state.safety_halted:
             state.safety_halt_months += 1
-            if state.cumulative_severe_risk_pct < BIO["safety_halt_threshold_pct"] * 0.5:
-                state.safety_halted = False
-                state.adverse_events.append(
-                    (month, f"Dosing resumed: risk fell to "
-                            f"{state.cumulative_severe_risk_pct:.2f}%"))
 
         # Administer ChiefJuice
         if chief_juice_active_now and _in_dose_window and not state.safety_halted:
@@ -9048,9 +9272,10 @@ def simulate_chief_juice(
         stem_cell_pool_ref = state.stem_cell_pool_pct
 
         # --- Telomere dynamics ---
-        # Only a small fraction of cells divide each month; telomere loss
-        # is dominated by the age-related component, not division count
-        divisions_per_month = 2  # average stem cell divisions per month
+        # Replicative turnover of the telomere-measured compartment: ~0.6-1.4
+        # population doublings/YEAR, not 2/month (that burned ~1,200 bp/yr and
+        # killed the untreated control at 64.3 of "telomere crisis").
+        divisions_per_month = BIO["replicative_doublings_per_month"]
         telomerase_on = cj  # ChiefJuice activates telomerase
         state.telomere_length_bp, _ = telomere_dynamics(
             state.telomere_length_bp, state.age_years, divisions_per_month, telomerase_on
@@ -9062,7 +9287,7 @@ def simulate_chief_juice(
         # --- Senescence ---
         state.senescent_burden_pct = senescence_model(
             state.senescent_burden_pct, state.telomere_length_bp,
-            state.inflammation_level, cj
+            state.inflammation_level, cj, state.immune_function_pct
         )
         cleared = state.senescent_burden_pct * 0.45 if cj else 0.0
         state.senescent_cells_cleared += cleared
@@ -9319,9 +9544,17 @@ def simulate_chief_juice(
         # The same interpolation enforces BOTH limits at once: the requested
         # holding age, and the maximum plausible rate of reversal. This month's
         # biological age may not go below either.
-        # Cap any biomarker that has run past the holding age before computing the
-        # mean, so a surplus in one marker cannot mask a deficit in another.
-        state.biomarkers_capped_this_month = rebalance_biomarkers(state, target)
+        # GOVERNOR DISABLED (governor_active=False / --no-governor): skip the
+        # rebalancing caps AND the alpha interpolation so the raw mechanism
+        # outputs are visible -- which is biomarkers running to their youthful
+        # maxima and biological age hitting the floor in a handful of months.
+        # That is an honest disclosure of how load-bearing the governor is,
+        # not a prediction.
+        if governor_active:
+            # Cap any biomarker that has run past the holding age before
+            # computing the mean, so a surplus in one marker cannot mask a
+            # deficit in another.
+            state.biomarkers_capped_this_month = rebalance_biomarkers(state, target)
 
         bio_after = state.biological_age_raw
         # The reversal-rate ceiling is itself individual. It represents how fast
@@ -9335,7 +9568,7 @@ def simulate_chief_juice(
                      * clamp(state.response_multiplier * state.regen_capacity_multiplier,
                              0.15, 2.0))
         month_floor = max(target, bio_before - _rate_cap)
-        if bio_after < month_floor and bio_after < bio_before:
+        if governor_active and bio_after < month_floor and bio_after < bio_before:
             # Scale this month's movement so biological age lands exactly on the
             # binding limit. alpha <= 0 (already at/below target) fully reverts
             # the month's treatment effect, holding the line.
@@ -9343,9 +9576,14 @@ def simulate_chief_juice(
             for _f, _v0 in gov_before.items():
                 setattr(state, _f, _v0 + alpha * (getattr(state, _f) - _v0))
             state.treatment_intensity = alpha
-        else:
+        elif governor_active:
             # Above target, or aging upward toward it: let the month stand.
             state.treatment_intensity = 1.0 if bio_after > target else 0.0
+        else:
+            # Ungoverned: full modeled effect every month. intensity 1.0 so
+            # downstream consumers see the mechanisms ran at full strength --
+            # the biological-age series itself shows the overshoot.
+            state.treatment_intensity = 1.0
 
         # --- Advance chronological age ---
         state.age_years += 1.0 / 12.0
@@ -9405,6 +9643,7 @@ def simulate_chief_juice(
         result.circadian_rhythm.append(state.circadian_rhythm_pct)
         result.plasma_young_factors.append(state.plasma_young_factors_pct)
         result.plasma_pro_aging.append(state.plasma_pro_aging_pct)
+        result.risk_trajectory.append(state.cumulative_severe_risk_pct)
 
         result.peak_biological_age = max(result.peak_biological_age, bio_age)
         result.lowest_biological_age = min(result.lowest_biological_age, bio_age)
@@ -9472,6 +9711,11 @@ def simulate_chief_juice(
 # and none of them is measured -- they are estimates, several of them mine. The
 # ranges are deliberately wide because the honest uncertainty IS wide.
 MONTE_CARLO_PRIORS = {
+    # The CENTRAL PREMISE, sampled down to ~1% of its modeled value (fold
+    # 0.013 * 75.6% ~= 1.0% -- the published ex-vivo upper bound). Varying
+    # only how well the mechanism works is not enough; it must be allowed to
+    # effectively fail. This is the most important prior in the table.
+    "net_conversion_efficiency_pct":       (0.013, 1.4),
     "adipocytes_per_gram":                 (0.5, 2.0),
     "stem_cell_engraftment_pct":           (0.3, 3.0),
     "ex_vivo_expansion_fold":              (0.3, 3.0),
@@ -9510,23 +9754,29 @@ MONTE_CARLO_PRIORS = {
 #      43.5 vs 59.1.
 #   2. More usefully, TUNING THE CHEAP LEVERS BEATS ADDING THE RISKY ONE. When
 #      body fat and dosing schedule are free to vary, a non-accelerated protocol
-#      at 22% / 2-on-1-off outperforms an accelerated one at ANY risk weight
+#      at 25% / 2-on-1-off outperforms an accelerated one at ANY risk weight
 #      tested, including W=2. Acceleration is buying with risk what scheduling
 #      supplies for free.
 #
 # Accelerate only where the alternative is permanent loss and no scheduling
 # change substitutes -- limb regrowth being the clear case.
 RECOMMENDED_PROTOCOL = {
-    "start_fat_pct": 22.0,
+    "start_fat_pct": 25.0,
     "dose_cycle": (2, 1),
     "nutrient_support": True,
     "accelerated_regen": False,
-    "rationale": "best 5th-percentile utility across parameter and patient uncertainty",
+    "rationale": "best 5th-percentile utility across parameter and patient uncertainty"
+                " (re-derived with premise uncertainty in the priors: the higher fat"
+                " reserve buffers conversion-failure draws; 22-25% is within MC noise)",
     "verified": {
-        "runs": 1000,
-        "quality_p5": 71.4, "quality_median": 84.5, "quality_p95": 89.4,
-        "risk_p5_pct": 0.238, "risk_median_pct": 0.654, "risk_p95_pct": 1.830,
-        "frac_runs_risk_over_2pct": 3.9,
+        "runs": 300,
+        "quality_p5": 61.8, "quality_median": 90.4, "quality_p95": 91.1,
+        "risk_p5_pct": 0.235, "risk_median_pct": 2.792, "risk_p95_pct": 5.016,
+        "frac_runs_risk_over_2pct": 59.3,
+        # Re-derived 300-run verification after premise uncertainty
+        # (net_conversion_efficiency 0.013-1.4x) and shared hazard factors
+        # entered the priors -- the honest cost is a much wider risk band
+        # than the pre-correlation figure this block previously quoted.
     },
     "accelerate_if": "risk weight W < 7.9 (high-burden indications such as limb loss)",
 }
@@ -9852,6 +10102,14 @@ def print_prescription_report(patient_conditions: Optional[List[str]] = None):
     print("\n" + "=" * 80)
     print("  ChiefJuiceV1.17 -- PERSONALIZED PRESCRIPTION GENERATOR")
     print("=" * 80)
+    print("""
+  *** HYPOTHETICAL RESEARCH SCENARIO -- NOT A PRESCRIPTION ***
+  This is simulated scenario output from an unvalidated model. No component
+  listed below has been shown to work in vivo as modelled, the combined
+  formulation has never been manufactured or administered, and nothing in
+  this report should inform any real treatment, dosing, or manufacturing
+  decision. See GOVERNANCE.md; consult a qualified physician for real care.
+  """)
 
     # Patient profile
     print("\n  PATIENT PROFILE:")
@@ -14134,9 +14392,9 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
         milestones = [
             (0.25, "First stem cells"),
             (1, "Immune edit complete"),
-            (2, "Immortality achieved"),
+            (2, "Setpoint reached (governor)"),
             (6, "Muscle/bone peak"),
-            (10, "Full rejuvenation"),
+            (10, "Full rejuvenation (model)"),
         ]
         for ms_yr, ms_label in milestones:
             mx = tl_x + int(tl_w * ms_yr / years)
@@ -14177,18 +14435,46 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
         breakdown = sorted(sim_result.risk_breakdown.items(), key=lambda kv: -kv[1])
         peak = max([v for _, v in breakdown] + [0.001])
         for label, val in breakdown:
-            if ry > top_y + content_h - 60:
+            if ry > top_y + content_h - 110:
                 break
             frac = val / peak if peak else 0.0
             col = C_BAD if val > peak * 0.6 else (C_WARN if val > peak * 0.3 else C_ACCENT)
             _bar(screen, font_sm, x + 10, ry, col_w - 24, 12, frac, col, label, f"{val:.3f}%")
             ry += 26
 
-        hy = top_y + content_h - 48
-        screen.blit(font_sm.render(f"interlock halts: {sim_result.safety_halt_months} mo",
-                                   True, C_TEXT_DIM), (x + 10, hy))
-        screen.blit(font_sm.render("residual is never zero -- by design", True, C_TEXT_DIM),
-                    (x + 10, hy + 16))
+        hy = top_y + content_h - 102
+        hf = [(st.delivery_hazard_factor, "lot"), (st.immune_hazard_factor, "imm"),
+            (st.adverse_risk_multiplier, "adv")]
+        worst = max(v for v, _ in hf)
+        hcol = C_GOOD if worst < 1.25 else (C_WARN if worst < 2.0 else C_BAD)
+        screen.blit(font_sm.render(
+            "hazard factors:  " + "  ".join(f"{lbl} {v:.2f}x" for v, lbl in hf),
+            True, hcol), (x + 10, hy))
+        screen.blit(font_sm.render("bad lots jointly raise related risks", True, C_TEXT_DIM),
+                    (x + 10, hy + 14))
+
+        # competing mortality channels -- what is accruing toward death
+        my = hy + 36
+        nonzero = sorted(((k, v) for k, v in st.disease_hazard_integrals.items() if v > 0.001),
+                         key=lambda kv: -kv[1])[:2]
+        screen.blit(font_sm.render("MORTALITY HAZARDS ACCRUED (competing)", True, C_WARN),
+                    (x + 10, my))
+        my += 15
+        screen.blit(font_sm.render(f"actuarial: {st.mortality_hazard_integral:.3f} / "
+                                   f"{st.mortality_hazard_threshold:.3f}",
+                                   True, C_TEXT_DIM), (x + 10, my))
+        my += 14
+        if nonzero:
+            for k, v in nonzero:
+                screen.blit(font_sm.render(f"{k[:22]}: {v:.3f}", True, C_TEXT_DIM), (x + 10, my))
+                my += 14
+        else:
+            screen.blit(font_sm.render("no pathology past danger level", True, C_GOOD),
+                        (x + 10, my))
+        my += 17
+        screen.blit(font_sm.render(f"interlock halts {sim_result.safety_halt_months} mo -- "
+                                   "incidence never decays", True, C_TEXT_DIM),
+                    (x + 10, my))
 
         # ---------- Column 2: how much to believe it ----------
         x = margin * 2 + col_w
@@ -14346,19 +14632,38 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
         screen.blit(font_sm.render("ONCOSHIELD -- CANCER PREVENTION", True, (255, 100, 100)),
                     (mid_x + 10, top_y + 8))
 
-        screen.blit(font_sm.render(f"Cancer risk reduction: {onco.get('cancer_risk_reduction_pct', 95):.0f}%", True, C_GOOD),
+        screen.blit(font_sm.render(f"Cancer risk reduction: {onco.get('cancer_risk_reduction_pct', 95):.0f}%  (claimed)", True, C_GOOD),
                     (mid_x + 10, top_y + 28))
-        screen.blit(font_sm.render(f"Teratoma prevention: {onco.get('teratoma_prevention_efficiency_pct', 99.5):.1f}%", True, C_GOOD),
+        screen.blit(font_sm.render(f"Teratoma prevention: {onco.get('teratoma_prevention_efficiency_pct', 99.5):.1f}%  (claimed)", True, C_GOOD),
                     (mid_x + 10, top_y + 44))
-        screen.blit(font_sm.render(f"Monitoring sensitivity: {onco.get('monitoring_sensitivity_pct', 98):.0f}%", True, C_GOOD),
+        screen.blit(font_sm.render(f"Monitoring sensitivity: {onco.get('monitoring_sensitivity_pct', 98):.0f}%  (claimed)", True, C_GOOD),
                     (mid_x + 10, top_y + 60))
+
+        # The gap that matters: what the simulation computed for THIS patient
+        # vs what the formulation claims. Claims are aspirational dict values;
+        # computed figures include residual risk that mitigation could not
+        # clear and shared per-patient hazard factors.
+        st = sim_result.final_state
+        cvs_y = top_y + 78
+        screen.blit(font_sm.render("SIMULATED (this patient):", True, C_ACCENT),
+                    (mid_x + 10, cvs_y))
+        for i, (lbl, val, col) in enumerate([
+                ("final cancer risk", f"{st.cancer_risk_pct:.2f}%",
+                 C_GOOD if st.cancer_risk_pct < 5 else C_WARN),
+                ("cum. severe-event risk", f"{st.cumulative_severe_risk_pct:.3f}%",
+                 C_GOOD if st.cumulative_severe_risk_pct < 1 else C_WARN),
+                ("dominant residual", st.dominant_risk[:24], C_TEXT_DIM)]):
+            screen.blit(font_sm.render(lbl, True, C_TEXT_DIM),
+                        (mid_x + 10, cvs_y + 16 + i * 14))
+            screen.blit(font_sm.render(val, True, col),
+                        (mid_x + 148, cvs_y + 16 + i * 14))
 
         # OncoShield components
         onco_comps = [(k, v) for k, v in onco.items() if isinstance(v, dict) and "role" in v]
         screen.blit(font_sm.render(f"COMPONENTS ({len(onco_comps)}):", True, C_ACCENT),
-                    (mid_x + 10, top_y + 84))
+                    (mid_x + 10, top_y + 142))
         for i, (name, data) in enumerate(onco_comps):
-            y = top_y + 104 + i * 22
+            y = top_y + 162 + i * 22
             if y + 20 > top_y + content_h - 10:
                 break
             n = name.replace("_", " ").title()
@@ -15832,7 +16137,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
         pygame.draw.circle(screen, C_WARN, (px, py), 6)
         screen.blit(font_sm.render("current patient", True, C_WARN), (px - 30, py - 18))
         hover_regions.append((right_x, mid_y, right_w, mid_h, "PATIENT RESPONSE DISTRIBUTION",
-            ["Normal distribution of treatment response", "Zones: Non-responder, Partial, Good, Exceptional", "Animated marker = current patient position", "92% of patients show good or exceptional response"]))
+            ["Normal distribution of treatment response", "Zones: Non-responder, Partial, Good, Exceptional", "Animated marker = current patient position", "Response-class shares are modeled assumptions, not cohort measurements"]))
 
         # Bottom: Clinical summary stats
         bot_y = mid_y + mid_h + 6
@@ -15841,18 +16146,18 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
         screen.blit(font_sm.render("CLINICAL SUMMARY", True, C_ACCENT), (margin + 10, bot_y + 8))
 
         stats = [
-            ("Trial Phase", "Phase III (simulated)"),
-            ("Patients (simulated)", "10,000"),
+            ("Trial Phase", "none -- in-silico only"),
+            ("Cohort", "1 treated + 1 control"),
             ("Duration", "50 years"),
-            ("Mean lifespan (treated)", f"{treated.final_state.age_years:.0f} yr"),
-            ("Mean lifespan (control)", f"{ctrl.final_state.age_years:.0f} yr"),
+            ("Lifespan (treated)", f"{treated.final_state.age_years:.0f} yr"),
+            ("Lifespan (control)", f"{ctrl.final_state.age_years:.0f} yr"),
+            ("Control cause of death", ctrl.final_state.cause_of_death[:18]),
             ("Lifespan delta", f"+{treated.final_state.age_years - ctrl.final_state.age_years:.0f} yr"),
             ("Bio age at end", f"{treated.biological_age[idx]:.0f} yr"),
             ("Stem cells generated", f"{treated.total_stem_cells:.2e}"),
-            ("Senescent cleared", f"{treated.total_senescent_cleared:.1f}%"),
             ("Fat used", f"{treated.total_fat_used_kg:.1f} kg"),
             ("Total doses", f"{treated.total_doses}"),
-            ("Adverse events (severe)", "0"),
+            ("Severe-event risk", f"{treated.final_state.cumulative_severe_risk_pct:.2f}%"),
         ]
         col_w = (rect.w - 2 * margin - 20) // 6
         for i, (label, val) in enumerate(stats):
@@ -15973,7 +16278,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             (f"Grade B: preliminary human ({_s['B']}/{_t})", int(100 * _s['B'] / _t), C_GOOD),
             (f"Grade C: animal/in-vitro ({_s['C']}/{_t})", int(100 * _s['C'] / _t), (255, 200, 80)),
             (f"Grade D: speculative ({_s['D']}/{_t})", int(100 * _s['D'] / _t), C_BAD),
-            ("Model math consistency (47 test checks)", 100, C_GOOD),
+            ("Model math consistency (verification suite)", 100, C_GOOD),
             ("Tested in any organism", 0, C_BAD),
             ("Regulatory approval / human trials", 0, C_BAD),
         ]
@@ -16112,9 +16417,13 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
         add("CHIEFJUICE V1.17 -- COMPLETE FORMULATION DATABASE", C_ACCENT, 0)
         add("=" * 60, C_PANEL_HI, 0)
         add(f"Tagline: {CHIEF_JUICE.get('tagline', 'N/A')}", C_TEXT_DIM, 0)
-        add(f"Reviews: 14  |  Working Score: 100%  |  31 domains scored 100%", C_GOOD, 0)
-        add(f"25 adversarial issues fixed  |  10 gap closures  |  6 regulatory precedents", C_GOOD, 0)
-        add(f"Chemistry: 20/20 verified  |  Biology: 22/22 validated  |  Doses: 20/20 in range", C_GOOD, 0)
+        add("STATUS: unvalidated research simulation -- nothing here has been", C_WARN, 0)
+        add("tested in cells, animals, or humans. Not medical advice.", C_WARN, 0)
+        ev = get_evidence_summary()
+        add(f"Evidence audit: {ev['total']} parameters graded -- "
+            f"A{ev['A']} B{ev['B']} C{ev['C']} D{ev['D']} "
+            f"({ev['speculative_fraction'] * 100:.0f}% speculative)", C_TEXT, 0)
+        add("Verification: 85-check suite (test_chiefjuice.py), CI on push", C_TEXT, 0)
 
         # === FORMULATION OVERVIEW ===
         add_section("FORMULATION OVERVIEW")
@@ -16145,6 +16454,31 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
         add(f"Target tissues: 6 (adipose, brain, bone, muscle, lung, immune)", C_TEXT, 0)
         add(f"Administration: Monthly cycle, 30-day staggered protocol", C_TEXT, 0)
         add(f"Duration: 50-year simulation, adaptive frequency (monthly->quarterly->semi-annual)", C_TEXT, 0)
+
+        # === MODEL MECHANICS (what the engine computes vs what it claims) ===
+        add_section("MODEL MECHANICS -- WHAT IS COMPUTED, NOT CLAIMED")
+        add("  Mortality: two COMPETING channels, not one death wall:", C_ACCENT2, 0)
+        add("    - actuarial Gompertz hazard on epigenetic age (SSA-calibrated;", C_TEXT, 1)
+        add("      sex-stratified x0.75 female) + 0.1%/yr non-ageing floor", C_TEXT, 1)
+        add("    - 10 pathology channels accrue rate x severity^2 past danger", C_TEXT, 1)
+        add("      levels; the largest contributor names the cause of death", C_TEXT, 1)
+        add("    - catastrophic severity >=2 remains instant; everything else is", C_TEXT, 1)
+        add("      a survival draw, so identical patients die on different months", C_TEXT, 1)
+        add(f"  Untreated 60y median ~82 (SSA ~82M/85F); cause mix ~80% actuarial /", C_TEXT, 0)
+        add(f"    ~20% cancer -- matching the real late-life share", C_TEXT, 1)
+        add("  Biological age: setpoint governor interpolates biomarker movement to", C_ACCENT2, 0)
+        add("    the requested holding age -- ALGORITHM output, not a measured clock.", C_TEXT, 1)
+        add("    --no-governor exposes raw mechanism overshoot (floor in ~5 months)", C_TEXT, 1)
+        add("  Safety: 8 hazard classes as MONOTONE cumulative incidence (cannot", C_ACCENT2, 0)
+        add("    decay during pauses); DSMB halt at 5% is permanent. Shared", C_TEXT, 1)
+        add("    delivery-lot / immune-axis factors correlate failures per patient", C_TEXT, 1)
+        add("  Premise failure: --conversion-efficiency-pct 0/1 exercises total and", C_ACCENT2, 0)
+        add("    published-range (<=1%) failure of the core mechanism; it is also a", C_TEXT, 1)
+        add("    Monte Carlo prior (0.013-1.4x) so uncertainty bands price it in", C_TEXT, 1)
+        add("  Cancer: malignancy-named conditions enrol WITH detectable disease --", C_ACCENT2, 0)
+        add("    treated -> cured, untreated -> terminal. The cure path is real", C_TEXT, 1)
+        add("  Files: TESTING.md (calibration targets) | GOVERNANCE.md (ethics,", C_GOOD, 0)
+        add("    supersedes former RULES) | requirements.txt | CI on push", C_GOOD, 1)
 
         # === KEY COMPONENTS ===
         add_section("KEY COMPONENTS & DOSES")
@@ -16627,7 +16961,7 @@ def run_visualization(patient_conditions: Optional[List[str]] = None):
             _gbar = "#" * int(_gpct // 4)
             add(f"  {_gname:30s} {_gn}/{_et} ({_gpct:3.0f}%) {_gbar}", _gcol, 0)
         add(f"  {'PRODUCT STATUS':30s} UNTESTED in any organism", C_BAD, 0)
-        add(f"  {'MATH STATUS':30s} 47/47 internal-consistency checks pass", C_GOOD, 0)
+        add(f"  {'MATH STATUS':30s} verification suite: internal-consistency checks pass", C_GOOD, 0)
         add(f"  Run --audit for the full parameter-by-parameter evidence table", C_ACCENT, 0)
 
         # === ADVERSARIAL FIX LOG ===
@@ -17263,6 +17597,10 @@ def main():
                              + ", ".join(sorted(BIO["appendages"])) +
                              ". Regrowth is supply-limited by fat-derived stem cells AND by "
                              "biomass, so a lean patient regrows more slowly or stalls.")
+    parser.add_argument("--conversion-efficiency-pct", type=float, default=None,
+                        help="Override fat->stem-cell conversion efficiency (0-100%%). "
+                             "Published ex-vivo values are <=1%%; the modeled scenario "
+                             "is 75.6%%. Set to 0 for the mechanism-failure scenario.")
     parser.add_argument("--no-safeguards", action="store_true",
                         help="Disable the formulation's safety systems (iCasp9 suicide switch, "
                              "p53 boost, forced differentiation, clonal release testing, "
@@ -17284,6 +17622,11 @@ def main():
                              "what the patient's existing adipose reserve alone can build "
                              "(for anything larger than a hand: not the whole structure).")
     parser.add_argument("--no-cj", action="store_true", help="Run without ChiefJuice (control only)")
+    parser.add_argument("--no-governor", action="store_true",
+                        help="Disable the biological-age setpoint governor AND biomarker "
+                             "rebalancing: every mechanism applies its raw modeled effect. "
+                             "Shows what the mechanisms alone predict -- an implausible plunge "
+                             "to the floor within months. A transparency tool, not a prediction.")
     parser.add_argument("--compare", action="store_true", help="Run comparative (with vs without)")
     parser.add_argument("--export", type=str, default="", help="Export results to JSON file")
     parser.add_argument("--prescribe", action="store_true",
@@ -17298,6 +17641,13 @@ def main():
                               "formulation. Default (unset): the visualization defaults to the project owner's "
                               "own 6 listed conditions; --sim/--compare/--export default to healthy.")
     args = parser.parse_args()
+
+    # Mechanism-failure / premise-sensitivity override. The engine's entire
+    # fat->stem-cell supply chain scales linearly with this one parameter;
+    # setting it to published ex-vivo values (<=1%) or 0 shows what the model
+    # predicts when the central mechanism does not work as hoped.
+    if args.conversion_efficiency_pct is not None:
+        BIO["net_conversion_efficiency_pct"] = args.conversion_efficiency_pct
 
     def _parse_conditions(raw, default):
         # raw is None => --conditions wasn't passed at all => use the caller's default.
@@ -17436,6 +17786,7 @@ def main():
                 nutrient_support=not args.no_supplements,
                 accelerated_regen=args.accelerated,
                 safeguards_active=not args.no_safeguards,
+                governor_active=not args.no_governor,
             )
             label = "ChiefJuiceV1.17" if cj_active else "CONTROL (No ChiefJuice)"
             print_simulation_report(result, label)

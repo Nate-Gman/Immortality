@@ -2,7 +2,7 @@
 
 > **"Your fat is your cure. Your body is your pharmacy."**
 
-A computational biology model (17,453 lines, single file) of an injectable
+A computational biology model (17,804 lines, single file) of an injectable
 formulation that reprograms adipose tissue into stem cells in vivo, then deploys
 them to reverse the hallmarks of aging, hold the patient at a chosen biological
 age, regrow missing structures, and treat a 304-condition disease survey.
@@ -42,8 +42,12 @@ and uncertainty modelling, and a 64-check verification suite.
 
 ```
 Immortality.2/
-  ChiefJuiceV1.17.py    # Main engine: 17,453 lines, sections 1-9 (see Architecture)
-  test_chiefjuice.py    # Verification suite: 490 lines, 64 checks in 12 suites
+  ChiefJuiceV1.17.py    # Main engine: 17,804 lines, sections 1-9 (see Architecture)
+  test_chiefjuice.py    # Verification suite: ~660 lines, 85 checks in 13 suites
+  .github/workflows/test.yml  # CI: full suite on push, Linux+Windows × Py3.11/3.13
+  requirements.txt      # Runtime dependency spec (numpy; pygame optional)
+  TESTING.md            # How to run/verify the suite + calibration targets
+  GOVERNANCE.md         # Research ethics; supersedes the former RULES file
   FatStemCells.py       # Thin library wrapper re-exporting the engine API
   Goal.md               # Original specification / target document
   Problems.md           # The owner's condition list — the survey's seed
@@ -112,23 +116,35 @@ Default comparative run (`--compare`, start age 60, 50 years, holding age 18):
 
 | Metric | Control | Treated |
 |---|---|---|
-| Final age | 64.3 (deceased) | 110 (alive) |
-| Biological age | 52.5 | 18.0 (held exactly) |
-| Telomere length | 1,919 bp (critical) | 7,253 bp |
-| Organ function | 66.5% | 73.4% |
-| Cancer risk | 32.4% | 0.1% |
+| Final age | 81.7 (deceased, actuarial) | 110 (alive) |
+| Biological age | 57.9 | 18.3 (held ~18, governor-limited) |
+| Telomere length | 5,798 bp | 7,550 bp |
+| Organ function | 57.7% | 87.4% |
+| Cancer risk | 60.7% | 0.05% |
 | Fat converted | — | 20.0 kg (mass-balanced to 0.0000 kg) |
 
-**Recommended operating point** (from `--optimize`), selected on 5th-percentile
-utility rather than median, verified over 1,000 Monte Carlo runs under full
-parameter and patient uncertainty:
+The control is calibrated to real actuarial mortality — a 60-year-old's
+median survival is ~82 (SSA 2023 period life table: ~82 M / ~85 F), with a
+cohort spread of roughly p10 ≈ 67 to p90 ≈ 94 across `patient_seed`s. An
+earlier version killed the control at 64.3 via a miscalibrated telomere
+wall; that inflated the apparent treatment benefit and has been corrected
+(see TESTING.md).
 
-**22% body fat · 2-on/1-off dosing · supplemented · non-accelerated**
+**Recommended operating point** (from `--optimize`), selected on 5th-percentile
+utility rather than median, verified over 300 Monte Carlo runs under full
+parameter and patient uncertainty — including the conversion premise itself:
+
+**25% body fat · 2-on/1-off dosing · supplemented · non-accelerated**
 
 | | p5 | median | p95 |
 |---|---|---|---|
-| Quality | 71.4 | 84.5 | 89.4 |
-| Severe-event risk | 0.24% | 0.65% | 1.83% |
+| Quality | 61.8 | 90.4 | 91.1 |
+| Severe-event risk | 0.24% | 2.79% | 5.02% |
+
+The wide risk band is the honest result of sampling the premise (conversion
+0.013–1.4×) and correlated hazard factors: at p95 the cumulative risk crosses
+the 5% DSMB halt threshold, and 59% of runs exceed 2%. A point estimate here
+would be fabrication; the spread *is* the finding.
 
 Headline facts:
 
@@ -150,7 +166,8 @@ Headline facts:
 - `pygame` (for visualization)
 
 ```bash
-pip install numpy pygame
+pip install -r requirements.txt   # numpy (required)
+pip install pygame                # optional, only for --visual
 ```
 
 ### Complete CLI reference
@@ -184,6 +201,8 @@ No flags → launches the interactive pygame visualization (22 modes).
 | `--no-supplements` | switch | off | Turn off cofactor supplementation |
 | `--no-nutrition` | switch | off | Turn off all nutritional support (adipose only) |
 | `--export FILE` | str | — | Export simulation results to JSON |
+| `--conversion-efficiency-pct P` | float | 75.6 | Override the modeled conversion efficiency — `0` exercises total premise failure, `1` is the published ex-vivo ceiling |
+| `--no-governor` | switch | off | Disable the age setpoint governor + biomarker rebalancing; exposes the raw mechanisms' implausible overshoot (transparency tool, not a prediction) |
 | `--visual` | switch | default | Explicitly request the GUI |
 
 ### Command recipes
@@ -244,14 +263,14 @@ python ChiefJuiceV1.17.py --roadmap
 ### Verification suite
 
 ```bash
-python test_chiefjuice.py           # 64 checks across 12 suites
+python test_chiefjuice.py           # 85 checks across 13 suites (--quick: 81)
 python test_chiefjuice.py --quick   # skip the slow Monte Carlo suite
 ```
 
 Run it after any change to `ChiefJuiceV1.17.py`. It exists because this project's
 headline metric was inflated three separate times before anything checked it.
 
-The 12 suites, in file order:
+The 13 suites, in file order:
 
 | # | Suite | What it checks |
 |---|---|---|
@@ -267,6 +286,7 @@ The 12 suites, in file order:
 | 10 | `test_doc_consistency` | Numbers quoted in docs match what the code computes |
 | 11 | `test_uncertainty` | Monte Carlo priors restored after run; percentile sanity |
 | 12 | `test_evidence_audit_and_honesty` | Audit entry counts/grades; speculative fraction; honesty locks |
+| 13 | `test_critique_regressions` | External-review regressions: cumulative risk cannot decay during pauses (unit + live trajectory); permanent DSMB halt; cancer cure reachable end-to-end; untreated median survival ~82 M/~85 F (actuarial, not 64.3); no kill wall in the survival bulk; 0%/1% conversion premise failure; ungoverned overshoot exposed; correlated hazard factors; stochastic competing-risk mortality; all 15 extension mechanisms reachable + finite |
 
 Each suite loads a fresh module instance, so a suite that mutates `BIO` cannot
 leak into another.
@@ -297,7 +317,7 @@ bone, hemo, proteoclear, nutrisense, commrepair, oxidshield, hormonebalance,
 plasmasync, ecm, memory, lung, immunoeternal, eternal_youth_pro, all 15
 extension modules, safety systems, monitoring, personalized medicine,
 drug interactions, PK/PD, stability, and 70+ `BIO` constants) plus a `BIO`
-section with 472 biological constants covering hematology, body composition,
+section with 482 biological constants covering hematology, body composition,
 cell biology, telomere dynamics, DNA damage/repair, senescence, mitochondrial
 function, stem cell pools, immune system, inflammation, organ function, cancer
 statistics, pharmacokinetics, nutritional requirements, growth factor PK, drug
@@ -446,9 +466,13 @@ transforming mutations, "shock and kill" latency reversal causes cytokine
 release syndrome, systemic collagenase weakens vessel walls. Mitigations are the
 safeguards the formulation already claimed (iCasp9 suicide switch, p53
 activation, forced differentiation, clonal release testing, fibrosis-activated
-protease). A **safety interlock** halts dosing at 5% cumulative risk
-(`safety_halt_threshold_pct`), as a DSMB stopping rule would, with hysteresis
-before resumption.
+protease). A **safety interlock** permanently halts dosing at 5% cumulative
+risk (`safety_halt_threshold_pct`), the way a real DSMB stopping rule works.
+The risk fields are cumulative incidence — P(severe event has occurred) —
+and are monotone non-decreasing by construction: a prospective hazard may
+fall when exposure stops, but accumulated incidence cannot decay during a
+dosing pause (an earlier version did decay, conflating the two; this is now
+a regression test).
 
 Per-month hazard rates and mitigation efficacies (`BIO`):
 
@@ -528,7 +552,7 @@ Risk only means something next to what the patient faces untreated:
 ## Uncertainty: How Much of This to Believe (`--uncertainty`)
 
 Every figure here is computed from parameters that were *estimated, not
-measured*. `run_monte_carlo()` samples 16 uncertain parameters
+measured*. `run_monte_carlo()` samples 17 uncertain parameters
 (`MONTE_CARLO_PRIORS`, uniform fold-ranges around the `BIO` base values) plus
 the patient population; `BIO` is always restored in a `finally` block. Sampling
 across ~11,500 runs:
@@ -540,12 +564,12 @@ across ~11,500 runs:
 | fat used | 14.83 | 14.83 | 14.83 | 1.0× | **ROBUST** |
 | regeneration | 59.1 | 81.2 | 95.5 | 1.6× | moderate |
 | months to target | 28 | 44 | 90 | 3.2× | FRAGILE |
-| **severe risk %** | **0.21** | **0.82** | **2.75** | **12.9×** | **FRAGILE** |
+| **severe risk %** | **0.30** | **0.95** | **5.02** | **16.6×** | **FRAGILE** |
 
 **The safety number is the least trustworthy figure in the model.** Quote it as
 a range, never as a point estimate.
 
-The 16 sampled priors (multiplicative fold ranges on `BIO` values):
+The 17 sampled priors (multiplicative fold ranges on `BIO` values):
 
 | Parameter | Fold range | Why it matters |
 |---|---|---|
@@ -565,10 +589,11 @@ The 16 sampled priors (multiplicative fold ranges on `BIO` values):
 | `mitig_clonal_release_testing` | 0.7–1.15 | |
 | `interaction_immunosupp_surveillance` | 0.5–1.6 | |
 | `biomass_conversion_efficiency` | 0.6–1.6 | |
+| `net_conversion_efficiency_pct` | 0.013–1.4 | **The premise itself** — spans total failure (~1%, the published ex-vivo ceiling) through the modeled 75.6% scenario |
 
 **Value of information:** one parameter — `hazard_immune_reaction_per_month_pct`
 — dominates risk uncertainty (Spearman +0.39). Measuring it collapses most of
-the spread. Nine of the sixteen sampled parameters move nothing and can stay
+the spread. Nine of the seventeen sampled parameters move nothing and can stay
 estimates.
 
 ### Recommended operating point (`--optimize`)
@@ -579,22 +604,28 @@ than median, because the two select measurably different protocols.
 `RECOMMENDED_PROTOCOL` in code:
 
 ```python
-{'start_fat_pct': 22.0, 'dose_cycle': (2, 1), 'nutrient_support': True,
+{'start_fat_pct': 25.0, 'dose_cycle': (2, 1), 'nutrient_support': True,
  'accelerated_regen': False,
  'rationale': 'best 5th-percentile utility across parameter and patient uncertainty',
- 'verified': {'runs': 1000, 'quality_p5': 71.4, 'quality_median': 84.5,
-              'quality_p95': 89.4, 'risk_p5_pct': 0.238, 'risk_median_pct': 0.654,
-              'risk_p95_pct': 1.83, 'frac_runs_risk_over_2pct': 3.9},
+ 'verified': {'runs': 300, 'quality_p5': 61.8, 'quality_median': 90.4,
+              'quality_p95': 91.1, 'risk_p5_pct': 0.235, 'risk_median_pct': 2.792,
+              'risk_p95_pct': 5.016, 'frac_runs_risk_over_2pct': 59.3},
  'accelerate_if': 'risk weight W < 7.9 (high-burden indications such as limb loss)'}
 ```
 
 Two findings retire the earlier "accelerated is strictly better" claim:
 
-1. **Acceleration is mean-improving but tail-worsening** — median quality 86.3 →
-   90.0, but risk p95 2.05% → 3.78%.
+1. **Acceleration is mean-improving but tail-worsening** — it buys quality at
+   the price of a fatter risk tail.
 2. **Tuning the cheap levers beats adding the risky one** — with body fat and
    schedule free to vary, non-accelerated wins at *every* risk weight tested.
    Acceleration buys with risk what scheduling supplies for free.
+
+(The earlier `verified` block quoted pre-correlation numbers — quality p5
+71.4, risk median 0.654%, only 3.9% of runs over 2%. Including the premise
+prior and shared hazard factors moved the median risk to 2.79% with 59.3%
+of runs over 2%; the protocol ranking itself is being re-derived — see
+`--optimize`.)
 
 `--risk-weight` is exposed because that trade is a value judgement, not a
 measurement.
@@ -761,6 +792,53 @@ reporting that those experiments succeeded, which they have not.**
 The 61 non-healed entries are the honest to-do list, and most of them are
 waiting on laboratories rather than on this repository.
 
+## What this model cannot show
+
+An external scientific review identified real defects in this project; each
+is now fixed and pinned by a regression test (`test_critique_regressions`).
+The remaining limits are structural — no code change removes them:
+
+- **The 80% figure is mechanism coverage, not efficacy.** `HEALED` means the
+  note text asserts root-cause reversal *if the modelled mechanisms work as
+  assumed*. It counts conditions ordinary medicine already cures (54/57
+  common/acute) alongside the hard ones (189/247 severe/chronic). It is a
+  hypothesis inventory, not evidence.
+- **The governor is an algorithm, not a result.** The setpoint governor
+  interpolates biomarker changes so the modeled biological-age average lands
+  on the requested target. "Biological age 18" demonstrates the governor's
+  arithmetic on an unvalidated internal average — it is not a measured
+  epigenetic clock, and it is not clinical rejuvenation. Run
+  `--no-governor` to see the raw mechanisms without it: biological age
+  plunges to the floor within ~5 months, which exposes exactly how much of
+  the plausible-looking trajectory is the governor rather than the biology.
+- **The control is calibrated, not validated.** Untreated mortality is a
+  sex-stratified actuarial channel (median ~82 male/unspecified, ~85 female,
+  matching SSA 2023) plus a stochastic competing-risk channel: biomarkers
+  past their danger levels accrue hazard rather than kill deterministically,
+  so untreated deaths land ~80% actuarial + ~20% cancer — the real
+  cause-of-death mix. Calibration to population data is not validation of
+  the treated arm.
+- **The premise can fail — and the model now says so.** At
+  `--conversion-efficiency-pct 0` exactly zero stem cells are generated and
+  the patient degrades; at 1% (the published ex-vivo ceiling) the effect is
+  ~76× weaker than the modeled 75.6% scenario. The other mechanisms still
+  act — modeled independence of failures is itself an assumption.
+- **Safety is a guess with error bars.** Cumulative incidence is computed
+  correctly now (it cannot decay during pauses; the DSMB halt is
+  permanent), but the hazard rates are grade-D and the 95% band spans ~17×.
+  Hazard classes are correlated within a patient via shared
+  delivery-lot and immune-axis factors — a bad lot fails teratoma,
+  off-target, ectopic and immune classes together rather than independently.
+- **A cancer patient can enrol — and the outcome is not guaranteed.**
+  Diagnosed malignancies start above the detection threshold; treatment
+  cures them in the model, untreated they progress to terminal cancer.
+- **Ethics is not optional.** `GOVERNANCE.md` supersedes the former `RULES`
+  file: informed consent, independent IRB/DSMB oversight, equal treatment,
+  withdrawal rights, and no authority over any person's care or life.
+- **This is not a treatment protocol.** Simulated prescriptions, doses, and
+  manufacturing steps are hypothetical scenario data for a model — never
+  medical guidance. Nothing here has been experimentally validated.
+
 ## Interactive Visualization
 
 22 view modes, cycled with TAB. Hover for detail tooltips on all interactive
@@ -820,19 +898,19 @@ a literal returns.
 | Section | Lines | Contents |
 |---|---|---|
 | 1 | ~164–2485 | Formulation constants (`CHIEF_JUICE`) — 89 top-level modules, 2,100+ nested keys |
-| 1C | ~2486–3328 | Evidence audit (`EVIDENCE_AUDIT`) — 219 graded parameters across 72 modules |
-| 1B | ~3329–4317 | Disease coverage survey (`DISEASE_COVERAGE`) — tiers **derived**, never asserted |
-| — | ~4317–5146 | Personalized treatments (29 modules with formulation instructions) |
-| — | ~5146–5528 | Tier derivation resolver + integrity locks + prescription logic |
-| 2 | ~5528–6354 | Biological constants (`BIO`) — 472 constants covering all body systems |
-| 3 | ~6354–6862 | Data structures (`BodyState` ~143 fields, `SimulationResult`) |
-| 4 | ~6863–8399 | Biological models (37 mechanism functions + failure models) |
-| 5 | ~8400–9466 | Simulation engine (monthly step, setpoint governor, safety interlock) |
+| 1C | ~2486–3329 | Evidence audit (`EVIDENCE_AUDIT`) — 219 graded parameters across 72 modules |
+| 1B | ~3330–4323 | Disease coverage survey (`DISEASE_COVERAGE`) — tiers **derived**, never asserted |
+| — | ~4324–5361 | Personalized treatments (29 modules with formulation instructions) |
+| — | ~5362–5528 | Tier derivation resolver + integrity locks + prescription logic |
+| 2 | ~5529–6417 | Biological constants (`BIO`) — 480+ constants covering all body systems |
+| 3 | ~6418–6993 | Data structures (`BodyState` ~150 fields, `SimulationResult`) |
+| 4 | ~6994–8575 | Biological models (37 mechanism functions + failure/competing-risk models) |
+| 5 | ~8576–9705 | Simulation engine (monthly step, actuarial + competing-risk mortality, setpoint governor, safety interlock) |
 | 5B | inside 4–5 | Failure/variability modelling — safety, rebound, variation, interactions, Monte Carlo |
-| 6 | ~9467–9627 | Comparative analysis |
-| 7 | ~9628–10850 | Reporting (formulation, feasibility, roadmap, uncertainty, protocol, audit) |
-| 8 | ~10851–17220 | Pygame visualization (22 modes, ~6,400 lines) |
-| 9 | ~17221–17453 | CLI (argparse) |
+| 6 | ~9706–9871 | Comparative analysis |
+| 7 | ~9872–11102 | Reporting (formulation, feasibility, roadmap, uncertainty, protocol, audit) |
+| 8 | ~11103–17472 | Pygame visualization (22 modes, ~6,400 lines) |
+| 9 | ~17473–17804 | CLI (argparse) |
 
 See `OVERVIEW.md` for the full technical architecture document.
 
